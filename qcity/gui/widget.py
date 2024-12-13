@@ -1,0 +1,81 @@
+import os
+
+from qgis.PyQt import uic, sip
+from qgis.PyQt.QtWidgets import QFrame, QWidget, QComboBox, QFileDialog
+from qgis.PyQt.QtCore import QCoreApplication
+from qgis.core import QgsProject, Qgis, QgsUnitTypes, QgsStringUtils
+from qgis.gui import (
+    QgsColorButton,
+    QgsDoubleSpinBox,
+    QgsPanelWidget,
+    QgsDockWidget,
+    QgsPanelWidgetStack,
+)
+
+from ..core import SETTINGS_MANAGER
+from ..gui.gui_utils import GuiUtils
+import shutil
+
+class TabDockWidget(QgsDockWidget):
+    """
+    Main dock widget.
+    """
+
+    def __init__(self, project) -> None:
+        super(TabDockWidget, self).__init__()
+        self.setObjectName("SlopeDigitizingLiveResultsDockWidget")
+
+        uic.loadUi(GuiUtils.get_ui_file_path("dockwidget_main.ui"), self)
+
+        self.project = project
+        self.set_base_layer_items()
+
+        self.plugin_path = os.path.dirname(os.path.realpath(__file__))
+
+        self.pushButton_add_base_layer.clicked.connect(self.add_base_layers)
+        self.pushButton_create_database.clicked.connect(self.create_new_project_database)
+
+    def set_base_layer_items(self):
+        self.comboBox_base_layers.addItems(SETTINGS_MANAGER.get_base_layers_items())
+
+
+    def add_base_layers(self) -> None:
+        """ Adds the selected layer in the combo box to the canvas. """
+        base_project_path = os.path.join(self.plugin_path, "..", "data",
+                                         f"{self.comboBox_base_layers.currentText()}.qgz")
+        temp_project = QgsProject()
+        temp_project.read(base_project_path)
+        layers = [layer for layer in temp_project.mapLayers().values()]
+
+        for layer in layers:
+            self.project.addMapLayer(layer)
+
+    def create_new_project_database(self) -> None:
+        """ Opens a QFileDialog and returns the path to the new project Geopackage. """
+        file_name, _ = QFileDialog.getSaveFileName(self, self.tr("Choose Project Database Path"), "*.gpkg")
+        if file_name and file_name.endswith(".gpkg"):
+            shutil.copyfile(os.path.join(self.plugin_path, "..", "base_project_database.gpkg"), file_name)
+
+    def load_project_database(self) -> None:
+        """ Loads a project database from a .gpkg file. """
+        file_name, _ = QFileDialog.getFileName(self, self.tr("Choose Project Database Path"), "*.gpkg")
+        # do something with it
+        if file_name and file_name.endswith(".gpkg"):
+            print(file_name)
+
+
+
+    @staticmethod
+    def tr(message) -> str:
+        """Get the translation for a string using Qt translation API.
+
+        We implement this ourselves since we do not inherit QObject.
+
+        :param message: String for translation.
+        :type message: str, QString
+
+        :returns: Translated version of message.
+        :rtype: QString
+        """
+        # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
+        return QCoreApplication.translate("X", message)
