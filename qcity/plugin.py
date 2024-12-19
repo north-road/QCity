@@ -2,13 +2,16 @@ from libdnf.smartcols import Table
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtWidgets import QAction
-from qgis._core import QgsProject
-from qgis.core import QgsApplication
+from qgis.core import QgsApplication, QgsProject
+
+from .core import SETTINGS_MANAGER
+from .utils.maptools import DrawPolygonTool, MapToolHandler
 
 from .gui.gui_utils import GuiUtils
 from .gui.widget import (
     TabDockWidget,
 )
+
 
 class GradientDigitizerPlugin:
     def __init__(self, iface):
@@ -21,19 +24,31 @@ class GradientDigitizerPlugin:
         self.action = QAction("QCity", self.iface.mainWindow())
         self.action.setIcon(GuiUtils.get_icon("plugin.svg"))
 
-        self.action_widget = QAction("Live Display", self.iface.mainWindow())
-
         self.actions.append(self.action)
-        self.actions.append(self.action_widget)
 
         self.iface.digitizeToolBar().addAction(self.action)
 
-        self.action.triggered.connect(self.widget_display)
-
-        message_bar = self.iface.messageBar()
-
         self.widget = TabDockWidget(self.project)
         self.iface.addDockWidget(Qt.RightDockWidgetArea, self.widget)
+        self.action.triggered.connect(self.widget_display)
+
+        self.action_maptool = QAction("QCity", self.iface.mainWindow())
+
+        message_bar = self.iface.messageBar()
+        self.map_tool = DrawPolygonTool(
+            map_canvas=self.iface.mapCanvas(),
+            cad_dock_widget=self.iface.cadDockWidget(),
+            message_bar=message_bar,
+            dlg=self.widget,
+            iface=self.iface,
+        )
+
+        self.handler = MapToolHandler(self.map_tool, self.action_maptool)
+        self.iface.registerMapToolHandler(self.handler)
+
+        SETTINGS_MANAGER.add_project_area_clicked.connect(
+            self.action_maptool.triggered
+        )
 
         self.widget.show()
 
@@ -45,6 +60,9 @@ class GradientDigitizerPlugin:
 
     def unload(self) -> None:
         """Removes the plugin menu item and icon from QGIS GUI."""
+
+        self.iface.unregisterMapToolHandler(self.handler)
+
         self.iface.removeToolBarIcon(self.action)
         del self.action
 

@@ -50,9 +50,7 @@ class SplitLinesTest(unittest.TestCase):
         self.assertTrue(line_layer.isValid())
         line_layer_source = QgsProcessingFeatureSource(line_layer, context)
 
-        alg.create_distance_area_calculators(
-            line_layer_source, context
-        )
+        alg.create_distance_area_calculators(line_layer_source, context)
 
         dist = alg._lines_distance_area.measureLine(
             QgsPointXY(10, 20), QgsPointXY(11, 20)
