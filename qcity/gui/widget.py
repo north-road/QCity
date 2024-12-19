@@ -1,5 +1,6 @@
 import os
 
+from qgis import processing
 from qgis.PyQt import uic, sip
 from qgis.PyQt.QtWidgets import QFrame, QWidget, QComboBox, QFileDialog
 from qgis.PyQt.QtCore import QCoreApplication
@@ -23,7 +24,7 @@ class TabDockWidget(QgsDockWidget):
     Main dock widget.
     """
 
-    def __init__(self, project) -> None:
+    def __init__(self, project, iface) -> None:
         super(TabDockWidget, self).__init__()
         self.database_pat: str = None
         self.setObjectName("SlopeDigitizingLiveResultsDockWidget")
@@ -31,6 +32,7 @@ class TabDockWidget(QgsDockWidget):
         uic.loadUi(GuiUtils.get_ui_file_path("dockwidget_main.ui"), self)
 
         self.project = project
+        self.iface = iface
         self.set_base_layer_items()
 
         self.plugin_path = os.path.dirname(os.path.realpath(__file__))
@@ -42,6 +44,9 @@ class TabDockWidget(QgsDockWidget):
         self.pushButton_load_database.clicked.connect(
             self.load_project_database
         )
+
+        self.toolButton_project_area_remove.clicked.connect(self.remove_selected_areas)
+
 
     def set_base_layer_items(self):
         self.comboBox_base_layers.addItems(SETTINGS_MANAGER.get_base_layers_items())
@@ -100,6 +105,33 @@ class TabDockWidget(QgsDockWidget):
 
     def action_maptool_emit(self):
         SETTINGS_MANAGER.add_project_area_clicked.emit(True)
+
+    def remove_selected_areas(self):
+        tbr_areas = self.listWidget_project_areas.selectedItems()
+
+        if tbr_areas:
+            rows = {self.listWidget_project_areas.row(item): item.text() for item in tbr_areas}
+
+            for key, value in rows.items():
+                self.listWidget_project_areas.takeItem(key)
+
+                layers = self.project.mapLayersByName(value)
+                if layers:
+                    layer = layers[0]
+                    self.project.removeMapLayer(layer.id())
+
+                # Don't like this yet
+                try:
+                    processing.run(
+                        "native:spatialiteexecutesql",
+                        {
+                            'DATABASE': f"{SETTINGS_MANAGER.get_database_path()}|layername={value}",
+                            'SQL': f"DROP TABLE \"{value}\""
+                        }
+                    )
+                    self.iface.mapCanvas().refresh()
+                except Exception as e:
+                    print(f"Failed to drop table {value}: {e}")
 
     @staticmethod
     def tr(message) -> str:
