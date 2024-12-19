@@ -14,6 +14,7 @@ import statistics
 from typing import List, Union, Tuple, Optional
 
 from PyQt5.QtCore import QVariant
+from PyQt5.QtWidgets import QInputDialog
 from qgis.PyQt import sip
 from qgis.PyQt.QtWidgets import QDockWidget, QDialog
 from qgis.PyQt.QtCore import Qt, QEvent, QSize
@@ -121,8 +122,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             options = QgsVectorFileWriter.SaveVectorOptions()
             options.driverName = "GPKG"
 
-            n_project_areas = len(SETTINGS_MANAGER.get_project_areas_items())
-            layer_name = f"Project_{n_project_areas+1}"
+            layer_name, ok = QInputDialog.getText(self.dlg, "Name", "Input Name for Project Area:")
             options.layerName = layer_name
 
             options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
