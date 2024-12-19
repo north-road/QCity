@@ -77,10 +77,7 @@ class SettingsManager(QObject):
         areas = list()
         for area in layers:
             name = area.split('!!::!!')[1]
-            if name.startswith("Project"):
-                areas.append(name)
-        print(layers)
-        print(areas)
+            areas.append(name)
         return areas
 
 
