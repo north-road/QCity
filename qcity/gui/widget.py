@@ -104,9 +104,11 @@ class TabDockWidget(QgsDockWidget):
 
 
     def action_maptool_emit(self):
+        """ Emitted when plus button is clicked. """
         SETTINGS_MANAGER.add_project_area_clicked.emit(True)
 
     def remove_selected_areas(self):
+        """ Removes selected area from Qlistwidget, map and geopackage. """
         tbr_areas = self.listWidget_project_areas.selectedItems()
 
         if tbr_areas:
