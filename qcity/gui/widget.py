@@ -61,8 +61,10 @@ class TabDockWidget(QgsDockWidget):
             self.plugin_path,
             "..",
             "data",
+            "projects",
             f"{self.comboBox_base_layers.currentText()}.qgz",
         )
+        print(base_project_path)
         temp_project = QgsProject()
         temp_project.read(base_project_path)
         layers = [layer for layer in temp_project.mapLayers().values()]
@@ -78,7 +80,7 @@ class TabDockWidget(QgsDockWidget):
         if file_name and file_name.endswith(".gpkg"):
             SETTINGS_MANAGER.set_database_path(file_name)
             shutil.copyfile(
-                os.path.join(self.plugin_path, "..", "base_project_database.gpkg"),
+                os.path.join(self.plugin_path, "..", "data", "base_project_database.gpkg"),
                 file_name,
             )
             self.toolButton_project_area_add.clicked.connect(
@@ -142,6 +144,9 @@ class TabDockWidget(QgsDockWidget):
                     self.iface.mapCanvas().refresh()
                 except Exception as e:
                     print(f"Failed to drop table {value}: {e}")
+
+            self.label_current_project_area.setText("Project")
+            self.lineEdit_current_project_area.setText("")
 
 
     def update_layer_name_gpkg(self) -> None:
