@@ -50,6 +50,8 @@ class TabDockWidget(QgsDockWidget):
 
         self.lineEdit_current_project_area.returnPressed.connect(self.update_layer_name_gpkg)
 
+        self.listWidget_project_areas.itemClicked.connect(lambda item: self.zoom_to_project_area(item))
+
 
     def set_base_layer_items(self):
         """ Adds all possible base layers to the selection combobox """
@@ -167,6 +169,16 @@ class TabDockWidget(QgsDockWidget):
         self.listWidget_project_areas.addItem(name)
 
         self.label_current_project_area.setText(name)
+
+    def zoom_to_project_area(self, item) -> None:
+        """ Sets the canvas extent to the clicked layer """
+        name = item.text()
+        uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={name}"
+        layer = QgsVectorLayer(uri, name, 'ogr')
+        extent = layer.extent()
+        self.iface.mapCanvas().setExtent(extent)
+        self.iface.mapCanvas().refresh()
+        del layer
 
 
     @staticmethod
