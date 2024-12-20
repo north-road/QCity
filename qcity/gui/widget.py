@@ -1,5 +1,6 @@
 import os
 
+from PyQt5.QtCore import Qt
 from qgis import processing
 from qgis.PyQt import uic, sip
 from qgis.PyQt.QtWidgets import QFrame, QWidget, QComboBox, QFileDialog
@@ -47,6 +48,8 @@ class TabDockWidget(QgsDockWidget):
 
         self.toolButton_project_area_remove.clicked.connect(self.remove_selected_areas)
 
+        self.lineEdit_current_project_area.returnPressed.connect(self.update_layer_name_gpkg)
+
 
     def set_base_layer_items(self):
         self.comboBox_base_layers.addItems(SETTINGS_MANAGER.get_base_layers_items())
@@ -81,6 +84,8 @@ class TabDockWidget(QgsDockWidget):
                 self.action_maptool_emit
             )
 
+            self.lineEdit_current_project_area.setEnabled(True)
+
 
     def load_project_database(self) -> None:
         """Loads a project database from a .gpkg file."""
@@ -101,6 +106,8 @@ class TabDockWidget(QgsDockWidget):
                 uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={area}"
                 layer = QgsVectorLayer(uri, area, 'ogr')
                 QgsProject.instance().addMapLayer(layer)
+
+            self.lineEdit_current_project_area.setEnabled(True)
 
 
     def action_maptool_emit(self):
@@ -134,6 +141,27 @@ class TabDockWidget(QgsDockWidget):
                     self.iface.mapCanvas().refresh()
                 except Exception as e:
                     print(f"Failed to drop table {value}: {e}")
+
+
+    def update_layer_name_gpkg(self):
+        old_layer_name = self.listWidget_project_areas.selectedItems()[0]
+        name = self.lineEdit_current_project_area.text()
+        try:
+            processing.run(
+            "native:spatialiteexecutesql",
+            {
+                'DATABASE': SETTINGS_MANAGER.get_database_path(),
+                'SQL': f'ALTER TABLE "{old_layer_name.text()}" RENAME TO "{name}"'
+            })
+        except Exception as e:
+            raise e
+
+        old_item_id = self.listWidget_project_areas.row(old_layer_name)
+        self.listWidget_project_areas.takeItem(old_item_id)
+        self.listWidget_project_areas.addItem(name)
+
+        self.label_current_project_area.setText(name)
+
 
     @staticmethod
     def tr(message) -> str:
