@@ -145,6 +145,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
 
 
     def cleanup(self):
+        """ Ruun after digitization is finished, cleans up the maptool """
         self.layer = QgsVectorLayer("Polygon?crs=EPSG:4326", "memory_polygon_layer", "memory")
         self.points = list()
 

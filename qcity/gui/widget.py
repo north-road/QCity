@@ -52,6 +52,7 @@ class TabDockWidget(QgsDockWidget):
 
 
     def set_base_layer_items(self):
+        """ Adds all possible base layers to the selection combobox """
         self.comboBox_base_layers.addItems(SETTINGS_MANAGER.get_base_layers_items())
 
     def add_base_layers(self) -> None:
@@ -110,11 +111,11 @@ class TabDockWidget(QgsDockWidget):
             self.lineEdit_current_project_area.setEnabled(True)
 
 
-    def action_maptool_emit(self):
+    def action_maptool_emit(self) -> None:
         """ Emitted when plus button is clicked. """
         SETTINGS_MANAGER.add_project_area_clicked.emit(True)
 
-    def remove_selected_areas(self):
+    def remove_selected_areas(self) -> None:
         """ Removes selected area from Qlistwidget, map and geopackage. """
         tbr_areas = self.listWidget_project_areas.selectedItems()
 
@@ -143,7 +144,7 @@ class TabDockWidget(QgsDockWidget):
                     print(f"Failed to drop table {value}: {e}")
 
 
-    def update_layer_name_gpkg(self):
+    def update_layer_name_gpkg(self) -> None:
         old_layer_name = self.listWidget_project_areas.selectedItems()[0]
         name = self.lineEdit_current_project_area.text()
         try:
