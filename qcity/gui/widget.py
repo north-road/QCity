@@ -89,6 +89,7 @@ class TabDockWidget(QgsDockWidget):
                 self.action_maptool_emit
             )
 
+            self.listWidget_project_areas.clear()
             self.lineEdit_current_project_area.setEnabled(True)
 
 
