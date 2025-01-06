@@ -1,26 +1,18 @@
 """
 Settings manager
 """
-import json
+
 import os
 from typing import Optional, List, Union
 
 from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox, QWidget
-from qgis import processing
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt import sip
 import sqlite3
 
 from qgis.core import (
-    Qgis,
     QgsSettings,
-    QgsSymbolLayerUtils,
-    QgsUnitTypes,
-    QgsRasterLayer,
     QgsVectorLayer,
-    QgsProject,
-    QgsMapLayer,
 )
 
 
@@ -69,7 +61,6 @@ class SettingsManager(QObject):
             )
             self.database_path_changed.emit(database_path)
 
-
     def get_database_path(self) -> QColor:
         """
         Get the current database path.
@@ -82,7 +73,7 @@ class SettingsManager(QObject):
         layers = layer.dataProvider().subLayers()
         areas = list()
         for area in layers:
-            name = area.split('!!::!!')[1]
+            name = area.split("!!::!!")[1]
             areas.append(name)
         return areas
 
@@ -95,8 +86,12 @@ class SettingsManager(QObject):
 
         try:
             if self._current_project_area_parameter_table_name:
-                cursor.execute(f"DELETE FROM {self._current_project_area_parameter_table_name} where widget_name = '{widget.objectName()}';")
-                cursor.execute(f"INSERT INTO {self._current_project_area_parameter_table_name} (widget_name, value) VALUES ('{widget.objectName()}', {value});")
+                cursor.execute(
+                    f"DELETE FROM {self._current_project_area_parameter_table_name} where widget_name = '{widget.objectName()}';"
+                )
+                cursor.execute(
+                    f"INSERT INTO {self._current_project_area_parameter_table_name} (widget_name, value) VALUES ('{widget.objectName()}', {value});"
+                )
                 conn.commit()
 
         except Exception as e:
@@ -108,7 +103,9 @@ class SettingsManager(QObject):
             conn.close()
         self.spinbox_changed.emit((widget.objectName(), value))
 
-    def get_spinbox_value_from_database(self, widget: QWidget) -> Optional[Union[int, float]]:
+    def get_spinbox_value_from_database(
+        self, widget: QWidget
+    ) -> Optional[Union[int, float]]:
         """
         Returns the value corresponding to the given widget name from the database.
         """

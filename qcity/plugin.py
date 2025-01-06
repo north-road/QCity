@@ -1,8 +1,6 @@
-from libdnf.smartcols import Table
-from qgis.PyQt import sip
 from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtWidgets import QAction
-from qgis.core import QgsApplication, QgsProject
+from qgis.core import QgsProject
 
 from .core import SETTINGS_MANAGER
 from .utils.maptools import DrawPolygonTool, MapToolHandler
@@ -46,9 +44,7 @@ class GradientDigitizerPlugin:
         self.handler = MapToolHandler(self.map_tool, self.action_maptool)
         self.iface.registerMapToolHandler(self.handler)
 
-        SETTINGS_MANAGER.add_project_area_clicked.connect(
-            self.action_maptool.triggered
-        )
+        SETTINGS_MANAGER.add_project_area_clicked.connect(self.action_maptool.triggered)
 
         self.widget.show()
 

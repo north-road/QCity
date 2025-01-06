@@ -9,33 +9,28 @@
 # (at your option) any later version.
 # ---------------------------------------------------------------------
 import json
-import math
 import os
 import sqlite3
-import statistics
-from typing import List, Union, Tuple, Optional
+from typing import List, Union, Optional
 
 from PyQt5.QtCore import QVariant
 from PyQt5.QtWidgets import QInputDialog
-from qgis.PyQt import sip
-from qgis.PyQt.QtWidgets import QDockWidget, QDialog
-from qgis.PyQt.QtCore import Qt, QEvent, QSize
-from qgis.PyQt.QtGui import QColor, QCursor, QPixmap, QPainter, QFont, QIcon
-from qgis._core import QgsFeature, QgsVectorLayerExporter, QgsVectorFileWriter, QgsCoordinateReferenceSystem, \
-    QgsCoordinateTransformContext, QgsField, QgsFields
+from qgis.PyQt.QtCore import Qt
+from qgis._core import (
+    QgsFeature,
+    QgsVectorFileWriter,
+    QgsCoordinateTransformContext,
+    QgsField,
+    QgsFields,
+)
 
 from qgis.core import (
     QgsProject,
-    QgsDistanceArea,
-    QgsWkbTypes,
     QgsGeometry,
     QgsVectorLayer,
-    QgsPoint,
     QgsPointXY,
     QgsRasterLayer,
-    QgsUnitTypes,
     Qgis,
-    QgsFeatureRequest,
 )
 
 from qgis.gui import (
@@ -48,12 +43,11 @@ from qgis.gui import (
     QgsMapTool,
     QgisInterface,
     QgsAbstractMapToolHandler,
-    QgsSnapIndicator,
     QgsMapToolCaptureLayerGeometry,
     QgsMapMouseEvent,
 )
 
-from ..core import SETTINGS_MANAGER, Utils
+from ..core import SETTINGS_MANAGER
 from ..gui.widget import TabDockWidget
 
 
@@ -90,7 +84,9 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         self.settings_section = "slopeDigitizer"
         self.project = QgsProject.instance()
         self.plugin_path = os.path.dirname(os.path.realpath(__file__))
-        self._default_project_area_parameters_path = os.path.join(self.plugin_path, "..", "data", "default_project_area_parameters.json")
+        self._default_project_area_parameters_path = os.path.join(
+            self.plugin_path, "..", "data", "default_project_area_parameters.json"
+        )
 
     def activate(self):
         # skip QgsMapToolDigitizeFeature method -- it has odd logic
@@ -126,7 +122,9 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             options = QgsVectorFileWriter.SaveVectorOptions()
             options.driverName = "GPKG"
 
-            table_name, ok = QInputDialog.getText(self.dlg, "Name", "Input Name for Project Area:")
+            table_name, ok = QInputDialog.getText(
+                self.dlg, "Name", "Input Name for Project Area:"
+            )
             options.layerName = table_name
 
             options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
@@ -134,15 +132,18 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             schema = QgsFields()
             schema.append(QgsField("project_areas", QVariant.Double))
 
-            error = QgsVectorFileWriter.writeAsVectorFormatV2(self.layer, gpkg_path,
-                                                              QgsCoordinateTransformContext(), options)
+            error = QgsVectorFileWriter.writeAsVectorFormatV2(
+                self.layer, gpkg_path, QgsCoordinateTransformContext(), options
+            )
             if error[0] == QgsVectorFileWriter.NoError:
                 gpkg_uri = f"{gpkg_path}|layername={table_name}"
                 new_layer = QgsVectorLayer(gpkg_uri, table_name, "ogr")
                 QgsProject.instance().addMapLayer(new_layer)
                 self.dlg.listWidget_project_areas.addItem(table_name)
 
-                SETTINGS_MANAGER.set_current_project_area_parameter_table_name(f"{SETTINGS_MANAGER.area_parameter_prefix}{table_name}")
+                SETTINGS_MANAGER.set_current_project_area_parameter_table_name(
+                    f"{SETTINGS_MANAGER.area_parameter_prefix}{table_name}"
+                )
 
                 conn = sqlite3.connect(gpkg_path)
                 cursor = conn.cursor()
@@ -151,7 +152,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
                     create_table_query = f"CREATE TABLE {SETTINGS_MANAGER.area_parameter_prefix}{table_name} (widget_name TEXT NOT NULL, value FLOAT NOT NULL);"
                     cursor.execute(create_table_query)
 
-                    with open(self._default_project_area_parameters_path, 'r') as file:
+                    with open(self._default_project_area_parameters_path, "r") as file:
                         data = json.load(file)
                     insert_queries = [
                         f"INSERT INTO {SETTINGS_MANAGER.area_parameter_prefix}{table_name} (widget_name, value) VALUES ('{widget_name}', {value});"
@@ -177,8 +178,10 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             self.cleanup()
 
     def cleanup(self):
-        """ Run after digitization is finished, cleans up the maptool """
-        self.layer = QgsVectorLayer("Polygon?crs=EPSG:4326", "memory_polygon_layer", "memory")
+        """Run after digitization is finished, cleans up the maptool"""
+        self.layer = QgsVectorLayer(
+            "Polygon?crs=EPSG:4326", "memory_polygon_layer", "memory"
+        )
         self.points = list()
 
 
