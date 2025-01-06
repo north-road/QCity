@@ -2,7 +2,6 @@ import os
 import sqlite3
 
 from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox
-from qgis import processing
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QFileDialog
 from qgis.PyQt.QtCore import QCoreApplication
@@ -196,9 +195,7 @@ class TabDockWidget(QgsDockWidget):
             conn = sqlite3.connect(SETTINGS_MANAGER.get_database_path())
             cursor = conn.cursor()
 
-            cursor.execute(
-                f'ALTER TABLE "{old_layer_name.text()}" RENAME TO "{name}"'
-            )
+            cursor.execute(f'ALTER TABLE "{old_layer_name.text()}" RENAME TO "{name}"')
 
             cursor.close()
             conn.close()

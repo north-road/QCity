@@ -14,6 +14,7 @@ import sqlite3
 from typing import List, Union, Optional
 
 from PyQt5.QtCore import QVariant
+from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QInputDialog
 from qgis.PyQt.QtCore import Qt
 from qgis._core import (
@@ -22,7 +23,9 @@ from qgis._core import (
     QgsCoordinateTransformContext,
     QgsField,
     QgsFields,
+    QgsWkbTypes,
 )
+from qgis._gui import QgsSnapIndicator
 
 from qgis.core import (
     QgsProject,
@@ -65,6 +68,8 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         iface: QgisInterface,
     ) -> None:
         super().__init__(map_canvas, cad_dock_widget, QgsMapToolCapture.CaptureLine)
+        self.default_color: QColor = QColor(255, 0, 0, 100)
+        self.cursor_band: Optional[QgsRubberBand] = None
         self.iface = iface
         self.dlg = dlg
         self.unit = None
@@ -77,7 +82,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         self.points: List[QgsPointXY] = []
         self.project_instance: QgsProject = QgsProject.instance()
         self.map_canvas: QgsMapCanvas = map_canvas
-        self.last_maptool: QgsMapTool = self.canvas().mapTool()
+        self.last_maptool: QgsMapTool = self.map_canvas.mapTool()
         self.layer: QgsVectorLayer = QgsVectorLayer(
             "Polygon?crs=EPSG:4326", "memory_polygon_layer", "memory"
         )
@@ -87,6 +92,11 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         self._default_project_area_parameters_path = os.path.join(
             self.plugin_path, "..", "data", "default_project_area_parameters.json"
         )
+        self.rubber_band = QgsRubberBand(
+            mapCanvas=self.map_canvas,
+            geometryType=QgsWkbTypes.GeometryType.PolygonGeometry,
+        )
+        self.snap_indicator = QgsSnapIndicator(map_canvas)
 
     def activate(self):
         # skip QgsMapToolDigitizeFeature method -- it has odd logic
@@ -100,14 +110,47 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         # things up
         QgsMapToolCaptureLayerGeometry.deactivate(self)
 
+    def createRubberBand(self, cursor_point: QgsPointXY) -> None:
+        """Creates the moving dotted line rubber band."""
+        if self.cursor_band:
+            self.canvas().scene().removeItem(self.cursor_band)
+        self.cursor_band = QgsRubberBand(self.map_canvas, QgsWkbTypes.PolygonGeometry)
+        self.cursor_band.setColor(self.default_color)
+        self.cursor_band.setLineStyle(Qt.DotLine)
+
+        if self.points:
+            self.cursor_band.addPoint(self.points[0])
+            self.cursor_band.addPoint(self.points[-1])
+            self.cursor_band.addPoint(cursor_point)
+
+    def showLine(self):
+        """Builds rubber band from all points and adds it to the map canvas."""
+        self.rubber_band = QgsRubberBand(self.map_canvas, QgsWkbTypes.PolygonGeometry)
+        self.rubber_band.setColor(self.default_color)
+
+        for point in self.points:
+            if point == self.points[-1]:
+                self.rubber_band.addPoint(point, True)
+            self.rubber_band.addPoint(point, False)
+        self.rubber_band.show()
+
+    def canvasMoveEvent(self, event: QgsMapMouseEvent) -> None:
+        move_map_point = event.snapPoint()
+        self.snap_indicator.setMatch(event.mapPointMatch())
+        self.createRubberBand(move_map_point)
+
     def canvasReleaseEvent(self, event: QgsMapMouseEvent) -> None:
         if event.button() == Qt.LeftButton:
             map_point = event.snapPoint()
             v_point = self.toLayerCoordinates(self.layer, map_point)
             self.points.append(v_point)
-            self.createRubberBand()
+            if self.rubber_band:
+                self.canvas().scene().removeItem(self.rubber_band)
+            self.showLine()
 
         if event.button() == Qt.RightButton:
+            self.clearRubberBands()
+
             gpkg_path = SETTINGS_MANAGER.get_database_path()
 
             layer_provider = self.layer.dataProvider()
@@ -183,6 +226,13 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             "Polygon?crs=EPSG:4326", "memory_polygon_layer", "memory"
         )
         self.points = list()
+
+    def clearRubberBands(self) -> None:
+        self.canvas().scene().removeItem(self.rubber_band)
+        self.rubber_band = None
+        if self.cursor_band:
+            self.canvas().scene().removeItem(self.cursor_band)
+        self.cursor_band = None
 
 
 class MapToolHandler(QgsAbstractMapToolHandler):
