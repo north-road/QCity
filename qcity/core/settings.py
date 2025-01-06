@@ -33,7 +33,7 @@ class SettingsManager(QObject):
 
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
-        self._current_project_area_parameter_table_name: str = None
+        self._current_project_area_parameter_table_name: Optional[str] = None
         self._database_path = None
 
     def get_base_layers_items(self) -> List[str]:

@@ -86,7 +86,6 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         self.layer: QgsVectorLayer = QgsVectorLayer(
             "Polygon?crs=EPSG:4326", "memory_polygon_layer", "memory"
         )
-        self.settings_section = "slopeDigitizer"
         self.project = QgsProject.instance()
         self.plugin_path = os.path.dirname(os.path.realpath(__file__))
         self._default_project_area_parameters_path = os.path.join(
@@ -228,6 +227,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         self.points = list()
 
     def clearRubberBands(self) -> None:
+        """Clears map canvas of all rubber bands and sets them to None."""
         self.canvas().scene().removeItem(self.rubber_band)
         self.rubber_band = None
         if self.cursor_band:
@@ -246,5 +246,5 @@ class MapToolHandler(QgsAbstractMapToolHandler):
         return (
             isinstance(layer, QgsVectorLayer)
             and layer.isEditable()
-            and layer.geometryType() == Qgis.GeometryType.Line
+            and layer.geometryType() == Qgis.GeometryType.Polygon
         )
