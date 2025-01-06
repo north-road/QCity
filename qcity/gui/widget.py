@@ -193,13 +193,15 @@ class TabDockWidget(QgsDockWidget):
         old_layer_name = self.listWidget_project_areas.selectedItems()[0]
         name = self.lineEdit_current_project_area.text()
         try:
-            processing.run(
-                "native:spatialiteexecutesql",
-                {
-                    "DATABASE": SETTINGS_MANAGER.get_database_path(),
-                    "SQL": f'ALTER TABLE "{old_layer_name.text()}" RENAME TO "{name}"',
-                },
+            conn = sqlite3.connect(SETTINGS_MANAGER.get_database_path())
+            cursor = conn.cursor()
+
+            cursor.execute(
+                f'ALTER TABLE "{old_layer_name.text()}" RENAME TO "{name}"'
             )
+
+            cursor.close()
+            conn.close()
         except Exception as e:
             raise e
 
