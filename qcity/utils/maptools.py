@@ -8,8 +8,10 @@
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
 # ---------------------------------------------------------------------
+import json
 import math
 import os
+import sqlite3
 import statistics
 from typing import List, Union, Tuple, Optional
 
@@ -87,6 +89,8 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         )
         self.settings_section = "slopeDigitizer"
         self.project = QgsProject.instance()
+        self.plugin_path = os.path.dirname(os.path.realpath(__file__))
+        self._default_project_area_parameters_path = os.path.join(self.plugin_path, "..", "data", "default_project_area_parameters.json")
 
     def activate(self):
         # skip QgsMapToolDigitizeFeature method -- it has odd logic
@@ -122,8 +126,8 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             options = QgsVectorFileWriter.SaveVectorOptions()
             options.driverName = "GPKG"
 
-            layer_name, ok = QInputDialog.getText(self.dlg, "Name", "Input Name for Project Area:")
-            options.layerName = layer_name
+            table_name, ok = QInputDialog.getText(self.dlg, "Name", "Input Name for Project Area:")
+            options.layerName = table_name
 
             options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
 
@@ -133,19 +137,47 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             error = QgsVectorFileWriter.writeAsVectorFormatV2(self.layer, gpkg_path,
                                                               QgsCoordinateTransformContext(), options)
             if error[0] == QgsVectorFileWriter.NoError:
-                gpkg_uri = f"{gpkg_path}|layername={layer_name}"
-                new_layer = QgsVectorLayer(gpkg_uri, layer_name, "ogr")
+                gpkg_uri = f"{gpkg_path}|layername={table_name}"
+                new_layer = QgsVectorLayer(gpkg_uri, table_name, "ogr")
                 QgsProject.instance().addMapLayer(new_layer)
-                self.dlg.listWidget_project_areas.addItem(layer_name)
+                self.dlg.listWidget_project_areas.addItem(table_name)
+
+                SETTINGS_MANAGER.set_current_project_area_parameter_table_name(f"{SETTINGS_MANAGER.area_parameter_prefix}{table_name}")
+
+                conn = sqlite3.connect(gpkg_path)
+                cursor = conn.cursor()
+
+                try:
+                    create_table_query = f"CREATE TABLE {SETTINGS_MANAGER.area_parameter_prefix}{table_name} (widget_name TEXT NOT NULL, value FLOAT NOT NULL);"
+                    cursor.execute(create_table_query)
+
+                    with open(self._default_project_area_parameters_path, 'r') as file:
+                        data = json.load(file)
+                    insert_queries = [
+                        f"INSERT INTO {SETTINGS_MANAGER.area_parameter_prefix}{table_name} (widget_name, value) VALUES ('{widget_name}', {value});"
+                        for widget_name, value in data.items()
+                    ]
+                    for insert_query in insert_queries:
+                        cursor.execute(insert_query)
+
+                    insert_gpkg_contents_query = """INSERT INTO gpkg_contents (table_name, data_type, identifier, description) VALUES ('widget_values', 'attributes', 'widget_values', 'A table to store widget settings');"""
+                    cursor.execute(insert_gpkg_contents_query)
+                    conn.commit()
+
+                except Exception as e:
+                    print(e)
+
+                finally:
+                    cursor.close()
+                    conn.close()
             else:
                 # TODO: message bar here instead
                 print(f"Error adding layer to GeoPackage: {error[1]}")
 
             self.cleanup()
 
-
     def cleanup(self):
-        """ Ruun after digitization is finished, cleans up the maptool """
+        """ Run after digitization is finished, cleans up the maptool """
         self.layer = QgsVectorLayer("Polygon?crs=EPSG:4326", "memory_polygon_layer", "memory")
         self.points = list()
 

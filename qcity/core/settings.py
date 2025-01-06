@@ -1,14 +1,16 @@
 """
 Settings manager
 """
-
+import json
 import os
-from typing import Optional, List
+from typing import Optional, List, Union
 
+from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox, QWidget
+from qgis import processing
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt import sip
-from qgis._core import QgsVectorFileWriter
+import sqlite3
 
 from qgis.core import (
     Qgis,
@@ -31,11 +33,15 @@ class SettingsManager(QObject):
 
     database_path_changed = pyqtSignal(str)
     add_project_area_clicked = pyqtSignal(bool)
+    spinbox_changed = pyqtSignal(tuple)
+    current_project_area_parameter_name_changed = pyqtSignal(str)
 
     plugin_path = os.path.dirname(os.path.realpath(__file__))
+    area_parameter_prefix = "project_area_parameters_"
 
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
+        self._current_project_area_parameter_table_name: str = None
         self._database_path = None
 
     def get_base_layers_items(self) -> List[str]:
@@ -79,6 +85,66 @@ class SettingsManager(QObject):
             name = area.split('!!::!!')[1]
             areas.append(name)
         return areas
+
+    def set_spinbox_value(self, widget, value):
+        """
+        Sets a spinbox value from the corresponding widget-value.
+        """
+        conn = sqlite3.connect(self._database_path)
+        cursor = conn.cursor()
+
+        try:
+            if self._current_project_area_parameter_table_name:
+                cursor.execute(f"DELETE FROM {self._current_project_area_parameter_table_name} where widget_name = '{widget.objectName()}';")
+                cursor.execute(f"INSERT INTO {self._current_project_area_parameter_table_name} (widget_name, value) VALUES ('{widget.objectName()}', {value});")
+                conn.commit()
+
+        except Exception as e:
+            print(e)
+            pass
+
+        finally:
+            cursor.close()
+            conn.close()
+        self.spinbox_changed.emit((widget.objectName(), value))
+
+    def get_spinbox_value_from_database(self, widget: QWidget) -> Optional[Union[int, float]]:
+        """
+        Returns the value corresponding to the given widget name from the database.
+        """
+        query = f"SELECT value FROM {self._current_project_area_parameter_table_name} WHERE widget_name = '{widget.objectName()}';"
+
+        conn = sqlite3.connect(self._database_path)
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchone()
+
+            if result:
+                if isinstance(widget, QSpinBox):
+                    return int(result[0])
+                elif isinstance(widget, QDoubleSpinBox):
+                    return result[0]
+            else:
+                print("No matching row found.")
+        finally:
+            # Clean up
+            cursor.close()
+            conn.close()
+
+    def set_current_project_area_parameter_table_name(self, name: str) -> None:
+        """
+        Sets the current project area parameter table name.
+        """
+        self._current_project_area_parameter_table_name = name
+        self.current_project_area_parameter_name_changed.emit(name)
+
+    def get_current_project_area_parameter_table_name(self) -> str:
+        """
+        Returns the current project area parameter table name.
+        """
+        return self._current_project_area_parameter_table_name
 
 
 # Settings manager singleton instance

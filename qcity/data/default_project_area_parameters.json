@@ -1,0 +1,22 @@
+{
+    "doubleSpinBox_bicycle_parking_commercial_bays_per": 1,
+    "doubleSpinBox_bicycle_parking_office_bays_per": 1,
+    "doubleSpinBox_car_parking_commercial_bays_per": 1,
+    "doubleSpinBox_car_parking_office_bays_per": 1,
+    "spinBox_bicycle_parking_bedroom_dwelling_1": 1,
+    "spinBox_bicycle_parking_bedroom_dwelling_2": 1,
+    "spinBox_bicycle_parking_bedroom_dwelling_3": 1,
+    "spinBox_bicycle_parking_bedroom_dwelling_4": 1,
+    "spinBox_bicycle_parking_office": 1,
+    "spinBox_bicyle_parking_commercial": 1,
+    "spinBox_car_parking_bedroom_dwelling_1": 1,
+    "spinBox_car_parking_bedroom_dwelling_2": 1,
+    "spinBox_car_parking_bedroom_dwelling_3": 1,
+    "spinBox_car_parking_bedroom_dwelling_4": 1,
+    "spinBox_car_parking_commercial": 1,
+    "spinBox_car_parking_office": 1,
+    "spinBox_dwellings_size_1": 1,
+    "spinBox_dwellings_size_2": 1,
+    "spinBox_dwellings_size_3": 1,
+    "spinBox_dwellings_size_4": 1
+}

@@ -1,6 +1,10 @@
+import json
 import os
+import sqlite3
+from pathlib import Path
 
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox
 from qgis import processing
 from qgis.PyQt import uic, sip
 from qgis.PyQt.QtWidgets import QFrame, QWidget, QComboBox, QFileDialog
@@ -27,7 +31,6 @@ class TabDockWidget(QgsDockWidget):
 
     def __init__(self, project, iface) -> None:
         super(TabDockWidget, self).__init__()
-        self.database_pat: str = None
         self.setObjectName("SlopeDigitizingLiveResultsDockWidget")
 
         uic.loadUi(GuiUtils.get_ui_file_path("dockwidget_main.ui"), self)
@@ -37,6 +40,7 @@ class TabDockWidget(QgsDockWidget):
         self.set_base_layer_items()
 
         self.plugin_path = os.path.dirname(os.path.realpath(__file__))
+        self._default_project_area_parameters_path = os.path.join(self.plugin_path, "..", "data", "default_project_area_parameters.json")
 
         self.pushButton_add_base_layer.clicked.connect(self.add_base_layers)
         self.pushButton_create_database.clicked.connect(
@@ -52,6 +56,10 @@ class TabDockWidget(QgsDockWidget):
 
         self.listWidget_project_areas.itemClicked.connect(lambda item: self.zoom_to_project_area(item))
 
+        for widget in self.findChildren((QSpinBox, QDoubleSpinBox)):
+            widget.valueChanged.connect(lambda value, widget=widget: SETTINGS_MANAGER.set_spinbox_value(widget, value))  # This does work indeed, despite the marked error
+
+        self.listWidget_project_areas.currentItemChanged.connect(self.update_project_area_parameters)
 
     def set_base_layer_items(self):
         """ Adds all possible base layers to the selection combobox """
@@ -93,6 +101,12 @@ class TabDockWidget(QgsDockWidget):
             self.lineEdit_current_project_area.setEnabled(True)
 
 
+            SETTINGS_MANAGER.set_current_project_area_parameter_table_name(None)
+
+        else:
+            # TODO: message bar here
+            print("not a gpkg file")
+
     def load_project_database(self) -> None:
         """Loads a project database from a .gpkg file."""
         file_name, _ = QFileDialog.getOpenFileName(
@@ -106,15 +120,23 @@ class TabDockWidget(QgsDockWidget):
 
             areas = SETTINGS_MANAGER.get_project_areas_items()
             self.listWidget_project_areas.clear()
-            self.listWidget_project_areas.addItems(areas)
+            self.listWidget_project_areas.addItems([item for item in areas if SETTINGS_MANAGER.area_parameter_prefix not in item])
 
             for area in areas:
-                uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={area}"
-                layer = QgsVectorLayer(uri, area, 'ogr')
-                QgsProject.instance().addMapLayer(layer)
+                if "" not in area:
+                    uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={area}"
+                    layer = QgsVectorLayer(uri, area, 'ogr')
+                    QgsProject.instance().addMapLayer(layer)
 
             self.lineEdit_current_project_area.setEnabled(True)
 
+            SETTINGS_MANAGER.set_current_project_area_parameter_table_name(None)
+            for area in areas:
+                # take the first areas' parameter file and use that
+                if SETTINGS_MANAGER.area_parameter_prefix in area:
+                    SETTINGS_MANAGER.set_current_project_area_parameter_table_name(area)
+                    self.update_project_area_parameters()
+                    break
 
     def action_maptool_emit(self) -> None:
         """ Emitted when plus button is clicked. """
@@ -137,13 +159,15 @@ class TabDockWidget(QgsDockWidget):
 
                 # Don't like this yet
                 try:
-                    processing.run(
-                        "native:spatialiteexecutesql",
-                        {
-                            'DATABASE': f"{SETTINGS_MANAGER.get_database_path()}|layername={value}",
-                            'SQL': f"DROP TABLE \"{value}\""
-                        }
-                    )
+                    conn = sqlite3.connect(SETTINGS_MANAGER.get_database_path())
+                    cursor = conn.cursor()
+
+                    cursor.execute(f"DROP TABLE '{value}'")
+                    cursor.execute(f"DROP TABLE '{SETTINGS_MANAGER.area_parameter_prefix}{value}'")
+
+                    cursor.close()
+                    conn.close()
+
                     self.iface.mapCanvas().refresh()
                 except Exception as e:
                     print(f"Failed to drop table {value}: {e}")
@@ -153,6 +177,9 @@ class TabDockWidget(QgsDockWidget):
 
 
     def update_layer_name_gpkg(self) -> None:
+        """
+        Updates the name of the table in the geopackage.
+        """
         old_layer_name = self.listWidget_project_areas.selectedItems()[0]
         name = self.lineEdit_current_project_area.text()
         try:
@@ -181,6 +208,38 @@ class TabDockWidget(QgsDockWidget):
         self.iface.mapCanvas().refresh()
         del layer
 
+    def update_project_area_parameters(self) -> None:
+        """
+        Updates the parameter-spin-boxes of the project area to the currently selected one.
+        """
+        widget = self.listWidget_project_areas.currentItem() or self.listWidget_project_areas.item(0)
+
+        if widget:
+            table_name = widget.text()
+
+            if SETTINGS_MANAGER.area_parameter_prefix in table_name:
+                SETTINGS_MANAGER.set_current_project_area_parameter_table_name(table_name)
+            else:
+                SETTINGS_MANAGER.set_current_project_area_parameter_table_name(f"{SETTINGS_MANAGER.area_parameter_prefix}{table_name}")
+
+            conn = sqlite3.connect(SETTINGS_MANAGER.get_database_path())
+            cursor = conn.cursor()
+
+            cursor.execute(f"SELECT widget_name, value FROM {SETTINGS_MANAGER.get_current_project_area_parameter_table_name()}")
+
+            widget_values_dict = {row[0]: row[1] for row in cursor.fetchall()}
+
+            for widget_name in widget_values_dict.keys():
+                widget = self.findChild((QSpinBox, QDoubleSpinBox), widget_name)
+                if isinstance(widget, QSpinBox):
+                    widget.setValue(int(widget_values_dict[widget.objectName()]))
+                else:
+                    widget.setValue(widget_values_dict[widget.objectName()])
+
+
+            # Close the connection
+            cursor.close()
+            conn.close()
 
     @staticmethod
     def tr(message) -> str:
