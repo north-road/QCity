@@ -138,7 +138,7 @@ class MapToolsTest(unittest.TestCase):
         self.map_tool.canvasReleaseEvent(self.click_from_middle(x=50, y=100))
         self.assertEqual(len(self.map_tool.rubber_bands), 2)
         self.assertEqual(
-            self.map_tool.widget.lineEdit_overallDistance.text(), "4.93 mm"
+            self.map_tool.og_widget.lineEdit_overallDistance.text(), "4.93 mm"
         )
 
         self.map_tool.canvasReleaseEvent(self.click_from_middle("right", 100, 50))
