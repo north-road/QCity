@@ -66,10 +66,7 @@ class WidgetUtilsProjectArea(QObject):
             cursor.execute(f'ALTER TABLE "{old_layer_name}" RENAME TO "{layer_name}"')
             cursor.execute(f'ALTER TABLE "{SETTINGS_MANAGER.area_parameter_prefix}{old_layer_name}" RENAME TO "{SETTINGS_MANAGER.area_parameter_prefix}{layer_name}"')
 
-            self.og_widget.project.removeMapLayer(self.og_widget.project.mapLayersByName(old_layer_name)[0].id())
-            uri = f"{database_path}|layername={layer_name}"
-            layer = QgsVectorLayer(uri, layer_name, "ogr")
-            QgsProject.instance().addMapLayer(layer)
+            conn.commit()
 
             cursor.close()
             conn.close()
