@@ -108,20 +108,11 @@ class WidgetUtilsProjectArea(QObject):
         if widget:
             table_name = widget.text()
 
-            if SETTINGS_MANAGER.area_parameter_prefix in table_name:
-                SETTINGS_MANAGER.set_current_project_area_parameter_table_name(
-                    table_name
-                )
-            else:
-                SETTINGS_MANAGER.set_current_project_area_parameter_table_name(
-                    f"{SETTINGS_MANAGER.area_parameter_prefix}{table_name}"
-                )
-
             conn = sqlite3.connect(SETTINGS_MANAGER.get_database_path())
             cursor = conn.cursor()
 
             cursor.execute(
-                f"SELECT widget_name, value FROM {SETTINGS_MANAGER.get_current_project_area_parameter_table_name()}"
+                f"SELECT widget_name, value FROM '{SETTINGS_MANAGER.area_parameter_prefix}{table_name}'"
             )
 
             widget_values_dict = {row[0]: row[1] for row in cursor.fetchall()}
@@ -180,8 +171,6 @@ class WidgetUtilsProjectArea(QObject):
             self.og_widget.listWidget_project_areas.clear()
             self.og_widget.lineEdit_current_project_area.setEnabled(True)
 
-            SETTINGS_MANAGER.set_current_project_area_parameter_table_name(None)
-
             self.og_widget.lineEdit_current_project_area.setText("")
             self.og_widget.label_current_project_area.setText("Project")
 
@@ -218,8 +207,6 @@ class WidgetUtilsProjectArea(QObject):
             self.og_widget.listWidget_project_areas.setCurrentRow(0)
 
             self.og_widget.lineEdit_current_project_area.setEnabled(True)
-
-            SETTINGS_MANAGER.set_current_project_area_parameter_table_name(None)
 
     def action_maptool_emit(self) -> None:
         """Emitted when plus button is clicked."""

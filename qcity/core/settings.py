@@ -130,19 +130,6 @@ class SettingsManager(QObject):
             cursor.close()
             conn.close()
 
-    def set_current_project_area_parameter_table_name(self, name: str) -> None:
-        """
-        Sets the current project area parameter table name.
-        """
-        self._current_project_area_parameter_table_name = name
-        self.current_project_area_parameter_name_changed.emit(name)
-
-    def get_current_project_area_parameter_table_name(self) -> str:
-        """
-        Returns the current project area parameter table name.
-        """
-        return self._current_project_area_parameter_table_name
-
 
 # Settings manager singleton instance
 SETTINGS_MANAGER = SettingsManager()

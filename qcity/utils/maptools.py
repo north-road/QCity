@@ -183,10 +183,6 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
                 QgsProject.instance().addMapLayer(new_layer)
                 self.dlg.listWidget_project_areas.addItem(table_name)
 
-                SETTINGS_MANAGER.set_current_project_area_parameter_table_name(
-                    f"{SETTINGS_MANAGER.area_parameter_prefix}{table_name}"
-                )
-
                 conn = sqlite3.connect(gpkg_path)
                 cursor = conn.cursor()
 
