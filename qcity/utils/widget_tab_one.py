@@ -8,6 +8,7 @@ from qgis._core import QgsVectorLayer, QgsProject
 
 from ..core import SETTINGS_MANAGER
 
+
 class WidgetUtilsProjectArea(QObject):
     def __init__(self, widget):
         super().__init__(widget)
@@ -50,7 +51,6 @@ class WidgetUtilsProjectArea(QObject):
             self.og_widget.label_current_project_area.setText("Project")
             self.og_widget.lineEdit_current_project_area.setText("")
 
-
     def update_layer_name_gpkg(self) -> None:
         """
         Updates the name of the table in the geopackage.
@@ -64,7 +64,9 @@ class WidgetUtilsProjectArea(QObject):
             cursor = conn.cursor()
 
             cursor.execute(f'ALTER TABLE "{old_layer_name}" RENAME TO "{layer_name}"')
-            cursor.execute(f'ALTER TABLE "{SETTINGS_MANAGER.area_parameter_prefix}{old_layer_name}" RENAME TO "{SETTINGS_MANAGER.area_parameter_prefix}{layer_name}"')
+            cursor.execute(
+                f'ALTER TABLE "{SETTINGS_MANAGER.area_parameter_prefix}{old_layer_name}" RENAME TO "{SETTINGS_MANAGER.area_parameter_prefix}{layer_name}"'
+            )
 
             conn.commit()
 
@@ -120,7 +122,9 @@ class WidgetUtilsProjectArea(QObject):
             widget_values_dict = {row[0]: row[1] for row in cursor.fetchall()}
 
             for widget_name in widget_values_dict.keys():
-                widget = self.og_widget.findChild((QSpinBox, QDoubleSpinBox), widget_name)
+                widget = self.og_widget.findChild(
+                    (QSpinBox, QDoubleSpinBox), widget_name
+                )
                 if isinstance(widget, QSpinBox):
                     widget.setValue(int(widget_values_dict[widget.objectName()]))
                 else:
@@ -141,7 +145,6 @@ class WidgetUtilsProjectArea(QObject):
             "projects",
             f"{self.og_widget.comboBox_base_layers.currentText()}.qgz",
         )
-        print(base_project_path)
         temp_project = QgsProject()
         temp_project.read(base_project_path)
         layers = [layer for layer in temp_project.mapLayers().values()]
@@ -158,11 +161,16 @@ class WidgetUtilsProjectArea(QObject):
             SETTINGS_MANAGER.set_database_path(file_name)
             shutil.copyfile(
                 os.path.join(
-                    self.og_widget.plugin_path, "..", "data", "base_project_database.gpkg"
+                    self.og_widget.plugin_path,
+                    "..",
+                    "data",
+                    "base_project_database.gpkg",
                 ),
                 file_name,
             )
-            self.og_widget.toolButton_project_area_add.clicked.connect(self.action_maptool_emit)
+            self.og_widget.toolButton_project_area_add.clicked.connect(
+                self.action_maptool_emit
+            )
 
             self.og_widget.listWidget_project_areas.clear()
             self.og_widget.lineEdit_current_project_area.setEnabled(True)
@@ -183,7 +191,9 @@ class WidgetUtilsProjectArea(QObject):
         )
         if file_name and file_name.endswith(".gpkg"):
             SETTINGS_MANAGER.set_database_path(file_name)
-            self.og_widget.toolButton_project_area_add.clicked.connect(self.action_maptool_emit)
+            self.og_widget.toolButton_project_area_add.clicked.connect(
+                self.action_maptool_emit
+            )
 
             areas = SETTINGS_MANAGER.get_project_areas_items()
             self.og_widget.listWidget_project_areas.clear()

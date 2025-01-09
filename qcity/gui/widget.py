@@ -1,19 +1,14 @@
 import os
-import sqlite3
 
 from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox
 from qgis.PyQt import uic
-from qgis.PyQt.QtWidgets import QFileDialog
 from qgis.PyQt.QtCore import QCoreApplication
-from qgis._core import QgsVectorLayer
-from qgis.core import QgsProject
 from qgis.gui import (
     QgsDockWidget,
 )
 
 from ..core import SETTINGS_MANAGER
 from ..gui.gui_utils import GuiUtils
-import shutil
 
 from ..utils.widget_tab_one import WidgetUtilsProjectArea
 
@@ -40,13 +35,19 @@ class TabDockWidget(QgsDockWidget):
 
         # Tab no. 1 things
         util_project_area = WidgetUtilsProjectArea(self)
-        self.pushButton_add_base_layer.clicked.connect(util_project_area.add_base_layers)
+        self.pushButton_add_base_layer.clicked.connect(
+            util_project_area.add_base_layers
+        )
         self.pushButton_create_database.clicked.connect(
             util_project_area.create_new_project_database
         )
-        self.pushButton_load_database.clicked.connect(util_project_area.load_project_database)
+        self.pushButton_load_database.clicked.connect(
+            util_project_area.load_project_database
+        )
 
-        self.toolButton_project_area_remove.clicked.connect(util_project_area.remove_selected_areas)
+        self.toolButton_project_area_remove.clicked.connect(
+            util_project_area.remove_selected_areas
+        )
 
         self.lineEdit_current_project_area.returnPressed.connect(
             util_project_area.update_layer_name_gpkg
