@@ -126,6 +126,8 @@ class WidgetUtilsProjectArea(QObject):
                 else:
                     widget.setValue(widget_values_dict[widget.objectName()])
 
+            self.og_widget.label_current_project_area.setText(table_name)
+
             # Close the connection
             cursor.close()
             conn.close()
