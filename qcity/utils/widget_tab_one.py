@@ -194,20 +194,15 @@ class WidgetUtilsProjectArea(QObject):
             )
 
             for area in areas:
-                if "" not in area:
-                    uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={area}"
-                    layer = QgsVectorLayer(uri, area, "ogr")
-                    QgsProject.instance().addMapLayer(layer)
+                uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={area}"
+                layer = QgsVectorLayer(uri, area, "ogr")
+                QgsProject.instance().addMapLayer(layer)
+
+            self.og_widget.listWidget_project_areas.setCurrentRow(0)
 
             self.og_widget.lineEdit_current_project_area.setEnabled(True)
 
             SETTINGS_MANAGER.set_current_project_area_parameter_table_name(None)
-            for area in areas:
-                # take the first areas' parameter file and use that
-                if SETTINGS_MANAGER.area_parameter_prefix in area:
-                    SETTINGS_MANAGER.set_current_project_area_parameter_table_name(area)
-                    self.update_project_area_parameters()
-                    break
 
     def action_maptool_emit(self) -> None:
         """Emitted when plus button is clicked."""
