@@ -170,6 +170,9 @@ class WidgetUtilsProjectArea(QObject):
 
             SETTINGS_MANAGER.set_current_project_area_parameter_table_name(None)
 
+            self.og_widget.lineEdit_current_project_area.setText("")
+            self.og_widget.label_current_project_area.setText("Project")
+
         else:
             # TODO: message bar here
             print("not a gpkg file")
