@@ -2,6 +2,7 @@ import os
 import shutil
 import sqlite3
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox, QFileDialog
 from qgis.PyQt.QtCore import QObject
 from qgis._core import QgsVectorLayer, QgsProject
@@ -78,6 +79,10 @@ class WidgetUtilsProjectArea(QObject):
         old_item_id = self.og_widget.listWidget_project_areas.row(widget)
         self.og_widget.listWidget_project_areas.takeItem(old_item_id)
         self.og_widget.listWidget_project_areas.addItem(layer_name)
+
+        # Set selection to changed item
+        item_to_select = self.og_widget.listWidget_project_areas.findItems(layer_name, Qt.MatchExactly)[0]
+        self.og_widget.listWidget_project_areas.setCurrentItem(item_to_select)
 
         self.og_widget.label_current_project_area.setText(layer_name)
 
