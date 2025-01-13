@@ -59,26 +59,33 @@ class WidgetUtilsProjectArea(QObject):
         widget = self.og_widget.listWidget_project_areas.selectedItems()[0]
         old_layer_name = widget.text()
         layer_name = self.og_widget.lineEdit_current_project_area.text()
+
+        old_item_id = self.og_widget.listWidget_project_areas.row(widget)
+        self.og_widget.listWidget_project_areas.takeItem(old_item_id)
+        self.og_widget.listWidget_project_areas.addItem(layer_name)
+
         try:
             database_path = SETTINGS_MANAGER.get_database_path()
             conn = sqlite3.connect(database_path)
             cursor = conn.cursor()
 
             cursor.execute(f'ALTER TABLE "{old_layer_name}" RENAME TO "{layer_name}"')
-            cursor.execute(
-                f'ALTER TABLE "{SETTINGS_MANAGER.area_parameter_prefix}{old_layer_name}" RENAME TO "{SETTINGS_MANAGER.area_parameter_prefix}{layer_name}"'
-            )
+            cursor.execute(f"UPDATE gpkg_contents SET table_name = '{layer_name}' WHERE table_name = '{old_layer_name}';")
+            cursor.execute(f"UPDATE gpkg_geometry_columns SET table_name = '{layer_name}' WHERE table_name = '{old_layer_name}'; ")
 
+            parameter_name = f'{SETTINGS_MANAGER.area_parameter_prefix}{layer_name}'
+            old_parameter_name = f'{SETTINGS_MANAGER.area_parameter_prefix}{old_layer_name}'
+            cursor.execute(
+                f"UPDATE gpkg_contents SET table_name = '{old_parameter_name}' WHERE table_name = '{parameter_name}';")
+            cursor.execute(
+                f"ALTER TABLE '{old_parameter_name}' RENAME TO '{parameter_name}'"
+            )
             conn.commit()
 
             cursor.close()
             conn.close()
         except Exception as e:
             raise e
-
-        old_item_id = self.og_widget.listWidget_project_areas.row(widget)
-        self.og_widget.listWidget_project_areas.takeItem(old_item_id)
-        self.og_widget.listWidget_project_areas.addItem(layer_name)
 
         # Set selection to changed item
         item_to_select = self.og_widget.listWidget_project_areas.findItems(layer_name, Qt.MatchExactly)[0]
