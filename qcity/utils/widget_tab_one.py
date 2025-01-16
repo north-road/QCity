@@ -34,16 +34,13 @@ class WidgetUtilsProjectArea(QObject):
                     self.og_widget.project.removeMapLayer(layer.id())
 
                 try:
-                    conn = sqlite3.connect(SETTINGS_MANAGER.get_database_path())
-                    cursor = conn.cursor()
+                    with sqlite3.connect(SETTINGS_MANAGER.get_database_path()) as conn:
+                        cursor = conn.cursor()
 
-                    cursor.execute(f"DROP TABLE '{value}'")
-                    cursor.execute(
-                        f"DROP TABLE '{SETTINGS_MANAGER.area_parameter_prefix}{value}'"
-                    )
-
-                    cursor.close()
-                    conn.close()
+                        cursor.execute(f"DROP TABLE '{value}'")
+                        cursor.execute(
+                            f"DROP TABLE '{SETTINGS_MANAGER.area_parameter_prefix}{value}'"
+                        )
 
                     self.og_widget.iface.mapCanvas().refresh()
                 except Exception as e:
@@ -66,24 +63,22 @@ class WidgetUtilsProjectArea(QObject):
 
         try:
             database_path = SETTINGS_MANAGER.get_database_path()
-            conn = sqlite3.connect(database_path)
-            cursor = conn.cursor()
+            with sqlite3.connect(database_path) as conn:
+                cursor = conn.cursor()
 
-            cursor.execute(f'ALTER TABLE "{old_layer_name}" RENAME TO "{layer_name}"')
-            cursor.execute(f"UPDATE gpkg_contents SET table_name = '{layer_name}' WHERE table_name = '{old_layer_name}';")
-            cursor.execute(f"UPDATE gpkg_geometry_columns SET table_name = '{layer_name}' WHERE table_name = '{old_layer_name}'; ")
+                cursor.execute(f'ALTER TABLE "{old_layer_name}" RENAME TO "{layer_name}"')
+                cursor.execute(f"UPDATE gpkg_contents SET table_name = '{layer_name}' WHERE table_name = '{old_layer_name}';")
+                cursor.execute(f"UPDATE gpkg_geometry_columns SET table_name = '{layer_name}' WHERE table_name = '{old_layer_name}'; ")
 
-            parameter_name = f'{SETTINGS_MANAGER.area_parameter_prefix}{layer_name}'
-            old_parameter_name = f'{SETTINGS_MANAGER.area_parameter_prefix}{old_layer_name}'
-            cursor.execute(
-                f"UPDATE gpkg_contents SET table_name = '{old_parameter_name}' WHERE table_name = '{parameter_name}';")
-            cursor.execute(
-                f"ALTER TABLE '{old_parameter_name}' RENAME TO '{parameter_name}'"
-            )
-            conn.commit()
+                parameter_name = f'{SETTINGS_MANAGER.area_parameter_prefix}{layer_name}'
+                old_parameter_name = f'{SETTINGS_MANAGER.area_parameter_prefix}{old_layer_name}'
+                cursor.execute(
+                    f"UPDATE gpkg_contents SET table_name = '{old_parameter_name}' WHERE table_name = '{parameter_name}';")
+                cursor.execute(
+                    f"ALTER TABLE '{old_parameter_name}' RENAME TO '{parameter_name}'"
+                )
+                conn.commit()
 
-            cursor.close()
-            conn.close()
         except Exception as e:
             raise e
 
@@ -114,28 +109,24 @@ class WidgetUtilsProjectArea(QObject):
 
             SETTINGS_MANAGER.set_current_project_area_parameter_table_name(table_name)
 
-            conn = sqlite3.connect(SETTINGS_MANAGER.get_database_path())
-            cursor = conn.cursor()
+            with sqlite3.connect(SETTINGS_MANAGER.get_database_path()) as conn:
+                cursor = conn.cursor()
 
-            cursor.execute(
-                f"SELECT widget_name, value FROM '{SETTINGS_MANAGER.area_parameter_prefix}{table_name}'"
-            )
-
-            widget_values_dict = {row[0]: row[1] for row in cursor.fetchall()}
-            for widget_name in widget_values_dict.keys():
-                widget = self.og_widget.findChild(
-                    (QSpinBox, QDoubleSpinBox), widget_name
+                cursor.execute(
+                    f"SELECT widget_name, value FROM '{SETTINGS_MANAGER.area_parameter_prefix}{table_name}'"
                 )
-                if isinstance(widget, QSpinBox):
-                    widget.setValue(int(widget_values_dict[widget_name]))
-                else:
-                    widget.setValue(widget_values_dict[widget_name])
 
-            self.og_widget.label_current_project_area.setText(table_name)
+                widget_values_dict = {row[0]: row[1] for row in cursor.fetchall()}
+                for widget_name in widget_values_dict.keys():
+                    widget = self.og_widget.findChild(
+                        (QSpinBox, QDoubleSpinBox), widget_name
+                    )
+                    if isinstance(widget, QSpinBox):
+                        widget.setValue(int(widget_values_dict[widget_name]))
+                    else:
+                        widget.setValue(widget_values_dict[widget_name])
 
-            # Close the connection
-            cursor.close()
-            conn.close()
+                self.og_widget.label_current_project_area.setText(table_name)
 
     def add_base_layers(self) -> None:
         """Adds the selected layer in the combo box to the canvas."""
