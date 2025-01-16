@@ -1,6 +1,7 @@
 import os
 import shutil
 import sqlite3
+from typing import Optional
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox, QFileDialog, QListWidgetItem
@@ -144,9 +145,11 @@ class WidgetUtilsProjectArea(QObject):
         for layer in layers:
             self.og_widget.project.addMapLayer(layer)
 
-    def create_new_project_database(self) -> None:
+    def create_new_project_database(self, file_name: str = "") -> None:
         """Opens a QFileDialog and returns the path to the new project Geopackage."""
-        file_name, _ = QFileDialog.getSaveFileName(
+        # Have the file_name as an argument to enable testing
+        if not file_name:
+            file_name, _ = QFileDialog.getSaveFileName(
             self.og_widget, self.og_widget.tr("Choose Project Database Path"), "*.gpkg"
         )
         if file_name and file_name.endswith(".gpkg"):
@@ -174,11 +177,14 @@ class WidgetUtilsProjectArea(QObject):
             # TODO: message bar here
             print("not a gpkg file")
 
-    def load_project_database(self) -> None:
+    def load_project_database(self, file_name: str = "") -> None:
         """Loads a project database from a .gpkg file."""
-        file_name, _ = QFileDialog.getOpenFileName(
-            self.og_widget, self.og_widget.tr("Choose Project Database Path"), "*.gpkg"
-        )
+        # Have the file_name as an argument to enable testing
+        if not file_name:
+            file_name, _ = QFileDialog.getOpenFileName(
+                self.og_widget, self.og_widget.tr("Choose Project Database Path"), "*.gpkg"
+            )
+
         if file_name and file_name.endswith(".gpkg"):
             SETTINGS_MANAGER.set_database_path(file_name)
             self.og_widget.toolButton_project_area_add.clicked.connect(
@@ -205,7 +211,7 @@ class WidgetUtilsProjectArea(QObject):
 
             self.og_widget.listWidget_project_areas.setCurrentRow(0)
             if areas:
-                SETTINGS_MANAGER.set_database_path(areas[0])
+                SETTINGS_MANAGER.set_current_project_area_parameter_table_name(areas[0])
 
     def action_maptool_emit(self) -> None:
         """Emitted when plus button is clicked."""
