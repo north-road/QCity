@@ -10,7 +10,7 @@ from qgis.gui import (
 from ..core import SETTINGS_MANAGER
 from ..gui.gui_utils import GuiUtils
 
-from ..utils.widget_tab_one import WidgetUtilsProjectArea
+from ..utils.widget_tab_project_areas import WidgetUtilsProjectArea
 
 
 class TabDockWidget(QgsDockWidget):
