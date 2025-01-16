@@ -3,7 +3,7 @@ import shutil
 import sqlite3
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox, QFileDialog
+from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox, QFileDialog, QListWidgetItem
 from qgis.PyQt.QtCore import QObject
 from qgis._core import QgsVectorLayer, QgsProject
 
@@ -90,12 +90,14 @@ class WidgetUtilsProjectArea(QObject):
         # Set selection to changed item
         item_to_select = self.og_widget.listWidget_project_areas.findItems(layer_name, Qt.MatchExactly)[0]
         self.og_widget.listWidget_project_areas.setCurrentItem(item_to_select)
+        SETTINGS_MANAGER.set_current_project_area_parameter_table_name(item_to_select.text())
 
         self.og_widget.label_current_project_area.setText(layer_name)
 
     def zoom_to_project_area(self, item) -> None:
         """Sets the canvas extent to the clicked layer"""
         name = item.text()
+        SETTINGS_MANAGER.set_current_project_area_parameter_table_name(name)
         uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={name}"
         layer = QgsVectorLayer(uri, name, "ogr")
         extent = layer.extent()
@@ -103,17 +105,14 @@ class WidgetUtilsProjectArea(QObject):
         self.og_widget.iface.mapCanvas().refresh()
         del layer
 
-    def update_project_area_parameters(self) -> None:
+    def update_project_area_parameters(self, item: QListWidgetItem) -> None:
         """
         Updates the parameter-spin-boxes of the project area to the currently selected one.
         """
-        widget = (
-            self.og_widget.listWidget_project_areas.currentItem()
-            or self.og_widget.listWidget_project_areas.item(0)
-        )
+        if item:
+            table_name = item.text()
 
-        if widget:
-            table_name = widget.text()
+            SETTINGS_MANAGER.set_current_project_area_parameter_table_name(table_name)
 
             conn = sqlite3.connect(SETTINGS_MANAGER.get_database_path())
             cursor = conn.cursor()
@@ -123,15 +122,14 @@ class WidgetUtilsProjectArea(QObject):
             )
 
             widget_values_dict = {row[0]: row[1] for row in cursor.fetchall()}
-
             for widget_name in widget_values_dict.keys():
                 widget = self.og_widget.findChild(
                     (QSpinBox, QDoubleSpinBox), widget_name
                 )
                 if isinstance(widget, QSpinBox):
-                    widget.setValue(int(widget_values_dict[widget.objectName()]))
+                    widget.setValue(int(widget_values_dict[widget_name]))
                 else:
-                    widget.setValue(widget_values_dict[widget.objectName()])
+                    widget.setValue(widget_values_dict[widget_name])
 
             self.og_widget.label_current_project_area.setText(table_name)
 
@@ -211,9 +209,12 @@ class WidgetUtilsProjectArea(QObject):
                 layer = QgsVectorLayer(uri, area, "ogr")
                 QgsProject.instance().addMapLayer(layer)
 
-            self.og_widget.listWidget_project_areas.setCurrentRow(0)
 
             self.og_widget.lineEdit_current_project_area.setEnabled(True)
+
+            self.og_widget.listWidget_project_areas.setCurrentRow(0)
+            if areas:
+                SETTINGS_MANAGER.set_database_path(areas[0])
 
     def action_maptool_emit(self) -> None:
         """Emitted when plus button is clicked."""

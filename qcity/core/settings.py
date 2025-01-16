@@ -81,26 +81,22 @@ class SettingsManager(QObject):
         """
         Sets a spinbox value from the corresponding widget-value.
         """
-        conn = sqlite3.connect(self._database_path)
-        cursor = conn.cursor()
-
         try:
             if self._current_project_area_parameter_table_name:
-                cursor.execute(
-                    f"DELETE FROM {self._current_project_area_parameter_table_name} where widget_name = '{widget.objectName()}';"
-                )
-                cursor.execute(
-                    f"INSERT INTO {self._current_project_area_parameter_table_name} (widget_name, value) VALUES ('{widget.objectName()}', {value});"
-                )
-                conn.commit()
+                with sqlite3.connect(self._database_path) as conn:
+                    cursor = conn.cursor()
+                    cursor.execute(
+                        f"DELETE FROM {self.area_parameter_prefix}{self._current_project_area_parameter_table_name} where widget_name = '{widget.objectName()}';"
+                    )
+                    cursor.execute(
+                        f"INSERT INTO {self.area_parameter_prefix}{self._current_project_area_parameter_table_name} (widget_name, value) VALUES ('{widget.objectName()}', {value});"
+                    )
+                    conn.commit()
 
         except Exception as e:
             print(e)
-            pass
+            raise e
 
-        finally:
-            cursor.close()
-            conn.close()
         self.spinbox_changed.emit((widget.objectName(), value))
 
     def get_spinbox_value_from_database(
@@ -109,8 +105,7 @@ class SettingsManager(QObject):
         """
         Returns the value corresponding to the given widget name from the database.
         """
-        query = f"SELECT value FROM {self._current_project_area_parameter_table_name} WHERE widget_name = '{widget.objectName()}';"
-
+        query = f"SELECT value FROM {self.area_parameter_prefix}{self._current_project_area_parameter_table_name} WHERE widget_name = '{widget.objectName()}';"
         conn = sqlite3.connect(self._database_path)
         cursor = conn.cursor()
 
@@ -125,10 +120,19 @@ class SettingsManager(QObject):
                     return result[0]
             else:
                 print("No matching row found.")
+        except Exception as e:
+            raise e
         finally:
             # Clean up
             cursor.close()
             conn.close()
+
+    def set_current_project_area_parameter_table_name(self, name: str) -> None:
+        """
+        Sets the current project area parameter table name.
+        """
+        self._current_project_area_parameter_table_name = name
+        self.current_project_area_parameter_name_changed.emit(name)
 
 
 # Settings manager singleton instance

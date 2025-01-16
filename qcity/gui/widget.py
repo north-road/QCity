@@ -65,7 +65,7 @@ class TabDockWidget(QgsDockWidget):
             )  # This does work indeed, despite the marked error
 
         self.listWidget_project_areas.currentItemChanged.connect(
-            util_project_area.update_project_area_parameters
+            lambda item: util_project_area.update_project_area_parameters(item)
         )
 
     def set_base_layer_items(self):

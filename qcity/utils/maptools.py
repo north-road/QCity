@@ -167,6 +167,9 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             table_name, ok = QInputDialog.getText(
                 self.dlg, "Name", "Input Name for Project Area:"
             )
+
+            SETTINGS_MANAGER.set_current_project_area_parameter_table_name(table_name)
+
             options.layerName = table_name
 
             options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
@@ -183,32 +186,39 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
                 QgsProject.instance().addMapLayer(new_layer)
                 self.dlg.listWidget_project_areas.addItem(table_name)
 
-                conn = sqlite3.connect(gpkg_path)
-                cursor = conn.cursor()
-
                 try:
-                    create_table_query = f"CREATE TABLE {SETTINGS_MANAGER.area_parameter_prefix}{table_name} (widget_name TEXT NOT NULL, value FLOAT NOT NULL);"
-                    cursor.execute(create_table_query)
+                    with sqlite3.connect(gpkg_path) as conn:
+                        cursor = conn.cursor()
 
-                    with open(self._default_project_area_parameters_path, "r") as file:
-                        data = json.load(file)
-                    insert_queries = [
-                        f"INSERT INTO {SETTINGS_MANAGER.area_parameter_prefix}{table_name} (widget_name, value) VALUES ('{widget_name}', {value});"
-                        for widget_name, value in data.items()
-                    ]
-                    for insert_query in insert_queries:
-                        cursor.execute(insert_query)
+                        create_table_query = f"CREATE TABLE {SETTINGS_MANAGER.area_parameter_prefix}{table_name} (widget_name TEXT NOT NULL, value FLOAT NOT NULL);"
+                        cursor.execute(create_table_query)
 
-                    insert_gpkg_contents_query = """INSERT INTO gpkg_contents (table_name, data_type, identifier, description) VALUES ('widget_values', 'attributes', 'widget_values', 'A table to store widget settings');"""
-                    cursor.execute(insert_gpkg_contents_query)
-                    conn.commit()
+                        with open(self._default_project_area_parameters_path, "r") as file:
+                            data = json.load(file)
+                        insert_queries = [
+                            f"INSERT INTO {SETTINGS_MANAGER.area_parameter_prefix}{table_name} (widget_name, value) VALUES ('{widget_name}', {value});"
+                            for widget_name, value in data.items()
+                        ]
+                        for insert_query in insert_queries:
+                            cursor.execute(insert_query)
+
+                        insert_gpkg_contents_query = f"""
+                        INSERT INTO gpkg_contents (table_name, data_type, identifier, description)
+                        VALUES 
+                            ('widget_values_{table_name}', 'attributes', 'widget_values_{table_name}', 'A table to store widget settings'),
+                            ('{SETTINGS_MANAGER.area_parameter_prefix}{table_name}', 'attributes', '{SETTINGS_MANAGER.area_parameter_prefix}{table_name}', 'A table to store widget settings');
+                        """
+                        cursor.execute(insert_gpkg_contents_query)
+
+                        conn.commit()
+
+
+                    item = self.dlg.listWidget_project_areas.findItems(table_name,Qt.MatchExactly)[0]
+                    row = self.dlg.listWidget_project_areas.row(item)
+                    self.dlg.listWidget_project_areas.setCurrentRow(row)
 
                 except Exception as e:
                     print(e)
-
-                finally:
-                    cursor.close()
-                    conn.close()
             else:
                 # TODO: message bar here instead
                 print(f"Error adding layer to GeoPackage: {error[1]}")
