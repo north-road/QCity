@@ -205,7 +205,6 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
                         insert_gpkg_contents_query = f"""
                         INSERT INTO gpkg_contents (table_name, data_type, identifier, description)
                         VALUES 
-                            ('widget_values_{table_name}', 'attributes', 'widget_values_{table_name}', 'A table to store widget settings'),
                             ('{SETTINGS_MANAGER.area_parameter_prefix}{table_name}', 'attributes', '{SETTINGS_MANAGER.area_parameter_prefix}{table_name}', 'A table to store widget settings');
                         """
                         cursor.execute(insert_gpkg_contents_query)
@@ -218,7 +217,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
                     self.dlg.listWidget_project_areas.setCurrentRow(row)
 
                 except Exception as e:
-                    print(e)
+                    raise e
             else:
                 # TODO: message bar here instead
                 print(f"Error adding layer to GeoPackage: {error[1]}")
