@@ -148,6 +148,15 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             self.showLine()
 
         if event.button() == Qt.RightButton:
+            table_name, ok = QInputDialog.getText(
+                self.dlg, "Name", "Input Name for Project Area:"
+            )
+
+            if not ok or not table_name:
+                self.cleanup()
+                self.clearRubberBands()
+                return
+
             self.clearRubberBands()
 
             gpkg_path = SETTINGS_MANAGER.get_database_path()
@@ -163,10 +172,6 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
 
             options = QgsVectorFileWriter.SaveVectorOptions()
             options.driverName = "GPKG"
-
-            table_name, ok = QInputDialog.getText(
-                self.dlg, "Name", "Input Name for Project Area:"
-            )
 
             SETTINGS_MANAGER.set_current_project_area_parameter_table_name(table_name)
 
