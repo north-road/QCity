@@ -157,7 +157,16 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
                 self.dlg, "Name", "Input Name for Project Area:"
             )
 
-            if not ok or not table_name:
+            areas = []
+            for index in range(self.dlg.listWidget_project_areas.count()):
+                item = self.dlg.listWidget_project_areas.item(index)
+                areas.append(item.text())
+            table_name_exists = True if table_name in areas else False
+
+            if not ok or not table_name or table_name_exists:
+                if table_name_exists:
+                    # TODO: Message bar here instead.
+                    print("Table name already exists.")
                 self.cleanup()
                 self.clearRubberBands()
                 return
