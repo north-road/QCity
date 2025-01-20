@@ -221,6 +221,9 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
                     row = self.dlg.listWidget_project_areas.row(item)
                     self.dlg.listWidget_project_areas.setCurrentRow(row)
 
+                    if not self.og_widget.tabWidget_project_area_parameters.isEnabled():
+                        self.og_widget.tabWidget_project_area_parameters.setEnabled(True)
+
                 except Exception as e:
                     raise e
             else:

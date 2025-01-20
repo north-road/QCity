@@ -124,26 +124,15 @@
          </spacer>
         </item>
         <item row="1" column="0">
-         <widget class="QToolBox" name="toolBox">
-          <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
+         <widget class="QTabWidget" name="tabWidget_project_area_parameters">
+          <property name="enabled">
+           <bool>false</bool>
           </property>
           <property name="currentIndex">
            <number>0</number>
           </property>
-          <widget class="QWidget" name="dwellings">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>418</width>
-             <height>146</height>
-            </rect>
-           </property>
-           <attribute name="label">
+          <widget class="QWidget" name="tabWidgetPage_dwellings">
+           <attribute name="title">
             <string>Dwellings</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_5">
@@ -193,16 +182,8 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="car_parking">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>404</width>
-             <height>232</height>
-            </rect>
-           </property>
-           <attribute name="label">
+          <widget class="QWidget" name="tabWidgetPage2">
+           <attribute name="title">
             <string>Car Parking</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_6">
@@ -356,17 +337,9 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="bicycle_parking">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>404</width>
-             <height>232</height>
-            </rect>
-           </property>
-           <attribute name="label">
-            <string>Bicycle Parking</string>
+          <widget class="QWidget" name="tabWidgetPage3">
+           <attribute name="title">
+            <string>Bike Parking</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_4">
             <item row="0" column="0">

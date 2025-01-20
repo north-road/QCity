@@ -212,6 +212,7 @@ class WidgetUtilsProjectArea(QObject):
             self.og_widget.listWidget_project_areas.setCurrentRow(0)
             if areas:
                 SETTINGS_MANAGER.set_current_project_area_parameter_table_name(areas[0])
+            self.og_widget.tabWidget_project_area_parameters.setEnabled(True)
 
     def action_maptool_emit(self) -> None:
         """Emitted when plus button is clicked."""
