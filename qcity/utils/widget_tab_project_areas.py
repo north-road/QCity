@@ -54,6 +54,14 @@ class WidgetUtilsProjectArea(QObject):
             self.og_widget.label_current_project_area.setText("Project")
             self.og_widget.lineEdit_current_project_area.setText("")
 
+            if self.og_widget.listWidget_project_areas.count() < 1:
+                SETTINGS_MANAGER.set_current_project_area_parameter_table_name(
+                    None
+                )
+                for widget in self.og_widget.findChildren((QSpinBox, QDoubleSpinBox)):
+                    widget.setValue(0)
+                self.og_widget.tabWidget_project_area_parameters.setEnabled(False)
+
     def update_layer_name_gpkg(self) -> None:
         """
         Updates the name of the table in the geopackage.
