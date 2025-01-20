@@ -148,7 +148,6 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             self.showLine()
 
         if event.button() == Qt.RightButton:
-
             if len(self.points) < 3:
                 self.cleanup()
                 self.clearRubberBands()
@@ -204,7 +203,9 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
                         create_table_query = f"CREATE TABLE {SETTINGS_MANAGER.area_parameter_prefix}{table_name} (widget_name TEXT NOT NULL, value FLOAT NOT NULL);"
                         cursor.execute(create_table_query)
 
-                        with open(self._default_project_area_parameters_path, "r") as file:
+                        with open(
+                            self._default_project_area_parameters_path, "r"
+                        ) as file:
                             data = json.load(file)
                         insert_queries = [
                             f"INSERT INTO {SETTINGS_MANAGER.area_parameter_prefix}{table_name} (widget_name, value) VALUES ('{widget_name}', {value});"
@@ -222,8 +223,9 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
 
                         conn.commit()
 
-
-                    item = self.dlg.listWidget_project_areas.findItems(table_name,Qt.MatchExactly)[0]
+                    item = self.dlg.listWidget_project_areas.findItems(
+                        table_name, Qt.MatchExactly
+                    )[0]
                     row = self.dlg.listWidget_project_areas.row(item)
                     self.dlg.listWidget_project_areas.setCurrentRow(row)
 

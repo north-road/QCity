@@ -1,7 +1,6 @@
 import os
 import shutil
 import sqlite3
-from typing import Optional
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox, QFileDialog, QListWidgetItem
@@ -67,14 +66,23 @@ class WidgetUtilsProjectArea(QObject):
             with sqlite3.connect(database_path) as conn:
                 cursor = conn.cursor()
 
-                cursor.execute(f'ALTER TABLE "{old_layer_name}" RENAME TO "{layer_name}"')
-                cursor.execute(f"UPDATE gpkg_contents SET table_name = '{layer_name}' WHERE table_name = '{old_layer_name}';")
-                cursor.execute(f"UPDATE gpkg_geometry_columns SET table_name = '{layer_name}' WHERE table_name = '{old_layer_name}'; ")
-
-                parameter_name = f'{SETTINGS_MANAGER.area_parameter_prefix}{layer_name}'
-                old_parameter_name = f'{SETTINGS_MANAGER.area_parameter_prefix}{old_layer_name}'
                 cursor.execute(
-                    f"UPDATE gpkg_contents SET table_name = '{old_parameter_name}' WHERE table_name = '{parameter_name}';")
+                    f'ALTER TABLE "{old_layer_name}" RENAME TO "{layer_name}"'
+                )
+                cursor.execute(
+                    f"UPDATE gpkg_contents SET table_name = '{layer_name}' WHERE table_name = '{old_layer_name}';"
+                )
+                cursor.execute(
+                    f"UPDATE gpkg_geometry_columns SET table_name = '{layer_name}' WHERE table_name = '{old_layer_name}'; "
+                )
+
+                parameter_name = f"{SETTINGS_MANAGER.area_parameter_prefix}{layer_name}"
+                old_parameter_name = (
+                    f"{SETTINGS_MANAGER.area_parameter_prefix}{old_layer_name}"
+                )
+                cursor.execute(
+                    f"UPDATE gpkg_contents SET table_name = '{old_parameter_name}' WHERE table_name = '{parameter_name}';"
+                )
                 cursor.execute(
                     f"ALTER TABLE '{old_parameter_name}' RENAME TO '{parameter_name}'"
                 )
@@ -84,9 +92,13 @@ class WidgetUtilsProjectArea(QObject):
             raise e
 
         # Set selection to changed item
-        item_to_select = self.og_widget.listWidget_project_areas.findItems(layer_name, Qt.MatchExactly)[0]
+        item_to_select = self.og_widget.listWidget_project_areas.findItems(
+            layer_name, Qt.MatchExactly
+        )[0]
         self.og_widget.listWidget_project_areas.setCurrentItem(item_to_select)
-        SETTINGS_MANAGER.set_current_project_area_parameter_table_name(item_to_select.text())
+        SETTINGS_MANAGER.set_current_project_area_parameter_table_name(
+            item_to_select.text()
+        )
 
         self.og_widget.label_current_project_area.setText(layer_name)
 
@@ -150,8 +162,10 @@ class WidgetUtilsProjectArea(QObject):
         # Have the file_name as an argument to enable testing
         if not file_name:
             file_name, _ = QFileDialog.getSaveFileName(
-            self.og_widget, self.og_widget.tr("Choose Project Database Path"), "*.gpkg"
-        )
+                self.og_widget,
+                self.og_widget.tr("Choose Project Database Path"),
+                "*.gpkg",
+            )
         if file_name and file_name.endswith(".gpkg"):
             SETTINGS_MANAGER.set_database_path(file_name)
             shutil.copyfile(
@@ -182,7 +196,9 @@ class WidgetUtilsProjectArea(QObject):
         # Have the file_name as an argument to enable testing
         if not file_name:
             file_name, _ = QFileDialog.getOpenFileName(
-                self.og_widget, self.og_widget.tr("Choose Project Database Path"), "*.gpkg"
+                self.og_widget,
+                self.og_widget.tr("Choose Project Database Path"),
+                "*.gpkg",
             )
 
         if file_name and file_name.endswith(".gpkg"):
@@ -205,7 +221,6 @@ class WidgetUtilsProjectArea(QObject):
                 uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={area}"
                 layer = QgsVectorLayer(uri, area, "ogr")
                 QgsProject.instance().addMapLayer(layer)
-
 
             self.og_widget.lineEdit_current_project_area.setEnabled(True)
 

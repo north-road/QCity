@@ -1,26 +1,16 @@
-import sqlite3
 import unittest
 import os
 
 from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis._core import QgsCoordinateReferenceSystem
-from qgis._gui import QgsMapCanvas
 
 from qgis.core import (
     QgsProject,
-    QgsRasterLayer,
-    QgsPointXY,
-    QgsVectorLayer,
-    QgsProcessingContext,
-    QgsCoordinateTransformContext,
     QgsSettings,
-    QgsProcessingFeatureSource,
 )
-from qgis.utils import iface
 
-from qcity.core import SETTINGS_MANAGER
-from qcity.gui.widget import TabDockWidget, SETTINGS_MANAGER
+from qcity.gui.widget import TabDockWidget
 from qcity.test.utilities import get_qgis_app
 from qcity.utils.widget_tab_project_areas import WidgetUtilsProjectArea
 
@@ -53,7 +43,9 @@ class QCityProjectAreaTest(unittest.TestCase):
         path = os.path.join(test_data_path, "test_database.gpkg")
         WidgetUtilsProjectArea(widget).create_new_project_database(path)
 
-        self.assertTrue(os.path.exists(os.path.join(test_data_path, "test_database.gpkg")))
+        self.assertTrue(
+            os.path.exists(os.path.join(test_data_path, "test_database.gpkg"))
+        )
         self.assertEqual(widget.label_current_project_area.text(), "Project")
 
         os.remove(path)
