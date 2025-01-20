@@ -148,6 +148,12 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             self.showLine()
 
         if event.button() == Qt.RightButton:
+
+            if len(self.points) < 3:
+                self.cleanup()
+                self.clearRubberBands()
+                return
+
             table_name, ok = QInputDialog.getText(
                 self.dlg, "Name", "Input Name for Project Area:"
             )
@@ -221,8 +227,8 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
                     row = self.dlg.listWidget_project_areas.row(item)
                     self.dlg.listWidget_project_areas.setCurrentRow(row)
 
-                    if not self.og_widget.tabWidget_project_area_parameters.isEnabled():
-                        self.og_widget.tabWidget_project_area_parameters.setEnabled(True)
+                    if not self.dlg.tabWidget_project_area_parameters.isEnabled():
+                        self.dlg.tabWidget_project_area_parameters.setEnabled(True)
 
                 except Exception as e:
                     raise e
