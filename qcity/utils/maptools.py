@@ -170,8 +170,8 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
                 self.cleanup()
                 self.clearRubberBands()
                 return
-
-            self.clearRubberBands()
+            if self.rubber_band:
+                self.clearRubberBands()
 
             gpkg_path = SETTINGS_MANAGER.get_database_path()
 
