@@ -25,10 +25,10 @@ class WidgetUtilsProjectArea(QObject):
                 for item in tbr_areas
             }
 
-            for key, value in rows.items():
+            for key, table_name in rows.items():
                 self.og_widget.listWidget_project_areas.takeItem(key)
 
-                layers = self.og_widget.project.mapLayersByName(value)
+                layers = self.og_widget.project.mapLayersByName(table_name)
                 if layers:
                     layer = layers[0]
                     self.og_widget.project.removeMapLayer(layer.id())
@@ -37,14 +37,19 @@ class WidgetUtilsProjectArea(QObject):
                     with sqlite3.connect(SETTINGS_MANAGER.get_database_path()) as conn:
                         cursor = conn.cursor()
 
-                        cursor.execute(f"DROP TABLE '{value}'")
+                        cursor.execute(f"DROP TABLE '{table_name}'")
                         cursor.execute(
-                            f"DROP TABLE '{SETTINGS_MANAGER.area_parameter_prefix}{value}'"
+                            f"DROP TABLE '{SETTINGS_MANAGER.area_parameter_prefix}{table_name}'"
                         )
+                        cursor.execute(f"""DELETE FROM gpkg_contents WHERE table_name = '{SETTINGS_MANAGER.area_parameter_prefix}{table_name}';""")
+                        cursor.execute(
+                            f"""DELETE FROM gpkg_contents WHERE table_name = '{table_name}';""")
+                        cursor.execute(f"DELETE FROM gpkg_geometry_columns WHERE table_name = '{table_name}';")
+                        cursor.execute(f"DELETE FROM gpkg_spatial_ref_sys WHERE srs_id = '{table_name}';")
 
                     self.og_widget.iface.mapCanvas().refresh()
                 except Exception as e:
-                    print(f"Failed to drop table {value}: {e}")
+                    raise e
 
             self.og_widget.label_current_project_area.setText("Project")
             self.og_widget.lineEdit_current_project_area.setText("")
