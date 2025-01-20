@@ -41,11 +41,18 @@ class WidgetUtilsProjectArea(QObject):
                         cursor.execute(
                             f"DROP TABLE '{SETTINGS_MANAGER.area_parameter_prefix}{table_name}'"
                         )
-                        cursor.execute(f"""DELETE FROM gpkg_contents WHERE table_name = '{SETTINGS_MANAGER.area_parameter_prefix}{table_name}';""")
                         cursor.execute(
-                            f"""DELETE FROM gpkg_contents WHERE table_name = '{table_name}';""")
-                        cursor.execute(f"DELETE FROM gpkg_geometry_columns WHERE table_name = '{table_name}';")
-                        cursor.execute(f"DELETE FROM gpkg_spatial_ref_sys WHERE srs_id = '{table_name}';")
+                            f"""DELETE FROM gpkg_contents WHERE table_name = '{SETTINGS_MANAGER.area_parameter_prefix}{table_name}';"""
+                        )
+                        cursor.execute(
+                            f"""DELETE FROM gpkg_contents WHERE table_name = '{table_name}';"""
+                        )
+                        cursor.execute(
+                            f"DELETE FROM gpkg_geometry_columns WHERE table_name = '{table_name}';"
+                        )
+                        cursor.execute(
+                            f"DELETE FROM gpkg_spatial_ref_sys WHERE srs_id = '{table_name}';"
+                        )
 
                     self.og_widget.iface.mapCanvas().refresh()
                 except Exception as e:
@@ -55,9 +62,7 @@ class WidgetUtilsProjectArea(QObject):
             self.og_widget.lineEdit_current_project_area.setText("")
 
             if self.og_widget.listWidget_project_areas.count() < 1:
-                SETTINGS_MANAGER.set_current_project_area_parameter_table_name(
-                    None
-                )
+                SETTINGS_MANAGER.set_current_project_area_parameter_table_name(None)
                 for widget in self.og_widget.findChildren((QSpinBox, QDoubleSpinBox)):
                     widget.setValue(0)
                 self.og_widget.tabWidget_project_area_parameters.setEnabled(False)
