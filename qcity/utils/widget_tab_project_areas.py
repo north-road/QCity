@@ -238,9 +238,10 @@ class WidgetUtilsProjectArea(QObject):
             )
 
             for area in areas:
-                uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={area}"
-                layer = QgsVectorLayer(uri, area, "ogr")
-                QgsProject.instance().addMapLayer(layer)
+                if SETTINGS_MANAGER.area_parameter_prefix not in area:
+                    uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={area}"
+                    layer = QgsVectorLayer(uri, area, "ogr")
+                    QgsProject.instance().addMapLayer(layer)
 
             self.og_widget.lineEdit_current_project_area.setEnabled(True)
 
