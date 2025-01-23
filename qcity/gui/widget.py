@@ -1,6 +1,6 @@
 import os
 
-from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox
+from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox, QWidget
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis.gui import (
@@ -32,6 +32,14 @@ class TabDockWidget(QgsDockWidget):
         self._default_project_area_parameters_path = os.path.join(
             self.plugin_path, "..", "data", "default_project_area_parameters.json"
         )
+
+        # Disable everything except database buttons
+        for i in range(self.tabWidget.count()):
+            tab = self.tabWidget.widget(i)
+            for child in tab.findChildren(QWidget):
+                if child in [self.pushButton_create_database, self.pushButton_load_database]:
+                    continue
+                child.setDisabled(True)
 
         # Tab no. 1 things
         util_project_area = WidgetUtilsProjectArea(self)

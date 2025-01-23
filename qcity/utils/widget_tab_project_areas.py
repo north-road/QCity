@@ -3,7 +3,7 @@ import shutil
 import sqlite3
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox, QFileDialog, QListWidgetItem
+from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox, QFileDialog, QListWidgetItem, QWidget
 from qgis.PyQt.QtCore import QObject
 from qgis._core import QgsVectorLayer, QgsProject
 
@@ -205,6 +205,8 @@ class WidgetUtilsProjectArea(QObject):
             self.og_widget.lineEdit_current_project_area.setText("")
             self.og_widget.label_current_project_area.setText("Project")
 
+            self.enable_widgets()
+
         else:
             # TODO: message bar here
             print("not a gpkg file")
@@ -247,6 +249,15 @@ class WidgetUtilsProjectArea(QObject):
                 SETTINGS_MANAGER.set_current_project_area_parameter_table_name(areas[0])
             self.og_widget.tabWidget_project_area_parameters.setEnabled(True)
 
+            self.enable_widgets()
+
     def action_maptool_emit(self) -> None:
         """Emitted when plus button is clicked."""
         SETTINGS_MANAGER.add_project_area_clicked.emit(True)
+
+    def enable_widgets(self):
+        # Enable everything
+        for i in range(self.og_widget.tabWidget.count()):
+            tab = self.og_widget.tabWidget.widget(i)
+            for child in tab.findChildren(QWidget):
+                child.setDisabled(False)
