@@ -3,10 +3,15 @@ import shutil
 import sqlite3
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox, QFileDialog, QListWidgetItem, QWidget
+from PyQt5.QtWidgets import (
+    QSpinBox,
+    QDoubleSpinBox,
+    QFileDialog,
+    QListWidgetItem,
+    QWidget,
+)
 from qgis.PyQt.QtCore import QObject
 from qgis._core import QgsVectorLayer, QgsProject
-from qgis._gui import QgisInterface
 
 from ..core import SETTINGS_MANAGER
 
@@ -24,7 +29,6 @@ class WidgetUtilsProjectArea(QObject):
         path = SETTINGS_MANAGER.get_database_path_with_project_name()
         if path:
             self.load_project_database(path)
-
 
     def remove_selected_areas(self) -> None:
         """Removes selected area from Qlistwidget, map and geopackage."""

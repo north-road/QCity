@@ -142,7 +142,9 @@ class SettingsManager(QObject):
                 section=QgsSettings.Plugins,
             )
 
-            self.database_path_with_project_name_saved.emit({project_name: self._database_path})
+            self.database_path_with_project_name_saved.emit(
+                {project_name: self._database_path}
+            )
 
     def get_database_path_with_project_name(self) -> Optional[dict]:
         """
@@ -156,7 +158,6 @@ class SettingsManager(QObject):
             )
             self.set_database_path(database_path)
             return database_path
-
 
 
 # Settings manager singleton instance

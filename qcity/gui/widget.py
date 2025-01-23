@@ -37,7 +37,10 @@ class TabDockWidget(QgsDockWidget):
         for i in range(self.tabWidget.count()):
             tab = self.tabWidget.widget(i)
             for child in tab.findChildren(QWidget):
-                if child in [self.pushButton_create_database, self.pushButton_load_database]:
+                if child in [
+                    self.pushButton_create_database,
+                    self.pushButton_load_database,
+                ]:
                     continue
                 child.setDisabled(True)
 
