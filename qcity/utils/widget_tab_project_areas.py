@@ -6,6 +6,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox, QFileDialog, QListWidgetItem, QWidget
 from qgis.PyQt.QtCore import QObject
 from qgis._core import QgsVectorLayer, QgsProject
+from qgis._gui import QgisInterface
 
 from ..core import SETTINGS_MANAGER
 
@@ -14,6 +15,16 @@ class WidgetUtilsProjectArea(QObject):
     def __init__(self, widget):
         super().__init__(widget)
         self.og_widget = widget
+
+        # Load associated database when project is loaded on startup
+        # TODO: Connect this so it also loads when a project is loaded while in session
+        self.load_saved_database_path()
+
+    def load_saved_database_path(self):
+        path = SETTINGS_MANAGER.get_database_path_with_project_name()
+        if path:
+            self.load_project_database(path)
+
 
     def remove_selected_areas(self) -> None:
         """Removes selected area from Qlistwidget, map and geopackage."""
@@ -186,6 +197,7 @@ class WidgetUtilsProjectArea(QObject):
             )
         if file_name and file_name.endswith(".gpkg"):
             SETTINGS_MANAGER.set_database_path(file_name)
+            SETTINGS_MANAGER.save_database_path_with_project_name()
             shutil.copyfile(
                 os.path.join(
                     self.og_widget.plugin_path,
@@ -223,6 +235,7 @@ class WidgetUtilsProjectArea(QObject):
 
         if file_name and file_name.endswith(".gpkg"):
             SETTINGS_MANAGER.set_database_path(file_name)
+            SETTINGS_MANAGER.save_database_path_with_project_name()
             self.og_widget.toolButton_project_area_add.clicked.connect(
                 self.action_maptool_emit
             )

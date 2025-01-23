@@ -10,6 +10,7 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.PyQt.QtGui import QColor
 import sqlite3
 
+from qgis._core import QgsProject
 from qgis.core import (
     QgsSettings,
     QgsVectorLayer,
@@ -27,6 +28,7 @@ class SettingsManager(QObject):
     add_project_area_clicked = pyqtSignal(bool)
     spinbox_changed = pyqtSignal(tuple)
     current_project_area_parameter_name_changed = pyqtSignal(str)
+    database_path_with_project_name_saved = pyqtSignal(dict)
 
     plugin_path = os.path.dirname(os.path.realpath(__file__))
     area_parameter_prefix = "project_area_parameters_"
@@ -35,6 +37,8 @@ class SettingsManager(QObject):
         super().__init__(parent)
         self._current_project_area_parameter_table_name: Optional[str] = None
         self._database_path = None
+
+        self.project = QgsProject().instance()
 
     def get_base_layers_items(self) -> List[str]:
         """Returns a list of all project files in plugin project directory."""
@@ -54,11 +58,6 @@ class SettingsManager(QObject):
         """
         if database_path != self.get_database_path():
             self._database_path = database_path
-            QgsSettings().setValue(
-                f"{self.SETTINGS_KEY}/database_path",
-                database_path,
-                section=QgsSettings.Plugins,
-            )
             self.database_path_changed.emit(database_path)
 
     def get_database_path(self) -> QColor:
@@ -129,6 +128,35 @@ class SettingsManager(QObject):
         """
         self._current_project_area_parameter_table_name = name
         self.current_project_area_parameter_name_changed.emit(name)
+
+    def save_database_path_with_project_name(self) -> None:
+        """
+        Saves the database path with the QGIS project name to the settings.
+        """
+        project_name = os.path.basename(self.project.fileName())
+
+        if project_name:
+            QgsSettings().setValue(
+                f"{self.SETTINGS_KEY}/database_path_{project_name}",
+                self._database_path,
+                section=QgsSettings.Plugins,
+            )
+
+            self.database_path_with_project_name_saved.emit({project_name: self._database_path})
+
+    def get_database_path_with_project_name(self) -> Optional[dict]:
+        """
+        Gets the database path with the QGIS project name from the settings.
+        """
+        project_name = os.path.basename(self.project.fileName())
+        if project_name:
+            database_path = QgsSettings().value(
+                f"{self.SETTINGS_KEY}/database_path_{project_name}",
+                section=QgsSettings.Plugins,
+            )
+            self.set_database_path(database_path)
+            return database_path
+
 
 
 # Settings manager singleton instance
