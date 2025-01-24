@@ -164,11 +164,11 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
                 self.clearRubberBands()
 
             tab_name = self.dlg.tabWidget.currentWidget().objectName()
-            self.create_layers(table_name, tab_name)
+            self.add_layers_to_gpkg(table_name, tab_name)
 
             self.cleanup()
 
-    def create_layers(self, table_name: str, tab_name: str) -> None:
+    def add_layers_to_gpkg(self, table_name: str, tab_name: str) -> None:
         """
         Creates a project area and parameter file, adds them to the gpkg and adds a list-widget entry.
         """
@@ -199,8 +199,6 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
 
         new_layer = self.create_layer(table_name)
         QgsProject.instance().addMapLayer(new_layer)
-
-
 
         list_widget.addItem(table_name)
 
