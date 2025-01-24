@@ -15,7 +15,7 @@ from typing import List, Union, Optional
 
 from PyQt5.QtCore import QVariant
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QInputDialog
+from PyQt5.QtWidgets import QInputDialog, QListWidget
 from qgis.PyQt.QtCore import Qt
 from qgis._core import (
     QgsFeature,
@@ -150,107 +150,133 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         if event.button() == Qt.RightButton:
             if len(self.points) < 3:
                 self.cleanup()
-                self.clearRubberBands()
                 return
 
             table_name, ok = QInputDialog.getText(
                 self.dlg, "Name", "Input Name for Project Area:"
             )
 
-            areas = []
-            for index in range(self.dlg.listWidget_project_areas.count()):
-                item = self.dlg.listWidget_project_areas.item(index)
-                areas.append(item.text())
-            table_name_exists = True if table_name in areas else False
-
-            if not ok or not table_name or table_name_exists:
-                if table_name_exists:
-                    # TODO: Message bar here instead.
-                    print("Table name already exists.")
+            if not ok:
                 self.cleanup()
-                self.clearRubberBands()
                 return
+
             if self.rubber_band:
                 self.clearRubberBands()
 
-            gpkg_path = SETTINGS_MANAGER.get_database_path()
-
-            layer_provider = self.layer.dataProvider()
-
-            polygon_geometry = QgsGeometry.fromPolygonXY([self.points])
-
-            feature = QgsFeature()
-            feature.setGeometry(polygon_geometry)
-
-            layer_provider.addFeature(feature)
-
-            options = QgsVectorFileWriter.SaveVectorOptions()
-            options.driverName = "GPKG"
-
-            SETTINGS_MANAGER.set_current_project_area_parameter_table_name(table_name)
-
-            options.layerName = table_name
-
-            options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
-
-            schema = QgsFields()
-            schema.append(QgsField("project_areas", QVariant.Double))
-
-            error = QgsVectorFileWriter.writeAsVectorFormatV2(
-                self.layer, gpkg_path, QgsCoordinateTransformContext(), options
-            )
-            if error[0] == QgsVectorFileWriter.NoError:
-                gpkg_uri = f"{gpkg_path}|layername={table_name}"
-                new_layer = QgsVectorLayer(gpkg_uri, table_name, "ogr")
-                QgsProject.instance().addMapLayer(new_layer)
-                self.dlg.listWidget_project_areas.addItem(table_name)
-
-                try:
-                    with sqlite3.connect(gpkg_path) as conn:
-                        cursor = conn.cursor()
-
-                        create_table_query = f"CREATE TABLE {SETTINGS_MANAGER.area_parameter_prefix}{table_name} (widget_name TEXT NOT NULL, value FLOAT NOT NULL);"
-                        cursor.execute(create_table_query)
-
-                        with open(
-                            self._default_project_area_parameters_path, "r"
-                        ) as file:
-                            data = json.load(file)
-                        insert_queries = [
-                            f"INSERT INTO {SETTINGS_MANAGER.area_parameter_prefix}{table_name} (widget_name, value) VALUES ('{widget_name}', {value});"
-                            for widget_name, value in data.items()
-                        ]
-                        for insert_query in insert_queries:
-                            cursor.execute(insert_query)
-
-                        insert_gpkg_contents_query = f"""
-                        INSERT INTO gpkg_contents (table_name, data_type, identifier, description)
-                        VALUES 
-                            ('{SETTINGS_MANAGER.area_parameter_prefix}{table_name}', 'attributes', '{SETTINGS_MANAGER.area_parameter_prefix}{table_name}', 'A table to store widget settings');
-                        """
-                        cursor.execute(insert_gpkg_contents_query)
-
-                        conn.commit()
-
-                    item = self.dlg.listWidget_project_areas.findItems(
-                        table_name, Qt.MatchExactly
-                    )[0]
-                    row = self.dlg.listWidget_project_areas.row(item)
-                    self.dlg.listWidget_project_areas.setCurrentRow(row)
-
-                    if not self.dlg.tabWidget_project_area_parameters.isEnabled():
-                        self.dlg.tabWidget_project_area_parameters.setEnabled(True)
-
-                except Exception as e:
-                    raise e
-            else:
-                # TODO: message bar here instead
-                print(f"Error adding layer to GeoPackage: {error[1]}")
+            tab_name = self.dlg.tabWidget.currentWidget().objectName()
+            self.create_layers(table_name, tab_name)
 
             self.cleanup()
 
+    def create_layers(self, table_name: str, tab_name: str) -> None:
+        """
+        Creates a project area and parameter file, adds them to the gpkg and adds a list-widget entry.
+        """
+        if tab_name == "tab_developement_sites":
+            prefix = SETTINGS_MANAGER.development_site_parameter_prefix
+            list_widget = self.dlg.listWidget_development_sites
+        elif tab_name == "tab_project_areas":
+            prefix = SETTINGS_MANAGER.area_parameter_prefix
+            list_widget = self.dlg.listWidget_project_areas
+        else:
+            raise Exception(f"Unknown tab name: {tab_name}")
+
+        items = []
+        for index in range(list_widget.count()):
+            item = list_widget.item(index)
+            items.append(item.text())
+
+        table_name_exists = True if table_name in items else False
+
+        if not table_name or table_name_exists:
+            if table_name_exists:
+                # TODO: Message bar here instead.
+                print("Table name already exists.")
+            self.cleanup()
+            return
+
+        gpkg_path = SETTINGS_MANAGER.get_database_path()
+
+        new_layer = self.create_layer(table_name)
+        QgsProject.instance().addMapLayer(new_layer)
+
+
+
+        list_widget.addItem(table_name)
+
+        try:
+            with sqlite3.connect(gpkg_path) as conn:
+                cursor = conn.cursor()
+
+                create_table_query = f"CREATE TABLE {prefix}{table_name} (widget_name TEXT NOT NULL, value FLOAT NOT NULL);"
+                cursor.execute(create_table_query)
+
+                with open(self._default_project_area_parameters_path, "r") as file:
+                    data = json.load(file)
+                insert_queries = [
+                    f"INSERT INTO {prefix}{table_name} (widget_name, value) VALUES ('{widget_name}', {value});"
+                    for widget_name, value in data.items()
+                ]
+                for insert_query in insert_queries:
+                    cursor.execute(insert_query)
+
+                insert_gpkg_contents_query = f"""
+                INSERT INTO gpkg_contents (table_name, data_type, identifier, description)
+                VALUES 
+                    ('{prefix}{table_name}', 'attributes', '{prefix}{table_name}', 'A table to store widget settings');
+                """
+                cursor.execute(insert_gpkg_contents_query)
+
+                conn.commit()
+
+            item = list_widget.findItems(table_name, Qt.MatchExactly)[0]
+            row = list_widget.row(item)
+            list_widget.setCurrentRow(row)
+
+            if not list_widget.isEnabled():
+                list_widget.setEnabled(True)
+
+        except Exception as e:
+            raise e
+
+    def create_layer(self, table_name: str) -> QgsVectorLayer:
+        """ """
+        gpkg_path = SETTINGS_MANAGER.get_database_path()
+
+        layer_provider = self.layer.dataProvider()
+
+        polygon_geometry = QgsGeometry.fromPolygonXY([self.points])
+
+        feature = QgsFeature()
+        feature.setGeometry(polygon_geometry)
+
+        layer_provider.addFeature(feature)
+
+        options = QgsVectorFileWriter.SaveVectorOptions()
+        options.driverName = "GPKG"
+
+        SETTINGS_MANAGER.set_current_project_area_parameter_table_name(table_name)
+
+        options.layerName = table_name
+
+        options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
+
+        schema = QgsFields()
+        schema.append(QgsField("project_areas", QVariant.Double))
+
+        error = QgsVectorFileWriter.writeAsVectorFormatV2(
+            self.layer, gpkg_path, QgsCoordinateTransformContext(), options
+        )
+        if error[0] == QgsVectorFileWriter.NoError:
+            gpkg_uri = f"{gpkg_path}|layername={table_name}"
+            return QgsVectorLayer(gpkg_uri, table_name, "ogr")
+        else:
+            # TODO: message bar here instead
+            raise Exception(f"Error adding layer to GeoPackage: {error[1]}")
+
     def cleanup(self):
         """Run after digitization is finished, cleans up the maptool"""
+        self.clearRubberBands()
         self.layer = QgsVectorLayer(
             "Polygon?crs=EPSG:4326", "memory_polygon_layer", "memory"
         )

@@ -32,6 +32,7 @@ class SettingsManager(QObject):
 
     plugin_path = os.path.dirname(os.path.realpath(__file__))
     area_parameter_prefix = "project_area_parameters_"
+    development_site_parameter_prefix = "development_site_parameters_"
 
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)

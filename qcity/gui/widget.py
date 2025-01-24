@@ -9,6 +9,7 @@ from qgis.gui import (
 
 from ..core import SETTINGS_MANAGER
 from ..gui.gui_utils import GuiUtils
+from ..utils.widget_tab_development_sites import WidgetUtilsDevelopmentSites
 
 from ..utils.widget_tab_project_areas import WidgetUtilsProjectArea
 
@@ -78,6 +79,9 @@ class TabDockWidget(QgsDockWidget):
         self.listWidget_project_areas.currentItemChanged.connect(
             lambda item: util_project_area.update_project_area_parameters(item)
         )
+
+        # Tab no.2 things
+        util_development_site = WidgetUtilsDevelopmentSites(self)
 
     def set_base_layer_items(self):
         """Adds all possible base layers to the selection combobox"""

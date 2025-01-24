@@ -25,6 +25,10 @@ class WidgetUtilsProjectArea(QObject):
         # TODO: Connect this so it also loads when a project is loaded while in session
         self.load_saved_database_path()
 
+        self.og_widget.toolButton_project_area_add.clicked.connect(
+            self.action_maptool_emit
+        )
+
     def load_saved_database_path(self):
         path = SETTINGS_MANAGER.get_database_path_with_project_name()
         if path:
@@ -211,9 +215,6 @@ class WidgetUtilsProjectArea(QObject):
                 ),
                 file_name,
             )
-            self.og_widget.toolButton_project_area_add.clicked.connect(
-                self.action_maptool_emit
-            )
 
             self.og_widget.listWidget_project_areas.clear()
             self.og_widget.lineEdit_current_project_area.setEnabled(True)
@@ -240,9 +241,6 @@ class WidgetUtilsProjectArea(QObject):
         if file_name and file_name.endswith(".gpkg"):
             SETTINGS_MANAGER.set_database_path(file_name)
             SETTINGS_MANAGER.save_database_path_with_project_name()
-            self.og_widget.toolButton_project_area_add.clicked.connect(
-                self.action_maptool_emit
-            )
 
             areas = SETTINGS_MANAGER.get_project_areas_items()
             self.og_widget.listWidget_project_areas.clear()
@@ -274,7 +272,9 @@ class WidgetUtilsProjectArea(QObject):
         SETTINGS_MANAGER.add_project_area_clicked.emit(True)
 
     def enable_widgets(self):
-        # Enable everything
+        """
+        Set all widgets to be enabled.
+        """
         for i in range(self.og_widget.tabWidget.count()):
             tab = self.og_widget.tabWidget.widget(i)
             for child in tab.findChildren(QWidget):
