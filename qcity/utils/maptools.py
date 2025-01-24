@@ -173,10 +173,12 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         Creates a project area and parameter file, adds them to the gpkg and adds a list-widget entry.
         """
         if tab_name == "tab_developement_sites":
-            prefix = SETTINGS_MANAGER.development_site_parameter_prefix
+            parameter_prefix = SETTINGS_MANAGER.development_site_parameter_prefix
+            prefix = "development_site"
             list_widget = self.dlg.listWidget_development_sites
         elif tab_name == "tab_project_areas":
-            prefix = SETTINGS_MANAGER.area_parameter_prefix
+            parameter_prefix = SETTINGS_MANAGER.area_parameter_prefix
+            prefix = "project_area"
             list_widget = self.dlg.listWidget_project_areas
         else:
             raise Exception(f"Unknown tab name: {tab_name}")
@@ -197,7 +199,8 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
 
         gpkg_path = SETTINGS_MANAGER.get_database_path()
 
-        new_layer = self.create_layer(table_name)
+        layer_name = f"{prefix}_{table_name}"
+        new_layer = self.create_layer(layer_name)
         QgsProject.instance().addMapLayer(new_layer)
 
         list_widget.addItem(table_name)
@@ -206,13 +209,13 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             with sqlite3.connect(gpkg_path) as conn:
                 cursor = conn.cursor()
 
-                create_table_query = f"CREATE TABLE {prefix}{table_name} (widget_name TEXT NOT NULL, value FLOAT NOT NULL);"
+                create_table_query = f"CREATE TABLE {parameter_prefix}{table_name} (widget_name TEXT NOT NULL, value FLOAT NOT NULL);"
                 cursor.execute(create_table_query)
 
                 with open(self._default_project_area_parameters_path, "r") as file:
                     data = json.load(file)
                 insert_queries = [
-                    f"INSERT INTO {prefix}{table_name} (widget_name, value) VALUES ('{widget_name}', {value});"
+                    f"INSERT INTO {parameter_prefix}{table_name} (widget_name, value) VALUES ('{widget_name}', {value});"
                     for widget_name, value in data.items()
                 ]
                 for insert_query in insert_queries:
@@ -221,7 +224,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
                 insert_gpkg_contents_query = f"""
                 INSERT INTO gpkg_contents (table_name, data_type, identifier, description)
                 VALUES 
-                    ('{prefix}{table_name}', 'attributes', '{prefix}{table_name}', 'A table to store widget settings');
+                    ('{parameter_prefix}{table_name}', 'attributes', '{parameter_prefix}{table_name}', 'A table to store widget settings');
                 """
                 cursor.execute(insert_gpkg_contents_query)
 
@@ -265,6 +268,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         error = QgsVectorFileWriter.writeAsVectorFormatV2(
             self.layer, gpkg_path, QgsCoordinateTransformContext(), options
         )
+
         if error[0] == QgsVectorFileWriter.NoError:
             gpkg_uri = f"{gpkg_path}|layername={table_name}"
             return QgsVectorLayer(gpkg_uri, table_name, "ogr")
