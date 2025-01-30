@@ -139,7 +139,7 @@ class WidgetUtilsProjectArea(QObject):
         """Sets the canvas extent to the clicked layer"""
         name = item.text()
         SETTINGS_MANAGER.set_current_project_area_parameter_table_name(name)
-        uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={name}"
+        uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.area_prefix}{name}"
         layer = QgsVectorLayer(uri, name, "ogr")
         extent = layer.extent()
         self.og_widget.iface.mapCanvas().setExtent(extent)
