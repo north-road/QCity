@@ -127,13 +127,13 @@ class WidgetUtilsProjectArea(QObject):
                 cursor = conn.cursor()
 
                 cursor.execute(
-                    f'ALTER TABLE "{old_layer_name}" RENAME TO "{layer_name}"'
+                    f'ALTER TABLE "{SETTINGS_MANAGER.area_prefix}{old_layer_name}" RENAME TO "{SETTINGS_MANAGER.area_prefix}{layer_name}"'
                 )
                 cursor.execute(
-                    f"UPDATE gpkg_contents SET table_name = '{layer_name}' WHERE table_name = '{old_layer_name}';"
+                    f"UPDATE gpkg_contents SET table_name = '{SETTINGS_MANAGER.area_prefix}{layer_name}' WHERE table_name = '{SETTINGS_MANAGER.area_prefix}{old_layer_name}';"
                 )
                 cursor.execute(
-                    f"UPDATE gpkg_geometry_columns SET table_name = '{layer_name}' WHERE table_name = '{old_layer_name}'; "
+                    f"UPDATE gpkg_geometry_columns SET table_name = '{SETTINGS_MANAGER.area_prefix}{layer_name}' WHERE table_name = '{SETTINGS_MANAGER.area_prefix}{old_layer_name}'; "
                 )
 
                 parameter_name = f"{SETTINGS_MANAGER.area_parameter_prefix}{layer_name}"
