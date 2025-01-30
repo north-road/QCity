@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox
+from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis._core import QgsCoordinateReferenceSystem
 
@@ -37,7 +37,6 @@ class QCityProjectAreaTest(unittest.TestCase):
         cls.CANVAS.resize(600, 400)
         assert cls.CANVAS.width() == 600
         assert cls.CANVAS.height() == 400
-
 
     def test_update_project_area_parameters(self):
         path = os.path.join(test_data_path, "filled_test_database.gpkg")

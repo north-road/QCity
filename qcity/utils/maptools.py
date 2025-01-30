@@ -13,18 +13,11 @@ import os
 import sqlite3
 from typing import List, Union, Optional
 
-from PyQt5.QtCore import QVariant
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QInputDialog, QListWidget
+from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import QInputDialog
 from qgis.PyQt.QtCore import Qt
-from qgis._core import (
-    QgsFeature,
-    QgsVectorFileWriter,
-    QgsCoordinateTransformContext,
-    QgsField,
-    QgsFields,
-    QgsWkbTypes,
-)
+
 from qgis._gui import QgsSnapIndicator
 
 from qgis.core import (
@@ -34,6 +27,12 @@ from qgis.core import (
     QgsPointXY,
     QgsRasterLayer,
     Qgis,
+    QgsFeature,
+    QgsVectorFileWriter,
+    QgsCoordinateTransformContext,
+    QgsField,
+    QgsFields,
+    QgsWkbTypes,
 )
 
 from qgis.gui import (

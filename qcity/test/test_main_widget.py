@@ -2,11 +2,11 @@ import unittest
 import os
 
 from qgis.PyQt.QtCore import QCoreApplication
-from qgis._core import QgsCoordinateReferenceSystem
 
 from qgis.core import (
     QgsProject,
     QgsSettings,
+    QgsCoordinateReferenceSystem,
 )
 
 from qcity.gui.widget import TabDockWidget
@@ -64,4 +64,3 @@ class QCityProjectMainWidgetTest(unittest.TestCase):
 
         # This needs to be updated if the base layers are changed
         self.assertEqual(widget.listWidget_project_areas.item(0).text(), "1")
-

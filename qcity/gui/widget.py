@@ -1,10 +1,10 @@
 import os
 import shutil
 
-from PyQt5.QtWidgets import QWidget, QFileDialog, QListWidget
+from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QListWidget
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QCoreApplication
-from qgis._core import QgsVectorLayer, QgsProject
+from qgis.core import QgsVectorLayer, QgsProject
 from qgis.gui import (
     QgsDockWidget,
 )
@@ -38,26 +38,20 @@ class TabDockWidget(QgsDockWidget):
 
         self.disable_widgets()
 
-        self.pushButton_add_base_layer.clicked.connect(
-            self.add_base_layers
-        )
+        self.pushButton_add_base_layer.clicked.connect(self.add_base_layers)
         self.pushButton_create_database.clicked.connect(
             self.create_new_project_database
         )
-        self.pushButton_load_database.clicked.connect(
-            self.load_project_database
-        )
+        self.pushButton_load_database.clicked.connect(self.load_project_database)
 
         # Initialize tabs
         WidgetUtilsProjectArea(self)
         WidgetUtilsDevelopmentSites(self)
 
-
-
     def set_base_layer_items(self):
         """Adds all possible base layers to the selection combobox"""
         self.comboBox_base_layers.addItems(SETTINGS_MANAGER.get_base_layers_items())
-        
+
     def create_new_project_database(self, file_name: str = "") -> None:
         """Opens a QFileDialog and returns the path to the new project Geopackage."""
         # Have the file_name as an argument to enable testing
@@ -131,13 +125,10 @@ class TabDockWidget(QgsDockWidget):
         items = [
             item
             for item in all_items
-            if item.startswith(prefix)
-               and not item.startswith(parameter_prefix)
+            if item.startswith(prefix) and not item.startswith(parameter_prefix)
         ]
 
-        widget.addItems(
-            [item[len(prefix):] for item in items]
-        )
+        widget.addItems([item[len(prefix) :] for item in items])
 
         for item in items:
             uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={item}"
@@ -186,7 +177,6 @@ class TabDockWidget(QgsDockWidget):
                 ]:
                     continue
                 child.setDisabled(True)
-
 
     @staticmethod
     def tr(message) -> str:

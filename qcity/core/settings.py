@@ -5,7 +5,7 @@ Settings manager
 import os
 from typing import Optional, List, Union
 
-from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox, QWidget
+from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QWidget
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.PyQt.QtGui import QColor
 import sqlite3
