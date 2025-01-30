@@ -52,7 +52,7 @@ class WidgetUtilsProjectArea(QObject):
                     with sqlite3.connect(SETTINGS_MANAGER.get_database_path()) as conn:
                         cursor = conn.cursor()
 
-                        cursor.execute(f"DROP TABLE '{table_name}'")
+                        cursor.execute(f"DROP TABLE '{SETTINGS_MANAGER.area_prefix}{table_name}'")
                         cursor.execute(
                             f"DROP TABLE '{SETTINGS_MANAGER.area_parameter_prefix}{table_name}'"
                         )
@@ -60,13 +60,13 @@ class WidgetUtilsProjectArea(QObject):
                             f"""DELETE FROM gpkg_contents WHERE table_name = '{SETTINGS_MANAGER.area_parameter_prefix}{table_name}';"""
                         )
                         cursor.execute(
-                            f"""DELETE FROM gpkg_contents WHERE table_name = '{table_name}';"""
+                            f"""DELETE FROM gpkg_contents WHERE table_name = '{SETTINGS_MANAGER.area_prefix}{table_name}';"""
                         )
                         cursor.execute(
-                            f"DELETE FROM gpkg_geometry_columns WHERE table_name = '{table_name}';"
+                            f"DELETE FROM gpkg_geometry_columns WHERE table_name = '{SETTINGS_MANAGER.area_prefix}{table_name}';"
                         )
                         cursor.execute(
-                            f"DELETE FROM gpkg_spatial_ref_sys WHERE srs_id = '{table_name}';"
+                            f"DELETE FROM gpkg_spatial_ref_sys WHERE srs_id = '{SETTINGS_MANAGER.area_prefix}{table_name}';"
                         )
 
                     self.og_widget.iface.mapCanvas().refresh()
