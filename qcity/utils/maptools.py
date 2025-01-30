@@ -174,11 +174,11 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         """
         if tab_name == "tab_developement_sites":
             parameter_prefix = SETTINGS_MANAGER.development_site_parameter_prefix
-            prefix = "development_site"
+            prefix = SETTINGS_MANAGER.development_site_prefix
             list_widget = self.dlg.listWidget_development_sites
         elif tab_name == "tab_project_areas":
             parameter_prefix = SETTINGS_MANAGER.area_parameter_prefix
-            prefix = "project_area"
+            prefix = SETTINGS_MANAGER.area_prefix
             list_widget = self.dlg.listWidget_project_areas
         else:
             raise Exception(f"Unknown tab name: {tab_name}")
@@ -199,7 +199,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
 
         gpkg_path = SETTINGS_MANAGER.get_database_path()
 
-        layer_name = f"{prefix}_{table_name}"
+        layer_name = f"{prefix}{table_name}"
         new_layer = self.create_layer(layer_name)
         QgsProject.instance().addMapLayer(new_layer)
 

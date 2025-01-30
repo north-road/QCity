@@ -242,27 +242,47 @@ class WidgetUtilsProjectArea(QObject):
             SETTINGS_MANAGER.set_database_path(file_name)
             SETTINGS_MANAGER.save_database_path_with_project_name()
 
-            areas = SETTINGS_MANAGER.get_project_areas_items()
+            items = SETTINGS_MANAGER.get_project_items()
+
+            # Project areas
             self.og_widget.listWidget_project_areas.clear()
+            areas = [
+                item
+                for item in items
+                if item.startswith(SETTINGS_MANAGER.area_prefix)
+                and not item.startswith(SETTINGS_MANAGER.area_parameter_prefix)
+            ]
             self.og_widget.listWidget_project_areas.addItems(
-                [
-                    item
-                    for item in areas
-                    if SETTINGS_MANAGER.area_parameter_prefix not in item
-                ]
+                [area[len(SETTINGS_MANAGER.area_prefix):] for area in areas]
             )
 
             for area in areas:
-                if SETTINGS_MANAGER.area_parameter_prefix not in area:
-                    uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={area}"
-                    layer = QgsVectorLayer(uri, area, "ogr")
-                    QgsProject.instance().addMapLayer(layer)
+                uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={area}"
+                layer = QgsVectorLayer(uri, area, "ogr")
+                QgsProject.instance().addMapLayer(layer)
+
+            # Development sites
+            self.og_widget.listWidget_development_sites.clear()
+            sites = [
+                item
+                for item in items
+                if item.startswith(SETTINGS_MANAGER.development_site_prefix)
+                and not item.startswith(SETTINGS_MANAGER.development_site_parameter_prefix)
+            ]
+            self.og_widget.listWidget_development_sites.addItems(
+                [site[len(SETTINGS_MANAGER.development_site_prefix):] for site in sites]
+            )
+
+            for site in sites:
+                uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={site}"
+                layer = QgsVectorLayer(uri, site, "ogr")
+                QgsProject.instance().addMapLayer(layer)
 
             self.og_widget.lineEdit_current_project_area.setEnabled(True)
 
             self.og_widget.listWidget_project_areas.setCurrentRow(0)
-            if areas:
-                SETTINGS_MANAGER.set_current_project_area_parameter_table_name(areas[0])
+            if items:
+                SETTINGS_MANAGER.set_current_project_area_parameter_table_name(items[0])
             self.og_widget.tabWidget_project_area_parameters.setEnabled(True)
 
             self.enable_widgets()

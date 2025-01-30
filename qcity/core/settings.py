@@ -32,7 +32,9 @@ class SettingsManager(QObject):
 
     plugin_path = os.path.dirname(os.path.realpath(__file__))
     area_parameter_prefix = "project_area_parameters_"
+    area_prefix = "project_area_"
     development_site_parameter_prefix = "development_site_parameters_"
+    development_site_prefix = "development_site_"
 
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
@@ -67,7 +69,7 @@ class SettingsManager(QObject):
         """
         return self._database_path
 
-    def get_project_areas_items(self):
+    def get_project_items(self):
         """Returns a list of all project areas in database."""
         layer = QgsVectorLayer(self._database_path, "database", "ogr")
         layers = layer.dataProvider().subLayers()
