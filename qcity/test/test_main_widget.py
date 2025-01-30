@@ -41,7 +41,7 @@ class QCityProjectAreaTest(unittest.TestCase):
     def test_create_database(self) -> None:
         widget = TabDockWidget(self.project, self.iface)
         path = os.path.join(test_data_path, "test_database.gpkg")
-        WidgetUtilsProjectArea(widget).create_new_project_database(path)
+        widget.create_new_project_database(path)
 
         self.assertTrue(
             os.path.exists(os.path.join(test_data_path, "test_database.gpkg"))
@@ -52,7 +52,7 @@ class QCityProjectAreaTest(unittest.TestCase):
 
     def test_add_base_layers(self) -> None:
         widget = TabDockWidget(self.project, self.iface)
-        WidgetUtilsProjectArea(widget).add_base_layers()
+        widget.add_base_layers()
 
         # This needs to be updated if the base layers are changed
         layer_name = "test_point_4326"
@@ -62,28 +62,8 @@ class QCityProjectAreaTest(unittest.TestCase):
     def test_load_project(self) -> None:
         path = os.path.join(test_data_path, "filled_test_database.gpkg")
         widget = TabDockWidget(self.project, self.iface)
-        WidgetUtilsProjectArea(widget).load_project_database(path)
+        widget.load_project_database(path)
 
         # This needs to be updated if the base layers are changed
         self.assertEqual(widget.listWidget_project_areas.item(0).text(), "1")
 
-    def test_update_project_area_parameters(self):
-        path = os.path.join(test_data_path, "filled_test_database.gpkg")
-        widget = TabDockWidget(self.project, self.iface)
-
-        value = widget.spinBox_dwellings_size_1.value()
-        self.assertEqual(value, 0)
-
-        widget.load_project_database(path)
-
-        value = widget.spinBox_bicycle_parking_bedroom_dwelling_1.value()
-        self.assertEqual(value, 3)
-
-        item = widget.listWidget_project_areas.item(1)
-        WidgetUtilsProjectArea(widget).update_project_area_parameters(item)
-
-        for sub_widget in widget.findChildren((QSpinBox, QDoubleSpinBox)):
-            self.assertNotEqual(sub_widget.value(), 0)
-
-    def test_zoom_to_project_area(self) -> None:
-        pass

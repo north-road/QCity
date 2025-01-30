@@ -56,6 +56,7 @@ class GradientDigitizerPlugin:
 
     def unload(self) -> None:
         """Removes the plugin menu item and icon from QGIS GUI."""
+        self.widget.close()
 
         self.iface.unregisterMapToolHandler(self.handler)
 

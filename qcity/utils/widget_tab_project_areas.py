@@ -21,6 +21,10 @@ class WidgetUtilsProjectArea(QObject):
         super().__init__(widget)
         self.og_widget = widget
 
+        self.og_widget.toolButton_project_area_add.clicked.connect(
+            self.action_maptool_emit
+        )
+
         # Load associated database when project is loaded on startup
         # TODO: Connect this so it also loads when a project is loaded while in session
         self.load_saved_database_path()
@@ -174,125 +178,7 @@ class WidgetUtilsProjectArea(QObject):
 
                 self.og_widget.label_current_project_area.setText(table_name)
 
-    def add_base_layers(self) -> None:
-        """Adds the selected layer in the combo box to the canvas."""
-        base_project_path = os.path.join(
-            self.og_widget.plugin_path,
-            "..",
-            "data",
-            "projects",
-            f"{self.og_widget.comboBox_base_layers.currentText()}.qgz",
-        )
-        temp_project = QgsProject()
-        temp_project.read(base_project_path)
-        layers = [layer for layer in temp_project.mapLayers().values()]
-
-        for layer in layers:
-            self.og_widget.project.addMapLayer(layer)
-
-    def create_new_project_database(self, file_name: str = "") -> None:
-        """Opens a QFileDialog and returns the path to the new project Geopackage."""
-        # Have the file_name as an argument to enable testing
-        if not file_name:
-            file_name, _ = QFileDialog.getSaveFileName(
-                self.og_widget,
-                self.og_widget.tr("Choose Project Database Path"),
-                "*.gpkg",
-            )
-        if file_name and file_name.endswith(".gpkg"):
-            SETTINGS_MANAGER.set_database_path(file_name)
-            SETTINGS_MANAGER.save_database_path_with_project_name()
-            shutil.copyfile(
-                os.path.join(
-                    self.og_widget.plugin_path,
-                    "..",
-                    "data",
-                    "base_project_database.gpkg",
-                ),
-                file_name,
-            )
-
-            self.og_widget.listWidget_project_areas.clear()
-            self.og_widget.lineEdit_current_project_area.setEnabled(True)
-
-            self.og_widget.lineEdit_current_project_area.setText("")
-            self.og_widget.label_current_project_area.setText("Project")
-
-            self.enable_widgets()
-
-            self.og_widget.toolButton_project_area_add.clicked.connect(
-                self.action_maptool_emit
-            )
-
-        else:
-            # TODO: message bar here
-            print("not a gpkg file")
-
-    def load_project_database(self, file_name: str = "") -> None:
-        """Loads a project database from a .gpkg file."""
-        # Have the file_name as an argument to enable testing
-        if not file_name:
-            file_name, _ = QFileDialog.getOpenFileName(
-                self.og_widget,
-                self.og_widget.tr("Choose Project Database Path"),
-                "*.gpkg",
-            )
-
-        if file_name and file_name.endswith(".gpkg"):
-            SETTINGS_MANAGER.set_database_path(file_name)
-            SETTINGS_MANAGER.save_database_path_with_project_name()
-
-            self.add_layers_to_widget_and_canvas(self.og_widget.listWidget_project_areas)
-            self.add_layers_to_widget_and_canvas(self.og_widget.listWidget_development_sites)
-
-        self.og_widget.lineEdit_current_project_area.setEnabled(True)
-
-        self.og_widget.listWidget_project_areas.setCurrentRow(0)
-
-        self.og_widget.tabWidget_project_area_parameters.setEnabled(True)
-
-        self.enable_widgets()
-
-    def add_layers_to_widget_and_canvas(self, widget: QListWidget) -> None:
-        all_items = SETTINGS_MANAGER.get_project_items()
-        widget.clear()
-
-        if widget.objectName() == "listWidget_development_sites":
-            prefix = SETTINGS_MANAGER.development_site_prefix
-            parameter_prefix = SETTINGS_MANAGER.development_site_parameter_prefix
-        elif widget.objectName() == "listWidget_project_areas":
-            prefix = SETTINGS_MANAGER.area_prefix
-            parameter_prefix = SETTINGS_MANAGER.area_parameter_prefix
-
-        items = [
-            item
-            for item in all_items
-            if item.startswith(prefix)
-               and not item.startswith(parameter_prefix)
-        ]
-
-        widget.addItems(
-            [item[len(prefix):] for item in items]
-        )
-
-        for item in items:
-            uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={item}"
-            layer = QgsVectorLayer(uri, item, "ogr")
-
-            QgsProject.instance().addMapLayer(layer)
-
-        """if items:
-            SETTINGS_MANAGER.set_current_project_area_parameter_table_name(items[0])"""
-
     def action_maptool_emit(self) -> None:
         """Emitted when plus button is clicked."""
         SETTINGS_MANAGER.add_project_area_clicked.emit(True)
 
-    def enable_widgets(self):
-        """
-        Set all widgets to be enabled.
-        """
-        for i in range(self.og_widget.tabWidget.count()):
-            tab = self.og_widget.tabWidget.widget(i)
-            for child in tab.findChildren(QWidget):
-                child.setDisabled(False)
