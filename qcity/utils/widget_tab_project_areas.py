@@ -25,10 +25,6 @@ class WidgetUtilsProjectArea(QObject):
         # TODO: Connect this so it also loads when a project is loaded while in session
         self.load_saved_database_path()
 
-        self.og_widget.toolButton_project_area_add.clicked.connect(
-            self.action_maptool_emit
-        )
-
     def load_saved_database_path(self):
         path = SETTINGS_MANAGER.get_database_path_with_project_name()
         if path:
@@ -223,6 +219,10 @@ class WidgetUtilsProjectArea(QObject):
             self.og_widget.label_current_project_area.setText("Project")
 
             self.enable_widgets()
+
+            self.og_widget.toolButton_project_area_add.clicked.connect(
+                self.action_maptool_emit
+            )
 
         else:
             # TODO: message bar here
