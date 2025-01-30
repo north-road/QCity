@@ -85,6 +85,10 @@ class TabDockWidget(QgsDockWidget):
         # Tab no.2 things
         util_development_site = WidgetUtilsDevelopmentSites(self)
 
+        self.toolButton_development_site_remove.clicked.connect(
+            util_development_site.remove_selected_sites
+        )
+
     def set_base_layer_items(self):
         """Adds all possible base layers to the selection combobox"""
         self.comboBox_base_layers.addItems(SETTINGS_MANAGER.get_base_layers_items())

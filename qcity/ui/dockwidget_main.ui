@@ -550,15 +550,18 @@
             </item>
            </layout>
           </item>
-          <item row="4" column="0">
-           <widget class="QListWidget" name="listWidget_development_sites"/>
-          </item>
           <item row="7" column="0">
            <widget class="QLabel" name="label_current_developement_site">
             <property name="text">
              <string>Development Site</string>
             </property>
            </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QListWidget" name="listWidget_development_sites"/>
+          </item>
+          <item row="8" column="0">
+           <widget class="QLineEdit" name="lineEdit_current_development_site"/>
           </item>
          </layout>
         </item>
