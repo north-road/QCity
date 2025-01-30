@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (
 from qgis.PyQt.QtCore import QObject
 from qgis._core import QgsVectorLayer, QgsProject
 
-from ..core import SETTINGS_MANAGER
+from qcity.core import SETTINGS_MANAGER
 
 
 class WidgetUtilsProjectArea(QObject):
@@ -23,6 +23,29 @@ class WidgetUtilsProjectArea(QObject):
 
         self.og_widget.toolButton_project_area_add.clicked.connect(
             self.action_maptool_emit
+        )
+
+        self.og_widget.toolButton_project_area_remove.clicked.connect(
+            self.remove_selected_areas
+        )
+
+        self.og_widget.lineEdit_current_project_area.returnPressed.connect(
+            self.update_layer_name_gpkg
+        )
+
+        self.og_widget.listWidget_project_areas.itemClicked.connect(
+            lambda item: self.zoom_to_project_area(item)
+        )
+
+        for widget in self.findChildren((QSpinBox, QDoubleSpinBox)):
+            widget.valueChanged.connect(
+                lambda value, widget=widget: SETTINGS_MANAGER.set_spinbox_value(
+                    widget, value
+                )
+            )  # This does work indeed, despite the marked error
+
+        self.og_widget.listWidget_project_areas.currentItemChanged.connect(
+            lambda item: self.update_project_area_parameters(item)
         )
 
         # Load associated database when project is loaded on startup

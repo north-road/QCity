@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox, QWidget, QFileDialog, QListWidget
+from PyQt5.QtWidgets import QWidget, QFileDialog, QListWidget
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis._core import QgsVectorLayer, QgsProject
@@ -11,9 +11,9 @@ from qgis.gui import (
 
 from ..core import SETTINGS_MANAGER
 from ..gui.gui_utils import GuiUtils
-from ..utils.widget_tab_development_sites import WidgetUtilsDevelopmentSites
+from qcity.gui.widget_tab_development_sites import WidgetUtilsDevelopmentSites
 
-from ..utils.widget_tab_project_areas import WidgetUtilsProjectArea
+from qcity.gui.widget_tab_project_areas import WidgetUtilsProjectArea
 
 
 class TabDockWidget(QgsDockWidget):
@@ -36,19 +36,8 @@ class TabDockWidget(QgsDockWidget):
             self.plugin_path, "..", "data", "default_project_area_parameters.json"
         )
 
-        # Disable everything except database buttons
-        for i in range(self.tabWidget.count()):
-            tab = self.tabWidget.widget(i)
-            for child in tab.findChildren(QWidget):
-                if child in [
-                    self.pushButton_create_database,
-                    self.pushButton_load_database,
-                ]:
-                    continue
-                child.setDisabled(True)
+        self.disable_widgets()
 
-        # Tab no. 1 things
-        util_project_area = WidgetUtilsProjectArea(self)
         self.pushButton_add_base_layer.clicked.connect(
             self.add_base_layers
         )
@@ -59,35 +48,11 @@ class TabDockWidget(QgsDockWidget):
             self.load_project_database
         )
 
-        self.toolButton_project_area_remove.clicked.connect(
-            util_project_area.remove_selected_areas
-        )
+        # Initialize tabs
+        WidgetUtilsProjectArea(self)
+        WidgetUtilsDevelopmentSites(self)
 
-        self.lineEdit_current_project_area.returnPressed.connect(
-            util_project_area.update_layer_name_gpkg
-        )
 
-        self.listWidget_project_areas.itemClicked.connect(
-            lambda item: util_project_area.zoom_to_project_area(item)
-        )
-
-        for widget in self.findChildren((QSpinBox, QDoubleSpinBox)):
-            widget.valueChanged.connect(
-                lambda value, widget=widget: SETTINGS_MANAGER.set_spinbox_value(
-                    widget, value
-                )
-            )  # This does work indeed, despite the marked error
-
-        self.listWidget_project_areas.currentItemChanged.connect(
-            lambda item: util_project_area.update_project_area_parameters(item)
-        )
-
-        # Tab no.2 things
-        util_development_site = WidgetUtilsDevelopmentSites(self)
-
-        self.toolButton_development_site_remove.clicked.connect(
-            util_development_site.remove_selected_sites
-        )
 
     def set_base_layer_items(self):
         """Adds all possible base layers to the selection combobox"""
@@ -199,7 +164,7 @@ class TabDockWidget(QgsDockWidget):
         for layer in layers:
             self.project.addMapLayer(layer)
 
-    def enable_widgets(self):
+    def enable_widgets(self) -> None:
         """
         Set all widgets to be enabled.
         """
@@ -207,6 +172,21 @@ class TabDockWidget(QgsDockWidget):
             tab = self.tabWidget.widget(i)
             for child in tab.findChildren(QWidget):
                 child.setDisabled(False)
+
+    def disable_widgets(self) -> None:
+        """
+        Set all widgets to be disabled except database buttons.
+        """
+        for i in range(self.tabWidget.count()):
+            tab = self.tabWidget.widget(i)
+            for child in tab.findChildren(QWidget):
+                if child in [
+                    self.pushButton_create_database,
+                    self.pushButton_load_database,
+                ]:
+                    continue
+                child.setDisabled(True)
+
 
     @staticmethod
     def tr(message) -> str:

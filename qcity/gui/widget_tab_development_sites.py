@@ -3,7 +3,7 @@ import sqlite3
 from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox
 from qgis.PyQt.QtCore import QObject
 
-from ..core import SETTINGS_MANAGER
+from qcity.core import SETTINGS_MANAGER
 
 
 class WidgetUtilsDevelopmentSites(QObject):
@@ -13,6 +13,10 @@ class WidgetUtilsDevelopmentSites(QObject):
 
         self.og_widget.toolButton_development_site_add.clicked.connect(
             self.action_maptool_emit
+        )
+
+        self.og_widget.toolButton_development_site_remove.clicked.connect(
+            self.remove_selected_sites
         )
 
     def action_maptool_emit(self) -> None:

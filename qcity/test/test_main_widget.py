@@ -1,7 +1,6 @@
 import unittest
 import os
 
-from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis._core import QgsCoordinateReferenceSystem
 
@@ -12,12 +11,11 @@ from qgis.core import (
 
 from qcity.gui.widget import TabDockWidget
 from qcity.test.utilities import get_qgis_app
-from qcity.utils.widget_tab_project_areas import WidgetUtilsProjectArea
 
 test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
 
 
-class QCityProjectAreaTest(unittest.TestCase):
+class QCityProjectMainWidgetTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Run before all tests"""
