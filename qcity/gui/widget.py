@@ -76,9 +76,13 @@ class TabDockWidget(QgsDockWidget):
 
             self.listWidget_project_areas.clear()
             self.lineEdit_current_project_area.setEnabled(True)
-
             self.lineEdit_current_project_area.setText("")
             self.label_current_project_area.setText("Project")
+
+            self.listWidget_development_sites.clear()
+            self.lineEdit_current_development_site.setEnabled(True)
+            self.lineEdit_current_development_site.setText("")
+            self.label_current_development_site.setText("Project")
 
             self.enable_widgets()
 
