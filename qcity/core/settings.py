@@ -81,7 +81,9 @@ class SettingsManager(QObject):
             areas.append(name)
         return areas
 
-    def save_widget_value_to_settings(self, widget: QWidget, value: Union[float, int, str], tab: str):
+    def save_widget_value_to_settings(
+        self, widget: QWidget, value: Union[float, int, str], tab: str
+    ):
         """
         Sets a spinbox value from the corresponding widget-value.
         """

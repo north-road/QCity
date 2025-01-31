@@ -180,7 +180,9 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             list_widget = self.dlg.listWidget_development_sites
             default_parameter_path = self._default_development_site_parameters_path
 
-            SETTINGS_MANAGER.set_current_development_site_parameter_table_name(table_name)
+            SETTINGS_MANAGER.set_current_development_site_parameter_table_name(
+                table_name
+            )
         elif tab_name == "tab_project_areas":
             parameter_prefix = SETTINGS_MANAGER.area_parameter_prefix
             prefix = SETTINGS_MANAGER.area_prefix

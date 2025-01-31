@@ -27,25 +27,28 @@ class WidgetUtilsDevelopmentSites(QObject):
 
         self.og_widget.lineEdit_development_site_address.textChanged.connect(
             lambda value,
-                   widget=self.og_widget.lineEdit_development_site_address: SETTINGS_MANAGER.save_widget_value_to_settings(
+            widget=self.og_widget.lineEdit_development_site_address: SETTINGS_MANAGER.save_widget_value_to_settings(
                 widget, value, "development_sites"
             )
         )
 
         self.og_widget.lineEdit_development_site_owner.textChanged.connect(
-            lambda value, widget=self.og_widget.lineEdit_development_site_owner: SETTINGS_MANAGER.save_widget_value_to_settings(
+            lambda value,
+            widget=self.og_widget.lineEdit_development_site_owner: SETTINGS_MANAGER.save_widget_value_to_settings(
                 widget, value, "development_sites"
             )
         )
 
         self.og_widget.lineEdit_development_site_year.textChanged.connect(
-            lambda value, widget=self.og_widget.lineEdit_development_site_year: SETTINGS_MANAGER.save_widget_value_to_settings(
+            lambda value,
+            widget=self.og_widget.lineEdit_development_site_year: SETTINGS_MANAGER.save_widget_value_to_settings(
                 widget, value, "development_sites"
             )
         )
 
         self.og_widget.comboBox_development_site_status.currentIndexChanged.connect(
-            lambda value, widget=self.og_widget.comboBox_development_site_status: SETTINGS_MANAGER.save_widget_value_to_settings(
+            lambda value,
+            widget=self.og_widget.comboBox_development_site_status: SETTINGS_MANAGER.save_widget_value_to_settings(
                 widget, value, "development_sites"
             )
         )
@@ -109,7 +112,7 @@ class WidgetUtilsDevelopmentSites(QObject):
             if self.og_widget.listWidget_development_sites.count() < 1:
                 SETTINGS_MANAGER.set_current_development_site_parameter_table_name(None)
                 # for widget in self.og_widget.findChildren((QSpinBox, QDoubleSpinBox)):
-                    # widget.setValue(0)
+                # widget.setValue(0)
                 # self.og_widget.tabWidget_project_area_parameters.setEnabled(False)
 
     def update_site_name_gpkg(self) -> None:
@@ -172,7 +175,9 @@ class WidgetUtilsDevelopmentSites(QObject):
         if item:
             table_name = item.text()
 
-            SETTINGS_MANAGER.set_current_development_site_parameter_table_name(table_name)
+            SETTINGS_MANAGER.set_current_development_site_parameter_table_name(
+                table_name
+            )
 
             with sqlite3.connect(SETTINGS_MANAGER.get_database_path()) as conn:
                 cursor = conn.cursor()
@@ -183,15 +188,12 @@ class WidgetUtilsDevelopmentSites(QObject):
 
                 widget_values_dict = {row[0]: row[1:] for row in cursor.fetchall()}
                 for widget_name in widget_values_dict.keys():
-                    widget = self.og_widget.findChild(
-                        QWidget, widget_name
-                    )
+                    widget = self.og_widget.findChild(QWidget, widget_name)
 
                     if isinstance(widget, QLineEdit):
                         widget.setText(widget_values_dict[widget_name][1])
                         print(widget_values_dict)
                     elif isinstance(widget, QComboBox):
                         widget.setCurrentIndex(int(widget_values_dict[widget_name][0]))
-
 
                 self.og_widget.label_current_project_area.setText(table_name)
