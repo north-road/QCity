@@ -93,7 +93,6 @@ class SettingsManager(QObject):
                 table_name = self._current_development_site_parameter_table_name
                 prefix = self.development_site_parameter_prefix
 
-            print("save_widget_value_to_settings", value)
             if isinstance(value, Union[float, int]):
                 col = "value_float"
             elif isinstance(value, str):
