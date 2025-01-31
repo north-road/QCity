@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Slope Digitizer Live-Display</string>
+   <string>QCity</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents_gradientDigitizer">
    <layout class="QGridLayout" name="gridLayout">
