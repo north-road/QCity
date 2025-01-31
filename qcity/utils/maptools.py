@@ -90,6 +90,9 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         self._default_project_area_parameters_path = os.path.join(
             self.plugin_path, "..", "data", "default_project_area_parameters.json"
         )
+        self._default_development_site_parameters_path = os.path.join(
+            self.plugin_path, "..", "data", "default_development_site_parameters.json"
+        )
         self.rubber_band = QgsRubberBand(
             mapCanvas=self.map_canvas,
             geometryType=QgsWkbTypes.GeometryType.PolygonGeometry,
@@ -171,14 +174,21 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         """
         Creates a project area and parameter file, adds them to the gpkg and adds a list-widget entry.
         """
-        if tab_name == "tab_developement_sites":
+        if tab_name == "tab_development_sites":
             parameter_prefix = SETTINGS_MANAGER.development_site_parameter_prefix
             prefix = SETTINGS_MANAGER.development_site_prefix
             list_widget = self.dlg.listWidget_development_sites
+            default_parameter_path = self._default_development_site_parameters_path
+
+            SETTINGS_MANAGER.set_current_development_site_parameter_table_name(table_name)
         elif tab_name == "tab_project_areas":
             parameter_prefix = SETTINGS_MANAGER.area_parameter_prefix
             prefix = SETTINGS_MANAGER.area_prefix
             list_widget = self.dlg.listWidget_project_areas
+            default_parameter_path = self._default_project_area_parameters_path
+
+            SETTINGS_MANAGER.set_current_project_area_parameter_table_name(table_name)
+
         else:
             raise Exception(f"Unknown tab name: {tab_name}")
 
@@ -208,17 +218,21 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             with sqlite3.connect(gpkg_path) as conn:
                 cursor = conn.cursor()
 
-                create_table_query = f"CREATE TABLE {parameter_prefix}{table_name} (widget_name TEXT NOT NULL, value FLOAT NOT NULL);"
+                create_table_query = f"CREATE TABLE {parameter_prefix}{table_name} (widget_name TEXT NOT NULL, value_float FLOAT, value_string TEXT, value_bool BOOLEAN);"
                 cursor.execute(create_table_query)
 
-                with open(self._default_project_area_parameters_path, "r") as file:
+                with open(default_parameter_path, "r") as file:
                     data = json.load(file)
-                insert_queries = [
-                    f"INSERT INTO {parameter_prefix}{table_name} (widget_name, value) VALUES ('{widget_name}', {value});"
-                    for widget_name, value in data.items()
-                ]
-                for insert_query in insert_queries:
-                    cursor.execute(insert_query)
+
+                for widget_name, value in data.items():
+                    if isinstance(value, Union[float, int]):
+                        col = "value_float"
+                    elif isinstance(value, str):
+                        col = "value_string"
+                    elif isinstance(value, bool):
+                        col = "value_bool"
+                    query = f"INSERT INTO {parameter_prefix}{table_name} (widget_name, {col}) VALUES ('{widget_name}', {value});"
+                    cursor.execute(query)
 
                 insert_gpkg_contents_query = f"""
                 INSERT INTO gpkg_contents (table_name, data_type, identifier, description)
@@ -254,8 +268,6 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
 
         options = QgsVectorFileWriter.SaveVectorOptions()
         options.driverName = "GPKG"
-
-        SETTINGS_MANAGER.set_current_project_area_parameter_table_name(table_name)
 
         options.layerName = table_name
 

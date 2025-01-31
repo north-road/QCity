@@ -512,7 +512,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_developement_sites">
+      <widget class="QWidget" name="tab_development_sites">
        <attribute name="title">
         <string>Developement Sites</string>
        </attribute>
@@ -550,8 +550,15 @@
             </item>
            </layout>
           </item>
+          <item row="9" column="0">
+           <widget class="QLabel" name="label_development_site_address">
+            <property name="text">
+             <string>Location (Address)</string>
+            </property>
+           </widget>
+          </item>
           <item row="7" column="0">
-           <widget class="QLabel" name="label_current_developement_site">
+           <widget class="QLabel" name="label_current_development_site">
             <property name="text">
              <string>Development Site</string>
             </property>
@@ -562,6 +569,71 @@
           </item>
           <item row="8" column="0">
            <widget class="QLineEdit" name="lineEdit_current_development_site"/>
+          </item>
+          <item row="10" column="0">
+           <widget class="QLineEdit" name="lineEdit_development_site_address"/>
+          </item>
+          <item row="11" column="0">
+           <layout class="QFormLayout" name="formLayout">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>5</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <property name="bottomMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_development_site_status">
+              <property name="text">
+               <string>Status</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="lineEdit_development_site_year"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_development_site_year">
+              <property name="text">
+               <string>Year</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLineEdit" name="lineEdit_development_site_owner"/>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_development_site_owner">
+              <property name="text">
+               <string>Owner</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="comboBox_development_site_status">
+              <item>
+               <property name="text">
+                <string>Constructed</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Proposed</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Modelled</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>

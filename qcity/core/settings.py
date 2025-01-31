@@ -29,6 +29,7 @@ class SettingsManager(QObject):
     spinbox_changed = pyqtSignal(tuple)
     current_project_area_parameter_name_changed = pyqtSignal(str)
     database_path_with_project_name_saved = pyqtSignal(dict)
+    current_development_site_parameter_name_changed = pyqtSignal(str)
 
     plugin_path = os.path.dirname(os.path.realpath(__file__))
     area_parameter_prefix = "project_area_parameters_"
@@ -38,6 +39,7 @@ class SettingsManager(QObject):
 
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
+        self._current_development_site_parameter_table_name: Optional[str] = None
         self._current_project_area_parameter_table_name: Optional[str] = None
         self._database_path = None
 
@@ -79,24 +81,38 @@ class SettingsManager(QObject):
             areas.append(name)
         return areas
 
-    def set_spinbox_value(self, widget, value):
+    def save_widget_value_to_settings(self, widget: QWidget, value: Union[float, int, str], tab: str):
         """
         Sets a spinbox value from the corresponding widget-value.
         """
         try:
-            if self._current_project_area_parameter_table_name:
+            if tab == "project_areas":
+                table_name = self._current_project_area_parameter_table_name
+                prefix = self.area_parameter_prefix
+            elif tab == "development_sites":
+                table_name = self._current_development_site_parameter_table_name
+                prefix = self.development_site_parameter_prefix
+
+            print("save_widget_value_to_settings", value)
+            if isinstance(value, Union[float, int]):
+                col = "value_float"
+            elif isinstance(value, str):
+                col = "value_string"
+            elif isinstance(value, bool):
+                col = "value_bool"
+
+            if table_name:
                 with sqlite3.connect(self._database_path) as conn:
                     cursor = conn.cursor()
                     cursor.execute(
-                        f"DELETE FROM {self.area_parameter_prefix}{self._current_project_area_parameter_table_name} where widget_name = '{widget.objectName()}';"
+                        f"DELETE FROM {prefix}{table_name} where widget_name = '{widget.objectName()}';"
                     )
-                    cursor.execute(
-                        f"INSERT INTO {self.area_parameter_prefix}{self._current_project_area_parameter_table_name} (widget_name, value) VALUES ('{widget.objectName()}', {value});"
-                    )
+                    sql = f"INSERT INTO {prefix}{table_name} (widget_name, {col}) VALUES (?, ?)"
+                    params = (widget.objectName(), value)
+                    cursor.execute(sql, params)
                     conn.commit()
 
         except Exception as e:
-            print(e)
             raise e
 
         self.spinbox_changed.emit((widget.objectName(), value))
@@ -131,6 +147,13 @@ class SettingsManager(QObject):
         """
         self._current_project_area_parameter_table_name = name
         self.current_project_area_parameter_name_changed.emit(name)
+
+    def set_current_development_site_parameter_table_name(self, name: str) -> None:
+        """
+        Sets the current project area parameter table name.
+        """
+        self._current_development_site_parameter_table_name = name
+        self.current_development_site_parameter_name_changed.emit(name)
 
     def save_database_path_with_project_name(self) -> None:
         """

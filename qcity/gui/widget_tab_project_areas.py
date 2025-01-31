@@ -12,9 +12,9 @@ from qcity.core import SETTINGS_MANAGER
 
 
 class WidgetUtilsProjectArea(QObject):
-    def __init__(self, widget):
-        super().__init__(widget)
-        self.og_widget = widget
+    def __init__(self, og_widget):
+        super().__init__(og_widget)
+        self.og_widget = og_widget
 
         self.og_widget.toolButton_project_area_add.clicked.connect(
             self.action_maptool_emit
@@ -34,8 +34,8 @@ class WidgetUtilsProjectArea(QObject):
 
         for widget in self.og_widget.tab_project_areas.findChildren((QSpinBox, QDoubleSpinBox)):
             widget.valueChanged.connect(
-                lambda value, widget=widget: SETTINGS_MANAGER.set_spinbox_value(
-                    widget, value
+                lambda value, widget=widget: SETTINGS_MANAGER.save_widget_value_to_settings(
+                    widget, value, "project_areas"
                 )
             )  # This does work indeed, despite the marked error
 
@@ -53,7 +53,7 @@ class WidgetUtilsProjectArea(QObject):
             self.load_project_database(path)
 
     def remove_selected_areas(self) -> None:
-        """Removes selected area from Qlistwidget, map and geopackage."""
+        """Removes selected area from QListwidget, map and geopackage."""
         tbr_areas = self.og_widget.listWidget_project_areas.selectedItems()
 
         if tbr_areas:
@@ -183,7 +183,7 @@ class WidgetUtilsProjectArea(QObject):
                 cursor = conn.cursor()
 
                 cursor.execute(
-                    f"SELECT widget_name, value FROM '{SETTINGS_MANAGER.area_parameter_prefix}{table_name}'"
+                    f"SELECT widget_name, value_float FROM '{SETTINGS_MANAGER.area_parameter_prefix}{table_name}'"
                 )
 
                 widget_values_dict = {row[0]: row[1] for row in cursor.fetchall()}
