@@ -32,7 +32,7 @@ class WidgetUtilsProjectArea(QObject):
             lambda item: self.zoom_to_project_area(item)
         )
 
-        for widget in self.findChildren((QSpinBox, QDoubleSpinBox)):
+        for widget in self.og_widget.tab_project_areas.findChildren((QSpinBox, QDoubleSpinBox)):
             widget.valueChanged.connect(
                 lambda value, widget=widget: SETTINGS_MANAGER.set_spinbox_value(
                     widget, value
