@@ -116,6 +116,7 @@ class WidgetUtilsProjectArea(QObject):
         widget = self.og_widget.listWidget_project_areas.selectedItems()[0]
         old_layer_name = widget.text()
         layer_name = self.og_widget.lineEdit_current_project_area.text()
+        self.og_widget.lineEdit_current_project_area.clear()
 
         old_item_id = self.og_widget.listWidget_project_areas.row(widget)
         self.og_widget.listWidget_project_areas.takeItem(old_item_id)

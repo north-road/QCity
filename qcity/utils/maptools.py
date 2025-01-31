@@ -18,8 +18,6 @@ from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QInputDialog
 from qgis.PyQt.QtCore import Qt
 
-from qgis._gui import QgsSnapIndicator
-
 from qgis.core import (
     QgsProject,
     QgsGeometry,
@@ -47,6 +45,7 @@ from qgis.gui import (
     QgsAbstractMapToolHandler,
     QgsMapToolCaptureLayerGeometry,
     QgsMapMouseEvent,
+    QgsSnapIndicator,
 )
 
 from ..core import SETTINGS_MANAGER

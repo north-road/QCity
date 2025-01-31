@@ -122,6 +122,7 @@ class WidgetUtilsDevelopmentSites(QObject):
         widget = self.og_widget.listWidget_development_sites.selectedItems()[0]
         old_layer_name = widget.text()
         layer_name = self.og_widget.lineEdit_current_development_site.text()
+        self.og_widget.lineEdit_current_development_site.clear()
 
         old_item_id = self.og_widget.listWidget_development_sites.row(widget)
         self.og_widget.listWidget_development_sites.takeItem(old_item_id)
