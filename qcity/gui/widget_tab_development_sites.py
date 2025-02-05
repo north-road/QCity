@@ -4,6 +4,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLineEdit
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QListWidgetItem, QComboBox, QWidget
+from qgis.core import QgsVectorLayer
 
 from qcity.core import SETTINGS_MANAGER
 
@@ -56,6 +57,45 @@ class WidgetUtilsDevelopmentSites(QObject):
         self.og_widget.listWidget_development_sites.currentItemChanged.connect(
             lambda item: self.update_development_site_parameters(item)
         )
+
+        self.og_widget.listWidget_project_areas.currentItemChanged.connect(
+            lambda item: self.update_development_site_listwidget(item)
+        )
+
+    def update_development_site_listwidget(self, item: QListWidgetItem) -> None:
+        """Updates the listwidget of the development sites to show only development sites within the active project area."""
+        try:
+            self.og_widget.listWidget_development_sites.clear()
+            area_name = item.text()
+            with sqlite3.connect(SETTINGS_MANAGER.get_database_path()) as conn:
+                cursor = conn.cursor()
+
+            cursor.execute(
+                """
+                SELECT table_name
+                FROM gpkg_contents
+                WHERE table_name LIKE '%development_site_%'
+                AND table_name NOT LIKE '%parameters%';
+                """
+            )
+            uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.area_prefix}{area_name}"
+            area_layer = QgsVectorLayer(uri, area_name, "ogr")
+
+            for name in cursor.fetchall():
+                uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={name[0]}"
+                layer = QgsVectorLayer(uri, name[0], "ogr")
+
+                for feature2 in layer.getFeatures():
+                    for feature1 in area_layer.getFeatures():
+                        if feature2.geometry().within(feature1.geometry()):
+                            self.og_widget.listWidget_development_sites.addItem(
+                                name[0].removeprefix(
+                                    SETTINGS_MANAGER.development_site_prefix
+                                )
+                            )
+
+        except sqlite3.OperationalError as e:
+            raise e
 
     def action_maptool_emit(self) -> None:
         """Emitted when plus button is clicked."""
@@ -193,7 +233,6 @@ class WidgetUtilsDevelopmentSites(QObject):
 
                     if isinstance(widget, QLineEdit):
                         widget.setText(widget_values_dict[widget_name][1])
-                        print(widget_values_dict)
                     elif isinstance(widget, QComboBox):
                         widget.setCurrentIndex(int(widget_values_dict[widget_name][0]))
 
