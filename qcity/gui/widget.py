@@ -111,7 +111,9 @@ class TabDockWidget(QgsDockWidget):
 
         self.listWidget_project_areas.setCurrentRow(0)
 
-        self.tabWidget_project_area_parameters.setEnabled(True)
+        self.groupbox_dwellings.setEnabled(True)
+        self.groupbox_car_parking.setEnabled(True)
+        self.groupbox_bike_parking.setEnabled(True)
 
         self.enable_widgets()
 
