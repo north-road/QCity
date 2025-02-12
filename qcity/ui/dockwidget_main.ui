@@ -467,7 +467,13 @@
            </widget>
           </item>
           <item row="4" column="0">
-           <widget class="QComboBox" name="comboBox_base_layers"/>
+           <widget class="QComboBox" name="comboBox_base_layers">
+            <item>
+             <property name="text">
+              <string>Add base layers</string>
+             </property>
+            </item>
+           </widget>
           </item>
           <item row="5" column="0">
            <widget class="QListWidget" name="listWidget_project_areas"/>
@@ -498,22 +504,15 @@
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_12">
-               <item row="0" column="0">
-                <widget class="QLabel" name="label">
-                 <property name="text">
-                  <string>1 bedroom dwelling size</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QSpinBox" name="spinBox_dwellings_size_1"/>
-               </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="label_2">
                  <property name="text">
                   <string>2 bedroom dwelling size</string>
                  </property>
                 </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QSpinBox" name="spinBox_dwellings_size_3"/>
                </item>
                <item row="1" column="1">
                 <widget class="QSpinBox" name="spinBox_dwellings_size_2"/>
@@ -525,8 +524,8 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="1">
-                <widget class="QSpinBox" name="spinBox_dwellings_size_3"/>
+               <item row="0" column="1">
+                <widget class="QSpinBox" name="spinBox_dwellings_size_1"/>
                </item>
                <item row="3" column="0">
                 <widget class="QLabel" name="label_3">
@@ -537,6 +536,13 @@
                </item>
                <item row="3" column="1">
                 <widget class="QSpinBox" name="spinBox_dwellings_size_4"/>
+               </item>
+               <item row="0" column="0">
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>1 bedroom dwelling size</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </widget>

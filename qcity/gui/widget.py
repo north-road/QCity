@@ -1,9 +1,10 @@
 import os
 import shutil
 
-from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QListWidget
+from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QListWidget, QGraphicsOpacityEffect
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import QCoreApplication
+from qgis.PyQt.QtCore import QCoreApplication, Qt
+from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsVectorLayer, QgsProject
 from qgis.gui import (
     QgsDockWidget,
@@ -14,6 +15,7 @@ from ..gui.gui_utils import GuiUtils
 from qcity.gui.widget_tab_development_sites import WidgetUtilsDevelopmentSites
 
 from qcity.gui.widget_tab_project_areas import WidgetUtilsProjectArea
+from ..utils.utils import FadeTextDelegate
 
 
 class TabDockWidget(QgsDockWidget):
@@ -31,6 +33,8 @@ class TabDockWidget(QgsDockWidget):
         self.iface = iface
         self.set_base_layer_items()
 
+        self.opacity_effect = QGraphicsOpacityEffect()
+
         self.plugin_path = os.path.dirname(os.path.realpath(__file__))
         self._default_project_area_parameters_path = os.path.join(
             self.plugin_path, "..", "data", "default_project_area_parameters.json"
@@ -44,9 +48,19 @@ class TabDockWidget(QgsDockWidget):
         )
         self.pushButton_load_database.clicked.connect(self.load_project_database)
 
+        self.comboBox_base_layers.currentIndexChanged.connect(self.set_add_button_activation)
+        self.comboBox_base_layers.setItemData(0, QColor(0, 0, 0, 100), Qt.ItemDataRole.ForegroundRole)
+
         # Initialize tabs
         WidgetUtilsProjectArea(self)
         WidgetUtilsDevelopmentSites(self)
+
+    def set_add_button_activation(self) -> None:
+        """Sets the add button for the base layers enabled/disabled, based on the current item text"""
+        if self.comboBox_base_layers.currentIndex() == "Add base layers":
+            self.pushButton_add_base_layer.setEnabled(False)
+        else:
+            self.pushButton_add_base_layer.setEnabled(True)
 
     def set_base_layer_items(self):
         """Adds all possible base layers to the selection combobox"""
@@ -75,13 +89,9 @@ class TabDockWidget(QgsDockWidget):
             )
 
             self.listWidget_project_areas.clear()
-            self.lineEdit_current_project_area.setEnabled(True)
-            self.lineEdit_current_project_area.setText("")
             self.label_current_project_area.setText("Project")
 
             self.listWidget_development_sites.clear()
-            self.lineEdit_current_development_site.setEnabled(True)
-            self.lineEdit_current_development_site.setText("")
             self.label_current_development_site.setText("Project")
 
             self.enable_widgets()
@@ -159,6 +169,9 @@ class TabDockWidget(QgsDockWidget):
         for layer in layers:
             self.project.addMapLayer(layer)
 
+        self.comboBox_base_layers.setCurrentIndex(0)
+        self.pushButton_add_base_layer.setEnabled(False)
+
     def enable_widgets(self) -> None:
         """
         Set all widgets to be enabled.
@@ -167,6 +180,8 @@ class TabDockWidget(QgsDockWidget):
             tab = self.tabWidget.widget(i)
             for child in tab.findChildren(QWidget):
                 child.setDisabled(False)
+
+        self.pushButton_add_base_layer.setEnabled(False)
 
     def disable_widgets(self) -> None:
         """
