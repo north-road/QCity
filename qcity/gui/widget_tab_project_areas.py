@@ -4,9 +4,11 @@ from qgis.PyQt.QtWidgets import (
     QSpinBox,
     QDoubleSpinBox,
     QListWidgetItem,
+    QDialog,
 )
 from qgis.PyQt.QtCore import QObject, Qt
 from qgis.core import QgsVectorLayer
+from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER
 
@@ -24,7 +26,7 @@ class WidgetUtilsProjectArea(QObject):
             self.remove_selected_areas
         )
 
-        self.og_widget.lineEdit_current_project_area.returnPressed.connect(
+        self.og_widget.toolButton_project_area_rename.clicked.connect(
             self.update_layer_name_gpkg
         )
 
@@ -115,8 +117,24 @@ class WidgetUtilsProjectArea(QObject):
         """
         widget = self.og_widget.listWidget_project_areas.selectedItems()[0]
         old_layer_name = widget.text()
-        layer_name = self.og_widget.lineEdit_current_project_area.text()
-        self.og_widget.lineEdit_current_project_area.clear()
+
+        existing_names = [self.og_widget.listWidget_project_areas.item(i).text() for i in range(self.og_widget.listWidget_project_areas.count())]
+
+        dialog = QgsNewNameDialog(
+            initial="",
+            existing=existing_names,
+            cs=Qt.CaseSensitivity.CaseSensitive,
+            parent=self.og_widget.iface.mainWindow()
+        )
+
+        dialog.setWindowTitle(self.tr('Rename'))
+        dialog.setAllowEmptyName(False)
+        dialog.setHintString(self.tr('Enter a name for the project area'))
+
+        if dialog.exec_() != QDialog.DialogCode.Accepted:
+            return
+
+        layer_name = dialog.name()
 
         old_item_id = self.og_widget.listWidget_project_areas.row(widget)
         self.og_widget.listWidget_project_areas.takeItem(old_item_id)

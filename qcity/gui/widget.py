@@ -107,8 +107,6 @@ class TabDockWidget(QgsDockWidget):
             self.add_layers_to_widget_and_canvas(self.listWidget_project_areas)
             self.add_layers_to_widget_and_canvas(self.listWidget_development_sites)
 
-        self.lineEdit_current_project_area.setEnabled(True)
-
         self.listWidget_project_areas.setCurrentRow(0)
 
         self.groupbox_dwellings.setEnabled(True)

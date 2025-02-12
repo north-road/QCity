@@ -3,8 +3,9 @@ import sqlite3
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLineEdit
 from qgis.PyQt.QtCore import QObject
-from qgis.PyQt.QtWidgets import QListWidgetItem, QComboBox, QWidget
+from qgis.PyQt.QtWidgets import QListWidgetItem, QComboBox, QWidget, QDialog
 from qgis.core import QgsVectorLayer
+from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER
 
@@ -22,7 +23,7 @@ class WidgetUtilsDevelopmentSites(QObject):
             self.remove_selected_sites
         )
 
-        self.og_widget.lineEdit_current_development_site.returnPressed.connect(
+        self.og_widget.toolButton_development_site_rename.clicked.connect(
             self.update_site_name_gpkg
         )
 
@@ -161,8 +162,25 @@ class WidgetUtilsDevelopmentSites(QObject):
         """
         widget = self.og_widget.listWidget_development_sites.selectedItems()[0]
         old_layer_name = widget.text()
-        layer_name = self.og_widget.lineEdit_current_development_site.text()
-        self.og_widget.lineEdit_current_development_site.clear()
+
+        existing_names = [self.og_widget.listWidget_development_sites.item(i).text() for i in
+                          range(self.og_widget.listWidget_development_sites.count())]
+
+        dialog = QgsNewNameDialog(
+            initial="",
+            existing=existing_names,
+            cs=Qt.CaseSensitivity.CaseSensitive,
+            parent=self.og_widget.iface.mainWindow()
+        )
+
+        dialog.setWindowTitle(self.tr('Rename'))
+        dialog.setAllowEmptyName(False)
+        dialog.setHintString(self.tr('Enter a name for the development site'))
+
+        if dialog.exec_() != QDialog.DialogCode.Accepted:
+            return
+
+        layer_name = dialog.name()
 
         old_item_id = self.og_widget.listWidget_development_sites.row(widget)
         self.og_widget.listWidget_development_sites.takeItem(old_item_id)
