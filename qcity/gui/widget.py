@@ -1,10 +1,14 @@
+import json
 import os
 import shutil
+import sqlite3
 
+from PyQt5.QtCore import QVariant
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QListWidget, QGraphicsOpacityEffect
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QCoreApplication, Qt
 from qgis.PyQt.QtGui import QColor
+from qgis._core import QgsGeometry, QgsFeature, QgsVectorFileWriter, QgsFields, QgsField, QgsCoordinateTransformContext
 from qgis.core import QgsVectorLayer, QgsProject
 from qgis.gui import (
     QgsDockWidget,
@@ -15,8 +19,6 @@ from ..gui.gui_utils import GuiUtils
 from qcity.gui.widget_tab_development_sites import WidgetUtilsDevelopmentSites
 
 from qcity.gui.widget_tab_project_areas import WidgetUtilsProjectArea
-from ..utils.utils import FadeTextDelegate
-
 
 class TabDockWidget(QgsDockWidget):
     """
@@ -35,10 +37,7 @@ class TabDockWidget(QgsDockWidget):
 
         self.opacity_effect = QGraphicsOpacityEffect()
 
-        self.plugin_path = os.path.dirname(os.path.realpath(__file__))
-        self._default_project_area_parameters_path = os.path.join(
-            self.plugin_path, "..", "data", "default_project_area_parameters.json"
-        )
+
 
         self.disable_widgets()
 
@@ -80,7 +79,7 @@ class TabDockWidget(QgsDockWidget):
             SETTINGS_MANAGER.save_database_path_with_project_name()
             shutil.copyfile(
                 os.path.join(
-                    self.plugin_path,
+                    SETTINGS_MANAGER.plugin_path,
                     "..",
                     "data",
                     "base_project_database.gpkg",
@@ -93,6 +92,9 @@ class TabDockWidget(QgsDockWidget):
 
             self.listWidget_development_sites.clear()
             self.label_current_development_site.setText("Project")
+
+            self.create_base_tables(SETTINGS_MANAGER.area_prefix, SETTINGS_MANAGER._default_project_area_parameters_path)
+            self.create_base_tables(SETTINGS_MANAGER.development_site_prefix, SETTINGS_MANAGER._default_project_development_site_path)
 
             self.enable_widgets()
 
@@ -156,7 +158,7 @@ class TabDockWidget(QgsDockWidget):
     def add_base_layers(self) -> None:
         """Adds the selected layer in the combo box to the canvas."""
         base_project_path = os.path.join(
-            self.plugin_path,
+            SETTINGS_MANAGER.plugin_path,
             "..",
             "data",
             "projects",
@@ -211,3 +213,38 @@ class TabDockWidget(QgsDockWidget):
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate("X", message)
+
+    def create_base_tables(self, table_name: str, path: str) -> QgsVectorLayer:
+        """Creates a GeoPackage layer with attributes based on JSON data."""
+        gpkg_path = SETTINGS_MANAGER.get_database_path()
+
+        get_qgis_type = lambda key: (
+            QVariant.Double if "doubleSpinBox" in key else
+            QVariant.Int if "spinBox" in key or "comboBox" in key else
+            QVariant.String if "lineEdit" in key else
+            QVariant.String
+        )
+
+        with open(path, "r") as file:
+            data = json.load(file)
+
+        fields = QgsFields()
+        fields.append(QgsField("name", QVariant.String))
+        for key in data.keys():
+            fields.append(QgsField(key, get_qgis_type(key)))
+
+        layer = QgsVectorLayer("Polygon?crs=EPSG:4326", table_name, "memory")
+        layer.dataProvider().addAttributes(fields)
+        layer.updateFields()
+
+        options = QgsVectorFileWriter.SaveVectorOptions()
+        options.driverName = "GPKG"
+        options.layerName = table_name
+        options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
+
+        error = QgsVectorFileWriter.writeAsVectorFormatV2(
+            layer, gpkg_path, QgsCoordinateTransformContext(), options
+        )
+
+        if not error[0] == QgsVectorFileWriter.NoError:
+            raise Exception(f"Error adding layer to GeoPackage: {error[1]}")

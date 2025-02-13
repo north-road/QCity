@@ -44,9 +44,9 @@ class WidgetUtilsProjectArea(QObject):
                 )
             )  # This does work indeed, despite the marked error
 
-        self.og_widget.listWidget_project_areas.currentItemChanged.connect(
+        """self.og_widget.listWidget_project_areas.currentItemChanged.connect(
             lambda item: self.update_project_area_parameters(item)
-        )
+        )"""
 
         # Load associated database when project is loaded on startup
         # TODO: Connect this so it also loads when a project is loaded while in session
@@ -205,7 +205,7 @@ class WidgetUtilsProjectArea(QObject):
                 cursor = conn.cursor()
 
                 cursor.execute(
-                    f"SELECT widget_name, value_float FROM '{SETTINGS_MANAGER.area_parameter_prefix}{table_name}'"
+                    f"SELECT widget_name, value_float FROM '{SETTINGS_MANAGER.area_parameter_prefix}'"
                 )
 
                 widget_values_dict = {row[0]: row[1] for row in cursor.fetchall()}

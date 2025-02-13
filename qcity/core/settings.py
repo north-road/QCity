@@ -33,15 +33,23 @@ class SettingsManager(QObject):
 
     plugin_path = os.path.dirname(os.path.realpath(__file__))
     area_parameter_prefix = "project_area_parameters_"
-    area_prefix = "project_area_"
+    area_prefix = "project_areas"
     development_site_parameter_prefix = "development_site_parameters_"
-    development_site_prefix = "development_site_"
+    development_site_prefix = "development_sites"
 
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
         self._current_development_site_parameter_table_name: Optional[str] = None
         self._current_project_area_parameter_table_name: Optional[str] = None
         self._database_path = None
+
+        self.plugin_path = os.path.dirname(os.path.realpath(__file__))
+        self._default_project_area_parameters_path = os.path.join(
+            self.plugin_path, "..", "data", "default_project_area_parameters.json"
+        )
+        self._default_project_development_site_path = os.path.join(
+            self.plugin_path, "..", "data", "default_development_site_parameters.json"
+        )
 
         self.project = QgsProject().instance()
 

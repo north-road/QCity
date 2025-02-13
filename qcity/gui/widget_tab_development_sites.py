@@ -55,9 +55,9 @@ class WidgetUtilsDevelopmentSites(QObject):
             )
         )
 
-        self.og_widget.listWidget_development_sites.currentItemChanged.connect(
+        """self.og_widget.listWidget_development_sites.currentItemChanged.connect(
             lambda item: self.update_development_site_parameters(item)
-        )
+        )"""
 
         self.og_widget.listWidget_project_areas.currentItemChanged.connect(
             lambda item: self.update_development_site_listwidget(item)
