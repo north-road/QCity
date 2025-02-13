@@ -118,18 +118,21 @@ class WidgetUtilsProjectArea(QObject):
         widget = self.og_widget.listWidget_project_areas.selectedItems()[0]
         old_layer_name = widget.text()
 
-        existing_names = [self.og_widget.listWidget_project_areas.item(i).text() for i in range(self.og_widget.listWidget_project_areas.count())]
+        existing_names = [
+            self.og_widget.listWidget_project_areas.item(i).text()
+            for i in range(self.og_widget.listWidget_project_areas.count())
+        ]
 
         dialog = QgsNewNameDialog(
             initial="",
             existing=existing_names,
             cs=Qt.CaseSensitivity.CaseSensitive,
-            parent=self.og_widget.iface.mainWindow()
+            parent=self.og_widget.iface.mainWindow(),
         )
 
-        dialog.setWindowTitle(self.tr('Rename'))
+        dialog.setWindowTitle(self.tr("Rename"))
         dialog.setAllowEmptyName(False)
-        dialog.setHintString(self.tr('Enter a name for the project area'))
+        dialog.setHintString(self.tr("Enter a name for the project area"))
 
         if dialog.exec_() != QDialog.DialogCode.Accepted:
             return

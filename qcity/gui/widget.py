@@ -1,14 +1,23 @@
 import json
 import os
 import shutil
-import sqlite3
 
 from PyQt5.QtCore import QVariant
-from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QListWidget, QGraphicsOpacityEffect
+from qgis.PyQt.QtWidgets import (
+    QWidget,
+    QFileDialog,
+    QListWidget,
+    QGraphicsOpacityEffect,
+)
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QCoreApplication, Qt
 from qgis.PyQt.QtGui import QColor
-from qgis._core import QgsGeometry, QgsFeature, QgsVectorFileWriter, QgsFields, QgsField, QgsCoordinateTransformContext
+from qgis._core import (
+    QgsVectorFileWriter,
+    QgsFields,
+    QgsField,
+    QgsCoordinateTransformContext,
+)
 from qgis.core import QgsVectorLayer, QgsProject
 from qgis.gui import (
     QgsDockWidget,
@@ -19,6 +28,7 @@ from ..gui.gui_utils import GuiUtils
 from qcity.gui.widget_tab_development_sites import WidgetUtilsDevelopmentSites
 
 from qcity.gui.widget_tab_project_areas import WidgetUtilsProjectArea
+
 
 class TabDockWidget(QgsDockWidget):
     """
@@ -37,8 +47,6 @@ class TabDockWidget(QgsDockWidget):
 
         self.opacity_effect = QGraphicsOpacityEffect()
 
-
-
         self.disable_widgets()
 
         self.pushButton_add_base_layer.clicked.connect(self.add_base_layers)
@@ -47,8 +55,12 @@ class TabDockWidget(QgsDockWidget):
         )
         self.pushButton_load_database.clicked.connect(self.load_project_database)
 
-        self.comboBox_base_layers.currentIndexChanged.connect(self.set_add_button_activation)
-        self.comboBox_base_layers.setItemData(0, QColor(0, 0, 0, 100), Qt.ItemDataRole.ForegroundRole)
+        self.comboBox_base_layers.currentIndexChanged.connect(
+            self.set_add_button_activation
+        )
+        self.comboBox_base_layers.setItemData(
+            0, QColor(0, 0, 0, 100), Qt.ItemDataRole.ForegroundRole
+        )
 
         # Initialize tabs
         WidgetUtilsProjectArea(self)
@@ -93,8 +105,14 @@ class TabDockWidget(QgsDockWidget):
             self.listWidget_development_sites.clear()
             self.label_current_development_site.setText("Project")
 
-            self.create_base_tables(SETTINGS_MANAGER.area_prefix, SETTINGS_MANAGER._default_project_area_parameters_path)
-            self.create_base_tables(SETTINGS_MANAGER.development_site_prefix, SETTINGS_MANAGER._default_project_development_site_path)
+            self.create_base_tables(
+                SETTINGS_MANAGER.area_prefix,
+                SETTINGS_MANAGER._default_project_area_parameters_path,
+            )
+            self.create_base_tables(
+                SETTINGS_MANAGER.development_site_prefix,
+                SETTINGS_MANAGER._default_project_development_site_path,
+            )
 
             self.enable_widgets()
 
@@ -219,10 +237,13 @@ class TabDockWidget(QgsDockWidget):
         gpkg_path = SETTINGS_MANAGER.get_database_path()
 
         get_qgis_type = lambda key: (
-            QVariant.Double if "doubleSpinBox" in key else
-            QVariant.Int if "spinBox" in key or "comboBox" in key else
-            QVariant.String if "lineEdit" in key else
-            QVariant.String
+            QVariant.Double
+            if "doubleSpinBox" in key
+            else QVariant.Int
+            if "spinBox" in key or "comboBox" in key
+            else QVariant.String
+            if "lineEdit" in key
+            else QVariant.String
         )
 
         with open(path, "r") as file:

@@ -10,10 +10,8 @@
 # ---------------------------------------------------------------------
 import json
 import os
-import sqlite3
 from typing import List, Union, Optional
 
-from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QInputDialog
 from qgis.PyQt.QtCore import Qt
@@ -26,10 +24,6 @@ from qgis.core import (
     QgsRasterLayer,
     Qgis,
     QgsFeature,
-    QgsVectorFileWriter,
-    QgsCoordinateTransformContext,
-    QgsField,
-    QgsFields,
     QgsWkbTypes,
 )
 
@@ -224,7 +218,9 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             if key in layer.fields().names():
                 feature.setAttribute(key, value)
 
-        polygon = QgsGeometry.fromPolygonXY([[QgsPointXY(x, y) for x, y in self.points]])
+        polygon = QgsGeometry.fromPolygonXY(
+            [[QgsPointXY(x, y) for x, y in self.points]]
+        )
         feature.setGeometry(polygon)
 
         layer.startEditing()
