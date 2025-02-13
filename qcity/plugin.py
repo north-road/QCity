@@ -24,7 +24,7 @@ class GradientDigitizerPlugin:
 
         self.actions.append(self.action)
 
-        self.iface.digitizeToolBar().addAction(self.action)
+        self.iface.pluginToolBar().addAction(self.action)
 
         self.widget = TabDockWidget(self.project, self.iface)
         self.iface.addDockWidget(Qt.RightDockWidgetArea, self.widget)
