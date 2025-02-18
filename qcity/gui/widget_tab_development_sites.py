@@ -57,9 +57,9 @@ class WidgetUtilsDevelopmentSites(QObject):
             lambda item: self.update_development_site_parameters(item)
         )
 
-        self.og_widget.listWidget_project_areas.currentItemChanged.connect(
+        """self.og_widget.listWidget_development_sites.currentItemChanged.connect(
             lambda item: self.update_development_site_listwidget(item)
-        )
+        )"""
 
     def update_development_site_listwidget(self, item: QListWidgetItem) -> None:
         """Updates the listwidget of the development sites to show only development sites within the active project area."""
@@ -67,7 +67,7 @@ class WidgetUtilsDevelopmentSites(QObject):
             return
         try:
             self.og_widget.listWidget_development_sites.clear()
-            area_name = item.text()
+            site_name = item.text()
             with sqlite3.connect(SETTINGS_MANAGER.get_database_path()) as conn:
                 cursor = conn.cursor()
 
@@ -79,15 +79,15 @@ class WidgetUtilsDevelopmentSites(QObject):
                 AND table_name NOT LIKE '%parameters%';
                 """
             )
-            uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.area_prefix}{area_name}"
-            area_layer = QgsVectorLayer(uri, area_name, "ogr")
+            uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.area_prefix}{site_name}"
+            site_layer = QgsVectorLayer(uri, site_name, "ogr")
 
             for name in cursor.fetchall():
                 uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={name[0]}"
                 layer = QgsVectorLayer(uri, name[0], "ogr")
 
                 for feature2 in layer.getFeatures():
-                    for feature1 in area_layer.getFeatures():
+                    for feature1 in site_layer.getFeatures():
                         if feature2.geometry().within(feature1.geometry()):
                             self.og_widget.listWidget_development_sites.addItem(
                                 name[0].removeprefix(
@@ -100,20 +100,20 @@ class WidgetUtilsDevelopmentSites(QObject):
 
     def action_maptool_emit(self) -> None:
         """Emitted when plus button is clicked."""
-        SETTINGS_MANAGER.add_project_area_clicked.emit(True)
+        SETTINGS_MANAGER.add_feature_clicked.emit(True)
 
     def remove_selected_sites(self) -> None:
         """Removes selected area from Qlistwidget, map and geopackage."""
-        tbr_areas = self.og_widget.listWidget_project_areas.selectedItems()
+        tbr_areas = self.og_widget.listWidget_development_sites.selectedItems()
 
         if tbr_areas:
             rows = {
-                self.og_widget.listWidget_project_areas.row(item): item.text()
+                self.og_widget.listWidget_development_sites.row(item): item.text()
                 for item in tbr_areas
             }
 
             for key, table_name in rows.items():
-                self.og_widget.listWidget_project_areas.takeItem(key)
+                self.og_widget.listWidget_development_sites.takeItem(key)
 
                 layers = self.og_widget.project.mapLayersByName(table_name)
                 if layers:
@@ -138,7 +138,7 @@ class WidgetUtilsDevelopmentSites(QObject):
                 SETTINGS_MANAGER.set_current_development_site_parameter_table_name(None)
                 for widget in self.og_widget.findChildren((QSpinBox, QDoubleSpinBox)):
                     widget.setValue(0)
-                    self.og_widget.tabWidget_project_area_parameters.setEnabled(False)
+                    # self.og_widget.tabWidget_project_area_parameters.setEnabled(False)
 
     def update_site_name_gpkg(self) -> None:
         """
@@ -207,11 +207,11 @@ class WidgetUtilsDevelopmentSites(QObject):
             layer_name, Qt.MatchExactly
         )[0]
         self.og_widget.listWidget_development_sites.setCurrentItem(item_to_select)
-        SETTINGS_MANAGER.set_current_project_area_parameter_table_name(
+        SETTINGS_MANAGER.set_current_development_site_parameter_table_name(
             item_to_select.text()
         )
 
-        self.og_widget.label_current_project_area.setText(layer_name)
+        self.og_widget.label_current_development_site.setText(layer_name)
 
     def update_development_site_parameters(self, item: QListWidgetItem) -> None:
         """
@@ -245,4 +245,4 @@ class WidgetUtilsDevelopmentSites(QObject):
                 elif isinstance(widget, QComboBox):
                     widget.setCurrentIndex(int(widget_values_dict[widget_name]))
 
-            self.og_widget.label_current_project_area.setText(feature_name)
+            self.og_widget.label_current_development_site.setText(feature_name)
