@@ -132,6 +132,8 @@ class WidgetUtilsDevelopmentSites(QObject):
 
                 del layer
 
+            self.og_widget.label_current_development_site.setText("Development Site")
+
             if self.og_widget.listWidget_development_sites.count() < 1:
                 SETTINGS_MANAGER.set_current_development_site_parameter_table_name(None)
                 for widget in self.og_widget.findChildren((QSpinBox, QDoubleSpinBox)):

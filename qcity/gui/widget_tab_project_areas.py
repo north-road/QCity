@@ -87,6 +87,8 @@ class WidgetUtilsProjectArea(QObject):
 
                 del layer
 
+            self.og_widget.label_current_project_area.setText("Project Area")
+
             if self.og_widget.listWidget_project_areas.count() < 1:
                 SETTINGS_MANAGER.set_current_project_area_parameter_table_name(None)
                 for widget in self.og_widget.findChildren((QSpinBox, QDoubleSpinBox)):
