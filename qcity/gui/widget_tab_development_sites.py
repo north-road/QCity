@@ -57,46 +57,24 @@ class WidgetUtilsDevelopmentSites(QObject):
             lambda item: self.update_development_site_parameters(item)
         )
 
-        """self.og_widget.listWidget_development_sites.currentItemChanged.connect(
+        self.og_widget.listWidget_development_sites.currentItemChanged.connect(
             lambda item: self.update_development_site_listwidget(item)
-        )"""
+        )
 
     def update_development_site_listwidget(self, item: QListWidgetItem) -> None:
         """Updates the listwidget of the development sites to show only development sites within the active project area."""
-        if not item:
-            return
-        try:
-            self.og_widget.listWidget_development_sites.clear()
-            site_name = item.text()
-            with sqlite3.connect(SETTINGS_MANAGER.get_database_path()) as conn:
-                cursor = conn.cursor()
+        site_layer = QgsProject.instance().mapLayer(SETTINGS_MANAGER.get_development_site_layer_id())
+        area_layer = QgsProject.instance().mapLayer(SETTINGS_MANAGER.get_project_area_layer_id())
 
-            cursor.execute(
-                """
-                SELECT table_name
-                FROM gpkg_contents
-                WHERE table_name LIKE '%development_site_%'
-                AND table_name NOT LIKE '%parameters%';
-                """
-            )
-            uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.area_prefix}{site_name}"
-            site_layer = QgsVectorLayer(uri, site_name, "ogr")
+        name = self.og_widget.listWidget_project_areas.currentItem().text()
 
-            for name in cursor.fetchall():
-                uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={name[0]}"
-                layer = QgsVectorLayer(uri, name[0], "ogr")
+        request = QgsFeatureRequest().setFilterExpression(f'"name" = \'{name}\'')
+        iterator = area_layer.getFeatures(request)
+        filter_feature = next(iterator)
+        filter_geom_wkt = filter_feature.geometry().asWkt()
 
-                for feature2 in layer.getFeatures():
-                    for feature1 in site_layer.getFeatures():
-                        if feature2.geometry().within(feature1.geometry()):
-                            self.og_widget.listWidget_development_sites.addItem(
-                                name[0].removeprefix(
-                                    SETTINGS_MANAGER.development_site_prefix
-                                )
-                            )
-
-        except sqlite3.OperationalError as e:
-            raise e
+        sql_filter = f"ST_Within($geometry, ST_GeomFromText('{filter_geom_wkt}', 4326)) and \"name\" = '{item.text()}'"
+        site_layer.setSubsetString(sql_filter)
 
     def action_maptool_emit(self) -> None:
         """Emitted when plus button is clicked."""

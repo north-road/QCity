@@ -176,6 +176,11 @@ class WidgetUtilsProjectArea(QObject):
         SETTINGS_MANAGER.set_current_project_area_parameter_table_name(name)
         layer = QgsProject.instance().mapLayer(SETTINGS_MANAGER.get_project_area_layer_id())
         layer.setSubsetString(f"name='{name}'")
+
+        site_layer = QgsProject.instance().mapLayer(SETTINGS_MANAGER.get_development_site_layer_id())
+        sql_filter = f"FALSE"
+        site_layer.setSubsetString(sql_filter)
+
         extent = layer.extent()
         self.og_widget.iface.mapCanvas().setExtent(extent)
         self.og_widget.iface.mapCanvas().refresh()

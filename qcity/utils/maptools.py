@@ -179,6 +179,10 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             list_widget = self.dlg.listWidget_project_areas
             SETTINGS_MANAGER.set_current_project_area_parameter_table_name(feature_name)
             layer = QgsProject.instance().mapLayer(SETTINGS_MANAGER.get_project_area_layer_id())
+
+            site_layer = QgsProject.instance().mapLayer(SETTINGS_MANAGER.get_development_site_layer_id())
+            sql_filter = f"FALSE"
+            site_layer.setSubsetString(sql_filter)
         else:
             raise Exception(f"Unknown tab name: {tab_name}")
 
