@@ -26,7 +26,7 @@ class SettingsManager(QObject):
     SETTINGS_KEY = "qcity"
 
     database_path_changed = pyqtSignal(str)
-    add_project_area_clicked = pyqtSignal(bool)
+    add_feature_clicked = pyqtSignal(bool)
     spinbox_changed = pyqtSignal(tuple)
     current_project_area_parameter_name_changed = pyqtSignal(str)
     database_path_with_project_name_saved = pyqtSignal(dict)

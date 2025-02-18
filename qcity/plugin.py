@@ -44,7 +44,7 @@ class GradientDigitizerPlugin:
         self.handler = MapToolHandler(self.map_tool, self.action_maptool)
         self.iface.registerMapToolHandler(self.handler)
 
-        SETTINGS_MANAGER.add_project_area_clicked.connect(self.action_maptool.triggered)
+        SETTINGS_MANAGER.add_feature_clicked.connect(self.action_maptool.triggered)
 
         self.widget.show()
 

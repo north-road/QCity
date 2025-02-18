@@ -216,4 +216,4 @@ class WidgetUtilsProjectArea(QObject):
 
     def action_maptool_emit(self) -> None:
         """Emitted when plus button is clicked."""
-        SETTINGS_MANAGER.add_project_area_clicked.emit(True)
+        SETTINGS_MANAGER.add_feature_clicked.emit(True)
