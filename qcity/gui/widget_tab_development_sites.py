@@ -1,9 +1,7 @@
 import sqlite3
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QLineEdit
-from qgis.PyQt.QtCore import QObject
-from qgis.PyQt.QtWidgets import QListWidgetItem, QComboBox, QWidget, QDialog
+from qgis.PyQt.QtCore import QObject, Qt
+from qgis.PyQt.QtWidgets import QListWidgetItem, QComboBox, QWidget, QDialog, QLineEdit, QSpinBox, QDoubleSpinBox
 from qgis.core import QgsVectorLayer, QgsFeatureRequest
 from qgis.gui import QgsNewNameDialog
 
@@ -65,6 +63,8 @@ class WidgetUtilsDevelopmentSites(QObject):
 
     def update_development_site_listwidget(self, item: QListWidgetItem) -> None:
         """Updates the listwidget of the development sites to show only development sites within the active project area."""
+        if not item:
+            return
         try:
             self.og_widget.listWidget_development_sites.clear()
             area_name = item.text()
@@ -104,57 +104,39 @@ class WidgetUtilsDevelopmentSites(QObject):
 
     def remove_selected_sites(self) -> None:
         """Removes selected area from Qlistwidget, map and geopackage."""
-        tbr_sites = self.og_widget.listWidget_development_sites.selectedItems()
+        tbr_areas = self.og_widget.listWidget_project_areas.selectedItems()
 
-        if tbr_sites:
+        if tbr_areas:
             rows = {
-                self.og_widget.listWidget_development_sites.row(item): item.text()
-                for item in tbr_sites
+                self.og_widget.listWidget_project_areas.row(item): item.text()
+                for item in tbr_areas
             }
 
             for key, table_name in rows.items():
-                self.og_widget.listWidget_development_sites.takeItem(key)
+                self.og_widget.listWidget_project_areas.takeItem(key)
 
                 layers = self.og_widget.project.mapLayersByName(table_name)
                 if layers:
-                    layer = layers[0]
-                    self.og_widget.project.removeMapLayer(layer.id())
+                    self.og_widget.project.removeMapLayer(layers[0].id())
 
-                try:
-                    with sqlite3.connect(SETTINGS_MANAGER.get_database_path()) as conn:
-                        cursor = conn.cursor()
+                gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.area_prefix}"
+                layer = QgsVectorLayer(gpkg_path, SETTINGS_MANAGER.area_prefix, "ogr")
+                layer.startEditing()
 
-                        cursor.execute(
-                            f"DROP TABLE '{SETTINGS_MANAGER.development_site_prefix}{table_name}'"
-                        )
-                        cursor.execute(
-                            f"DROP TABLE '{SETTINGS_MANAGER.development_site_parameter_prefix}{table_name}'"
-                        )
-                        cursor.execute(
-                            f"""DELETE FROM gpkg_contents WHERE table_name = '{SETTINGS_MANAGER.development_site_parameter_prefix}{table_name}';"""
-                        )
-                        cursor.execute(
-                            f"""DELETE FROM gpkg_contents WHERE table_name = '{SETTINGS_MANAGER.development_site_prefix}{table_name}';"""
-                        )
-                        cursor.execute(
-                            f"DELETE FROM gpkg_geometry_columns WHERE table_name = '{SETTINGS_MANAGER.development_site_prefix}{table_name}';"
-                        )
-                        cursor.execute(
-                            f"DELETE FROM gpkg_spatial_ref_sys WHERE srs_id = '{SETTINGS_MANAGER.development_site_prefix}{table_name}';"
-                        )
+                feature_ids = [feat.id() for feat in layer.getFeatures() if feat["name"] == table_name]
 
-                    self.og_widget.iface.mapCanvas().refresh()
-                except Exception as e:
-                    raise e
+                if feature_ids:
+                    for fid in feature_ids:
+                        layer.deleteFeature(fid)
+                layer.commitChanges()
 
-            self.og_widget.label_current_development_site.setText("Project")
-            self.og_widget.lineEdit_current_development_site.setText("")
+                del layer
 
             if self.og_widget.listWidget_development_sites.count() < 1:
                 SETTINGS_MANAGER.set_current_development_site_parameter_table_name(None)
-                # for widget in self.og_widget.findChildren((QSpinBox, QDoubleSpinBox)):
-                # widget.setValue(0)
-                # self.og_widget.tabWidget_project_area_parameters.setEnabled(False)
+                for widget in self.og_widget.findChildren((QSpinBox, QDoubleSpinBox)):
+                    widget.setValue(0)
+                    self.og_widget.tabWidget_project_area_parameters.setEnabled(False)
 
     def update_site_name_gpkg(self) -> None:
         """

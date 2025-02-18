@@ -2,7 +2,6 @@ import json
 import os
 import shutil
 
-from PyQt5.QtCore import QVariant
 from qgis.PyQt.QtWidgets import (
     QWidget,
     QFileDialog,
@@ -10,7 +9,7 @@ from qgis.PyQt.QtWidgets import (
     QGraphicsOpacityEffect,
 )
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import QCoreApplication, Qt
+from qgis.PyQt.QtCore import QCoreApplication, Qt,QVariant
 from qgis.PyQt.QtGui import QColor
 from qgis._core import (
     QgsVectorFileWriter,

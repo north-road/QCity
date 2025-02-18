@@ -72,44 +72,28 @@ class WidgetUtilsProjectArea(QObject):
 
                 layers = self.og_widget.project.mapLayersByName(table_name)
                 if layers:
-                    layer = layers[0]
-                    self.og_widget.project.removeMapLayer(layer.id())
+                    self.og_widget.project.removeMapLayer(layers[0].id())
 
-                try:
-                    with sqlite3.connect(SETTINGS_MANAGER.get_database_path()) as conn:
-                        cursor = conn.cursor()
+                gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.area_prefix}"
+                layer = QgsVectorLayer(gpkg_path, SETTINGS_MANAGER.area_prefix, "ogr")
+                layer.startEditing()
 
-                        cursor.execute(
-                            f"DROP TABLE '{SETTINGS_MANAGER.area_prefix}{table_name}'"
-                        )
-                        cursor.execute(
-                            f"DROP TABLE '{SETTINGS_MANAGER.area_parameter_prefix}{table_name}'"
-                        )
-                        cursor.execute(
-                            f"""DELETE FROM gpkg_contents WHERE table_name = '{SETTINGS_MANAGER.area_parameter_prefix}{table_name}';"""
-                        )
-                        cursor.execute(
-                            f"""DELETE FROM gpkg_contents WHERE table_name = '{SETTINGS_MANAGER.area_prefix}{table_name}';"""
-                        )
-                        cursor.execute(
-                            f"DELETE FROM gpkg_geometry_columns WHERE table_name = '{SETTINGS_MANAGER.area_prefix}{table_name}';"
-                        )
-                        cursor.execute(
-                            f"DELETE FROM gpkg_spatial_ref_sys WHERE srs_id = '{SETTINGS_MANAGER.area_prefix}{table_name}';"
-                        )
+                feature_ids = [feat.id() for feat in layer.getFeatures() if feat["name"] == table_name]
 
-                    self.og_widget.iface.mapCanvas().refresh()
-                except Exception as e:
-                    raise e
+                if feature_ids:
+                    for fid in feature_ids:
+                        layer.deleteFeature(fid)
+                layer.commitChanges()
 
-            self.og_widget.label_current_project_area.setText("Project")
-            self.og_widget.lineEdit_current_project_area.setText("")
+                del layer
 
             if self.og_widget.listWidget_project_areas.count() < 1:
                 SETTINGS_MANAGER.set_current_project_area_parameter_table_name(None)
                 for widget in self.og_widget.findChildren((QSpinBox, QDoubleSpinBox)):
                     widget.setValue(0)
-                self.og_widget.tabWidget_project_area_parameters.setEnabled(False)
+                self.og_widget.groupbox_car_parking.setEnabled(False)
+                self.og_widget.groupbox_bike_parking.setEnabled(False)
+                self.og_widget.groupbox_dwellings.setEnabled(False)
 
     def update_layer_name_gpkg(self) -> None:
         """
