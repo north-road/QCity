@@ -115,18 +115,7 @@ class TabDockWidget(QgsDockWidget):
 
             self.enable_widgets()
 
-            uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.area_prefix}"
-            self.area_layer = QgsVectorLayer(uri, SETTINGS_MANAGER.area_prefix, "ogr")
-
-            uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.development_site_prefix}"
-            self.dev_site_layer = QgsVectorLayer(
-                uri, SETTINGS_MANAGER.development_site_prefix, "ogr"
-            )
-
-            QgsProject.instance().addMapLayer(self.area_layer)
-            QgsProject.instance().addMapLayer(self.dev_site_layer)
-
-            SETTINGS_MANAGER.set_project_layer_ids(self.area_layer, self.dev_site_layer)
+            self.add_area_and_site_layers_to_canvas()
 
         else:
             # TODO: message bar here
@@ -146,8 +135,8 @@ class TabDockWidget(QgsDockWidget):
             SETTINGS_MANAGER.set_database_path(file_name)
             SETTINGS_MANAGER.save_database_path_with_project_name()
 
-            self.add_layers_to_widget_and_canvas(self.listWidget_project_areas)
-            self.add_layers_to_widget_and_canvas(self.listWidget_development_sites)
+            self.add_area_and_site_layers_to_canvas()
+            self.add_area_and_site_layers_to_list_widgets()
 
         self.listWidget_project_areas.setCurrentRow(0)
 
@@ -157,33 +146,29 @@ class TabDockWidget(QgsDockWidget):
 
         self.enable_widgets()
 
-    def add_layers_to_widget_and_canvas(self, widget: QListWidget) -> None:
-        all_items = SETTINGS_MANAGER.get_project_items()
-        widget.clear()
 
-        if widget.objectName() == "listWidget_development_sites":
-            prefix = SETTINGS_MANAGER.development_site_prefix
-            parameter_prefix = SETTINGS_MANAGER.development_site_parameter_prefix
-        elif widget.objectName() == "listWidget_project_areas":
-            prefix = SETTINGS_MANAGER.area_prefix
-            parameter_prefix = SETTINGS_MANAGER.area_parameter_prefix
+    def add_area_and_site_layers_to_list_widgets(self):
+        feats = self.area_layer.getFeatures()
+        for feat in feats:
+            self.listWidget_project_areas.addItem(feat["name"])
 
-        items = [
-            item
-            for item in all_items
-            if item.startswith(prefix) and not item.startswith(parameter_prefix)
-        ]
+        feats = self.development_site_layer.getFeatures()
+        for feat in feats:
+            self.listWidget_development_sites.addItem(feat["name"])
 
-        widget.addItems([item[len(prefix) :] for item in items])
+    def add_area_and_site_layers_to_canvas(self) -> None:
+        """Adds the layers from the gpkg to the canvas"""
+        database_path = SETTINGS_MANAGER.get_database_path()
 
-        for item in items:
-            uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={item}"
-            layer = QgsVectorLayer(uri, item, "ogr")
+        self.area_layer = QgsVectorLayer(f"{database_path}|layername={SETTINGS_MANAGER.area_prefix}",
+                                         SETTINGS_MANAGER.area_prefix, "ogr")
+        self.development_site_layer = QgsVectorLayer(f"{database_path}|layername={SETTINGS_MANAGER.development_site_prefix}",
+                                                     SETTINGS_MANAGER.development_site_prefix, "ogr")
 
+        for layer in (self.area_layer, self.development_site_layer):
             QgsProject.instance().addMapLayer(layer)
 
-        """if items:
-            SETTINGS_MANAGER.set_current_project_area_parameter_table_name(items[0])"""
+        SETTINGS_MANAGER.set_project_layer_ids(self.area_layer, self.development_site_layer)
 
     def add_base_layers(self) -> None:
         """Adds the selected layer in the combo box to the canvas."""

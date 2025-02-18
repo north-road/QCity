@@ -81,16 +81,6 @@ class SettingsManager(QObject):
         """
         return self._database_path
 
-    def get_project_items(self):
-        """Returns a list of all project areas in database."""
-        layer = QgsVectorLayer(self._database_path, "database", "ogr")
-        layers = layer.dataProvider().subLayers()
-        areas = list()
-        for area in layers:
-            name = area.split("!!::!!")[1]
-            areas.append(name)
-        return areas
-
     def save_widget_value_to_settings(
         self, widget: QWidget, value: Union[float, int, str], tab: str
     ):
