@@ -121,30 +121,6 @@ class SettingsManager(QObject):
 
         self.spinbox_changed.emit((widget.objectName(), value))
 
-    def get_spinbox_value_from_database(
-        self, widget: QWidget
-    ) -> Optional[Union[int, float]]:
-        """
-        Returns the value corresponding to the given widget name from the database.
-        """
-        try:
-            with sqlite3.connect(self._database_path) as conn:
-                cursor = conn.cursor()
-
-                query = f"SELECT value FROM {self.area_parameter_prefix}{self._current_project_area_parameter_table_name} WHERE widget_name = '{widget.objectName()}';"
-                cursor.execute(query)
-                result = cursor.fetchone()
-
-                if result:
-                    if isinstance(widget, QSpinBox):
-                        return int(result[0])
-                    elif isinstance(widget, QDoubleSpinBox):
-                        return result[0]
-                else:
-                    print("No matching row found.")
-        except Exception as e:
-            raise e
-
     def set_current_project_area_parameter_table_name(self, name: str) -> None:
         """
         Sets the current project area parameter table name.
