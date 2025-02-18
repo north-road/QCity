@@ -9,7 +9,7 @@ from qgis.PyQt.QtWidgets import (
     QGraphicsOpacityEffect,
 )
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import QCoreApplication, Qt,QVariant
+from qgis.PyQt.QtCore import QCoreApplication, Qt, QVariant
 from qgis.PyQt.QtGui import QColor
 from qgis._core import (
     QgsVectorFileWriter,
@@ -119,13 +119,14 @@ class TabDockWidget(QgsDockWidget):
             self.area_layer = QgsVectorLayer(uri, SETTINGS_MANAGER.area_prefix, "ogr")
 
             uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.development_site_prefix}"
-            self.dev_site_layer = QgsVectorLayer(uri, SETTINGS_MANAGER.development_site_prefix, "ogr")
+            self.dev_site_layer = QgsVectorLayer(
+                uri, SETTINGS_MANAGER.development_site_prefix, "ogr"
+            )
 
             QgsProject.instance().addMapLayer(self.area_layer)
             QgsProject.instance().addMapLayer(self.dev_site_layer)
 
             SETTINGS_MANAGER.set_project_layer_ids(self.area_layer, self.dev_site_layer)
-
 
         else:
             # TODO: message bar here

@@ -1,14 +1,14 @@
 """
 Settings manager
 """
+
 import json
 import os
-from typing import Optional, List, Union, Any
+from typing import Optional, List, Union
 
-from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QWidget
+from qgis.PyQt.QtWidgets import QWidget
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.PyQt.QtGui import QColor
-import sqlite3
 
 from qgis.core import (
     QgsSettings,
@@ -107,7 +107,9 @@ class SettingsManager(QObject):
         if feature_name:
             gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={kind}"
             layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
-            request = QgsFeatureRequest().setFilterExpression(f'"name" = \'{feature_name}\'')
+            request = QgsFeatureRequest().setFilterExpression(
+                f"\"name\" = '{feature_name}'"
+            )
             iterator = layer.getFeatures(request)
             feature = next(iterator)
 

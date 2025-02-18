@@ -1,7 +1,15 @@
 import sqlite3
 
 from qgis.PyQt.QtCore import QObject, Qt
-from qgis.PyQt.QtWidgets import QListWidgetItem, QComboBox, QWidget, QDialog, QLineEdit, QSpinBox, QDoubleSpinBox
+from qgis.PyQt.QtWidgets import (
+    QListWidgetItem,
+    QComboBox,
+    QWidget,
+    QDialog,
+    QLineEdit,
+    QSpinBox,
+    QDoubleSpinBox,
+)
 from qgis.core import QgsVectorLayer, QgsFeatureRequest, QgsProject
 from qgis.gui import QgsNewNameDialog
 
@@ -63,12 +71,16 @@ class WidgetUtilsDevelopmentSites(QObject):
 
     def update_development_site_listwidget(self, item: QListWidgetItem) -> None:
         """Updates the listwidget of the development sites to show only development sites within the active project area."""
-        site_layer = QgsProject.instance().mapLayer(SETTINGS_MANAGER.get_development_site_layer_id())
-        area_layer = QgsProject.instance().mapLayer(SETTINGS_MANAGER.get_project_area_layer_id())
+        site_layer = QgsProject.instance().mapLayer(
+            SETTINGS_MANAGER.get_development_site_layer_id()
+        )
+        area_layer = QgsProject.instance().mapLayer(
+            SETTINGS_MANAGER.get_project_area_layer_id()
+        )
 
         name = self.og_widget.listWidget_project_areas.currentItem().text()
 
-        request = QgsFeatureRequest().setFilterExpression(f'"name" = \'{name}\'')
+        request = QgsFeatureRequest().setFilterExpression(f"\"name\" = '{name}'")
         iterator = area_layer.getFeatures(request)
         filter_feature = next(iterator)
         filter_geom_wkt = filter_feature.geometry().asWkt()
@@ -101,7 +113,11 @@ class WidgetUtilsDevelopmentSites(QObject):
                 layer = QgsVectorLayer(gpkg_path, SETTINGS_MANAGER.area_prefix, "ogr")
                 layer.startEditing()
 
-                feature_ids = [feat.id() for feat in layer.getFeatures() if feat["name"] == table_name]
+                feature_ids = [
+                    feat.id()
+                    for feat in layer.getFeatures()
+                    if feat["name"] == table_name
+                ]
 
                 if feature_ids:
                     for fid in feature_ids:
@@ -205,7 +221,9 @@ class WidgetUtilsDevelopmentSites(QObject):
             gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.development_site_prefix}"
 
             layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
-            request = QgsFeatureRequest().setFilterExpression(f'"name" = \'{feature_name}\'')
+            request = QgsFeatureRequest().setFilterExpression(
+                f"\"name\" = '{feature_name}'"
+            )
             iterator = layer.getFeatures(request)
             feature = next(iterator)
 

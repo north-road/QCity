@@ -78,7 +78,11 @@ class WidgetUtilsProjectArea(QObject):
                 layer = QgsVectorLayer(gpkg_path, SETTINGS_MANAGER.area_prefix, "ogr")
                 layer.startEditing()
 
-                feature_ids = [feat.id() for feat in layer.getFeatures() if feat["name"] == table_name]
+                feature_ids = [
+                    feat.id()
+                    for feat in layer.getFeatures()
+                    if feat["name"] == table_name
+                ]
 
                 if feature_ids:
                     for fid in feature_ids:
@@ -174,11 +178,15 @@ class WidgetUtilsProjectArea(QObject):
         """Sets the canvas extent to the clicked layer"""
         name = item.text()
         SETTINGS_MANAGER.set_current_project_area_parameter_table_name(name)
-        layer = QgsProject.instance().mapLayer(SETTINGS_MANAGER.get_project_area_layer_id())
+        layer = QgsProject.instance().mapLayer(
+            SETTINGS_MANAGER.get_project_area_layer_id()
+        )
         layer.setSubsetString(f"name='{name}'")
 
-        site_layer = QgsProject.instance().mapLayer(SETTINGS_MANAGER.get_development_site_layer_id())
-        sql_filter = f"FALSE"
+        site_layer = QgsProject.instance().mapLayer(
+            SETTINGS_MANAGER.get_development_site_layer_id()
+        )
+        sql_filter = "FALSE"
         site_layer.setSubsetString(sql_filter)
 
         extent = layer.extent()
@@ -197,7 +205,9 @@ class WidgetUtilsProjectArea(QObject):
             gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.area_prefix}"
 
             layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
-            request = QgsFeatureRequest().setFilterExpression(f'"name" = \'{feature_name}\'')
+            request = QgsFeatureRequest().setFilterExpression(
+                f"\"name\" = '{feature_name}'"
+            )
             iterator = layer.getFeatures(request)
 
             feature = next(iterator)
