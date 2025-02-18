@@ -1,6 +1,6 @@
 {
-    "lineEdit_development_site_address": "''",
+    "lineEdit_development_site_address": "",
     "comboBox_development_site_status": 0,
-    "lineEdit_development_site_year": "'01/01/2000'",
-    "lineEdit_development_site_owner": "''"
+    "lineEdit_development_site_year": "01/01/2000",
+    "lineEdit_development_site_owner": ""
 }

@@ -1,7 +1,7 @@
 """
 Settings manager
 """
-
+import json
 import os
 from typing import Optional, List, Union
 
@@ -10,10 +10,11 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.PyQt.QtGui import QColor
 import sqlite3
 
-from qgis._core import QgsProject
 from qgis.core import (
     QgsSettings,
     QgsVectorLayer,
+    QgsProject,
+    QgsFeatureRequest,
 )
 
 
@@ -95,34 +96,27 @@ class SettingsManager(QObject):
         """
         Sets a spinbox value from the corresponding widget-value.
         """
-        try:
-            if tab == "project_areas":
-                table_name = self._current_project_area_parameter_table_name
-                prefix = self.area_parameter_prefix
-            elif tab == "development_sites":
-                table_name = self._current_development_site_parameter_table_name
-                prefix = self.development_site_parameter_prefix
+        if tab == "project_areas":
+            feature_name = self._current_project_area_parameter_table_name
+            kind = self.area_prefix
+        elif tab == "development_sites":
+            feature_name = self._current_development_site_parameter_table_name
+            kind = self.development_site_prefix
 
-            if isinstance(value, Union[float, int]):
-                col = "value_float"
-            elif isinstance(value, str):
-                col = "value_string"
-            elif isinstance(value, bool):
-                col = "value_bool"
+        if feature_name:
+            gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={kind}"
+            layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
+            request = QgsFeatureRequest().setFilterExpression(f'"name" = \'{feature_name}\'')
+            iterator = layer.getFeatures(request)
+            feature = next(iterator)
 
-            if table_name:
-                with sqlite3.connect(self._database_path) as conn:
-                    cursor = conn.cursor()
-                    cursor.execute(
-                        f"DELETE FROM {prefix}{table_name} where widget_name = '{widget.objectName()}';"
-                    )
-                    sql = f"INSERT INTO {prefix}{table_name} (widget_name, {col}) VALUES (?, ?)"
-                    params = (widget.objectName(), value)
-                    cursor.execute(sql, params)
-                    conn.commit()
-
-        except Exception as e:
-            raise e
+            layer.startEditing()
+            if feature:
+                feature.setAttribute(layer.fields().indexOf(widget.objectName()), value)
+                layer.updateFeature(feature)
+                layer.commitChanges()
+            else:
+                layer.rollBack()
 
         self.spinbox_changed.emit((widget.objectName(), value))
 
@@ -193,6 +187,18 @@ class SettingsManager(QObject):
             )
             self.set_database_path(database_path)
             return database_path
+
+    def get_attributes_from_json(self, kind: str) -> dict:
+        """Gets the attributes of the default values from the json files"""
+        if kind == "project_areas":
+            json_path = self._default_project_area_parameters_path
+        elif kind == "development_sites":
+            json_path = self._default_project_development_site_path
+
+        with open(json_path, "r") as file:
+            attributes = json.load(file)
+
+        return attributes
 
 
 # Settings manager singleton instance

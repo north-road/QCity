@@ -7,7 +7,7 @@ from qgis.PyQt.QtWidgets import (
     QDialog,
 )
 from qgis.PyQt.QtCore import QObject, Qt
-from qgis.core import QgsVectorLayer
+from qgis.core import QgsVectorLayer, QgsFeatureRequest
 from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER
@@ -44,9 +44,9 @@ class WidgetUtilsProjectArea(QObject):
                 )
             )  # This does work indeed, despite the marked error
 
-        """self.og_widget.listWidget_project_areas.currentItemChanged.connect(
+        self.og_widget.listWidget_project_areas.currentItemChanged.connect(
             lambda item: self.update_project_area_parameters(item)
-        )"""
+        )
 
         # Load associated database when project is loaded on startup
         # TODO: Connect this so it also loads when a project is loaded while in session
@@ -200,28 +200,34 @@ class WidgetUtilsProjectArea(QObject):
         Updates the parameter-spin-boxes of the project area to the currently selected one.
         """
         if item:
-            table_name = item.text()
+            feature_name = item.text()
 
-            SETTINGS_MANAGER.set_current_project_area_parameter_table_name(table_name)
+            SETTINGS_MANAGER.set_current_project_area_parameter_table_name(feature_name)
 
-            with sqlite3.connect(SETTINGS_MANAGER.get_database_path()) as conn:
-                cursor = conn.cursor()
+            gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.area_prefix}"
 
-                cursor.execute(
-                    f"SELECT widget_name, value_float FROM '{SETTINGS_MANAGER.area_parameter_prefix}'"
+            layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
+            request = QgsFeatureRequest().setFilterExpression(f'"name" = \'{feature_name}\'')
+            iterator = layer.getFeatures(request)
+
+            feature = next(iterator)
+
+            feature_dict = feature.attributes()
+            col_names = [field.name() for field in layer.fields()]
+            widget_values_dict = dict(zip(col_names, feature_dict))
+
+            for widget_name in widget_values_dict.keys():
+                if widget_name in ["fid", "name"]:
+                    continue
+                widget = self.og_widget.findChild(
+                    (QSpinBox, QDoubleSpinBox), widget_name
                 )
+                if isinstance(widget, QSpinBox):
+                    widget.setValue(int(widget_values_dict[widget_name]))
+                else:
+                    widget.setValue(widget_values_dict[widget_name])
 
-                widget_values_dict = {row[0]: row[1] for row in cursor.fetchall()}
-                for widget_name in widget_values_dict.keys():
-                    widget = self.og_widget.findChild(
-                        (QSpinBox, QDoubleSpinBox), widget_name
-                    )
-                    if isinstance(widget, QSpinBox):
-                        widget.setValue(int(widget_values_dict[widget_name]))
-                    else:
-                        widget.setValue(widget_values_dict[widget_name])
-
-                self.og_widget.label_current_project_area.setText(table_name)
+            self.og_widget.label_current_project_area.setText(feature_name)
 
     def action_maptool_emit(self) -> None:
         """Emitted when plus button is clicked."""

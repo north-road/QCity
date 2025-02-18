@@ -171,14 +171,12 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         if tab_name == "tab_development_sites":
             kind = SETTINGS_MANAGER.development_site_prefix
             list_widget = self.dlg.listWidget_development_sites
-            json_path = SETTINGS_MANAGER._default_project_development_site_path
             SETTINGS_MANAGER.set_current_development_site_parameter_table_name(
                 feature_name
             )
         elif tab_name == "tab_project_areas":
             kind = SETTINGS_MANAGER.area_prefix
             list_widget = self.dlg.listWidget_project_areas
-            json_path = SETTINGS_MANAGER._default_project_area_parameters_path
             SETTINGS_MANAGER.set_current_project_area_parameter_table_name(feature_name)
 
         else:
@@ -198,7 +196,6 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             self.cleanup()
             return
 
-        list_widget.addItem(feature_name)
 
         gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={kind}"
 
@@ -210,8 +207,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         feature = QgsFeature()
         feature.setFields(layer.fields())
 
-        with open(json_path, "r") as file:
-            attributes = json.load(file)
+        attributes = SETTINGS_MANAGER.get_attributes_from_json(kind)
 
         feature.setAttribute("name", feature_name)
         for key, value in attributes.items():
@@ -227,10 +223,6 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         layer.dataProvider().addFeature(feature)
         layer.commitChanges()
 
-        item = list_widget.findItems(feature_name, Qt.MatchExactly)[0]
-        row = list_widget.row(item)
-        list_widget.setCurrentRow(row)
-
         # Add layer to canvas
         layer.setSubsetString(f"name='{feature_name}'")
         if not layer.isValid():
@@ -240,6 +232,11 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
 
         if not list_widget.isEnabled():
             list_widget.setEnabled(True)
+
+        list_widget.addItem(feature_name)
+        item = list_widget.findItems(feature_name, Qt.MatchExactly)[0]
+        row = list_widget.row(item)
+        list_widget.setCurrentRow(row)
 
     def cleanup(self):
         """Run after digitization is finished, cleans up the maptool"""

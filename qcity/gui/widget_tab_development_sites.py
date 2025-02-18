@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLineEdit
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QListWidgetItem, QComboBox, QWidget, QDialog
-from qgis.core import QgsVectorLayer
+from qgis.core import QgsVectorLayer, QgsFeatureRequest
 from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER
@@ -55,9 +55,9 @@ class WidgetUtilsDevelopmentSites(QObject):
             )
         )
 
-        """self.og_widget.listWidget_development_sites.currentItemChanged.connect(
+        self.og_widget.listWidget_development_sites.currentItemChanged.connect(
             lambda item: self.update_development_site_parameters(item)
-        )"""
+        )
 
         self.og_widget.listWidget_project_areas.currentItemChanged.connect(
             lambda item: self.update_development_site_listwidget(item)
@@ -234,26 +234,31 @@ class WidgetUtilsDevelopmentSites(QObject):
         Updates the line edits and combobox of the development sites tab to the currently selected site.
         """
         if item:
-            table_name = item.text()
+            feature_name = item.text()
 
             SETTINGS_MANAGER.set_current_development_site_parameter_table_name(
-                table_name
+                feature_name
             )
 
-            with sqlite3.connect(SETTINGS_MANAGER.get_database_path()) as conn:
-                cursor = conn.cursor()
+            gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.development_site_prefix}"
 
-                cursor.execute(
-                    f"SELECT widget_name, value_float, value_string, value_bool FROM '{SETTINGS_MANAGER.development_site_parameter_prefix}{table_name}'"
-                )
+            layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
+            request = QgsFeatureRequest().setFilterExpression(f'"name" = \'{feature_name}\'')
+            iterator = layer.getFeatures(request)
+            feature = next(iterator)
 
-                widget_values_dict = {row[0]: row[1:] for row in cursor.fetchall()}
-                for widget_name in widget_values_dict.keys():
-                    widget = self.og_widget.findChild(QWidget, widget_name)
+            feature_dict = feature.attributes()
+            col_names = [field.name() for field in layer.fields()]
+            widget_values_dict = dict(zip(col_names, feature_dict))
 
-                    if isinstance(widget, QLineEdit):
-                        widget.setText(widget_values_dict[widget_name][1])
-                    elif isinstance(widget, QComboBox):
-                        widget.setCurrentIndex(int(widget_values_dict[widget_name][0]))
+            for widget_name in widget_values_dict.keys():
+                if widget_name in ["fid", "name"]:
+                    pass
+                widget = self.og_widget.findChild(QWidget, widget_name)
 
-                self.og_widget.label_current_project_area.setText(table_name)
+                if isinstance(widget, QLineEdit):
+                    widget.setText(widget_values_dict[widget_name])
+                elif isinstance(widget, QComboBox):
+                    widget.setCurrentIndex(int(widget_values_dict[widget_name]))
+
+            self.og_widget.label_current_project_area.setText(feature_name)
