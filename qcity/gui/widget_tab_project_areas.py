@@ -7,7 +7,7 @@ from qgis.PyQt.QtWidgets import (
     QDialog,
 )
 from qgis.PyQt.QtCore import QObject, Qt
-from qgis.core import QgsVectorLayer, QgsFeatureRequest
+from qgis.core import QgsVectorLayer, QgsFeatureRequest, QgsProject
 from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER
@@ -174,12 +174,11 @@ class WidgetUtilsProjectArea(QObject):
         """Sets the canvas extent to the clicked layer"""
         name = item.text()
         SETTINGS_MANAGER.set_current_project_area_parameter_table_name(name)
-        uri = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.area_prefix}{name}"
-        layer = QgsVectorLayer(uri, name, "ogr")
+        layer = QgsProject.instance().mapLayer(SETTINGS_MANAGER.get_project_area_layer_id())
+        layer.setSubsetString(f"name='{name}'")
         extent = layer.extent()
         self.og_widget.iface.mapCanvas().setExtent(extent)
         self.og_widget.iface.mapCanvas().refresh()
-        del layer
 
     def update_project_area_parameters(self, item: QListWidgetItem) -> None:
         """

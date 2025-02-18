@@ -3,7 +3,7 @@ Settings manager
 """
 import json
 import os
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Any
 
 from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QWidget
 from qgis.PyQt.QtCore import QObject, pyqtSignal
@@ -31,6 +31,7 @@ class SettingsManager(QObject):
     current_project_area_parameter_name_changed = pyqtSignal(str)
     database_path_with_project_name_saved = pyqtSignal(dict)
     current_development_site_parameter_name_changed = pyqtSignal(str)
+    project_layer_ids_changed = pyqtSignal(tuple)
 
     plugin_path = os.path.dirname(os.path.realpath(__file__))
     area_parameter_prefix = "project_area_parameters_"
@@ -199,6 +200,18 @@ class SettingsManager(QObject):
             attributes = json.load(file)
 
         return attributes
+
+    def set_project_layer_ids(self, area_layer, dev_site_layer) -> None:
+        self.area_layer_id = area_layer.id()
+        self.dev_site_layer_id = dev_site_layer.id()
+
+        self.project_layer_ids_changed.emit((area_layer.id(), dev_site_layer.id()))
+
+    def get_project_area_layer_id(self) -> int:
+        return self.area_layer_id
+
+    def get_development_site_layer_id(self) -> int:
+        return self.dev_site_layer_id
 
 
 # Settings manager singleton instance

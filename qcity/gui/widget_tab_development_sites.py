@@ -2,7 +2,7 @@ import sqlite3
 
 from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtWidgets import QListWidgetItem, QComboBox, QWidget, QDialog, QLineEdit, QSpinBox, QDoubleSpinBox
-from qgis.core import QgsVectorLayer, QgsFeatureRequest
+from qgis.core import QgsVectorLayer, QgsFeatureRequest, QgsProject
 from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER

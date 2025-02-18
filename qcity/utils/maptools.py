@@ -166,7 +166,6 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
 
     def add_layers_to_gpkg(self, feature_name: str, tab_name: str) -> None:
         """
-        Creates a project area and parameter file, adds them to the gpkg and adds a list-widget entry.
         """
         if tab_name == "tab_development_sites":
             kind = SETTINGS_MANAGER.development_site_prefix
@@ -174,11 +173,12 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             SETTINGS_MANAGER.set_current_development_site_parameter_table_name(
                 feature_name
             )
+            layer = QgsProject.instance().mapLayer(SETTINGS_MANAGER.get_development_site_layer_id())
         elif tab_name == "tab_project_areas":
             kind = SETTINGS_MANAGER.area_prefix
             list_widget = self.dlg.listWidget_project_areas
             SETTINGS_MANAGER.set_current_project_area_parameter_table_name(feature_name)
-
+            layer = QgsProject.instance().mapLayer(SETTINGS_MANAGER.get_project_area_layer_id())
         else:
             raise Exception(f"Unknown tab name: {tab_name}")
 
@@ -195,11 +195,6 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
                 print("Table name already exists.")
             self.cleanup()
             return
-
-
-        gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={kind}"
-
-        layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
 
         if not layer.isValid():
             raise Exception(f"Layer {feature_name} is not valid!")
@@ -223,12 +218,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         layer.dataProvider().addFeature(feature)
         layer.commitChanges()
 
-        # Add layer to canvas
         layer.setSubsetString(f"name='{feature_name}'")
-        if not layer.isValid():
-            print("Layer failed to load!")
-        else:
-            QgsProject.instance().addMapLayer(layer)
 
         if not list_widget.isEnabled():
             list_widget.setEnabled(True)
