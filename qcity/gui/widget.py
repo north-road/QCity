@@ -22,6 +22,7 @@ from qgis.gui import (
     QgsDockWidget,
 )
 
+from .widget_tab_building_levels import WidgetUtilsBuildingLevels
 from ..core import SETTINGS_MANAGER
 from ..gui.gui_utils import GuiUtils
 from qcity.gui.widget_tab_development_sites import WidgetUtilsDevelopmentSites
@@ -64,6 +65,7 @@ class TabDockWidget(QgsDockWidget):
         # Initialize tabs
         WidgetUtilsProjectArea(self)
         WidgetUtilsDevelopmentSites(self)
+        WidgetUtilsBuildingLevels(self)
 
     def set_add_button_activation(self) -> None:
         """Sets the add button for the base layers enabled/disabled, based on the current item text"""
@@ -112,6 +114,10 @@ class TabDockWidget(QgsDockWidget):
                 SETTINGS_MANAGER.development_site_prefix,
                 SETTINGS_MANAGER._default_project_development_site_path,
             )
+            self.create_base_tables(
+                SETTINGS_MANAGER.building_level_prefix,
+                SETTINGS_MANAGER._default_project_building_level_path,
+            )
 
             self.enable_widgets()
 
@@ -156,6 +162,10 @@ class TabDockWidget(QgsDockWidget):
         for feat in feats:
             self.listWidget_development_sites.addItem(feat["name"])
 
+        feats = self.building_level_layer.getFeatures()
+        for feat in feats:
+            self.listWidget_building_levels.addItem(feat["name"])
+
     def add_area_and_site_layers_to_canvas(self) -> None:
         """Adds the layers from the gpkg to the canvas"""
         database_path = SETTINGS_MANAGER.get_database_path()
@@ -164,11 +174,14 @@ class TabDockWidget(QgsDockWidget):
                                          SETTINGS_MANAGER.project_area_prefix, "ogr")
         self.development_site_layer = QgsVectorLayer(f"{database_path}|layername={SETTINGS_MANAGER.development_site_prefix}",
                                                      SETTINGS_MANAGER.development_site_prefix, "ogr")
+        self.building_level_layer = QgsVectorLayer(
+            f"{database_path}|layername={SETTINGS_MANAGER.building_level_prefix}",
+            SETTINGS_MANAGER.building_level_prefix, "ogr")
 
-        for layer in (self.area_layer, self.development_site_layer):
+        for layer in (self.area_layer, self.development_site_layer, self.building_level_layer):
             QgsProject.instance().addMapLayer(layer)
 
-        SETTINGS_MANAGER.set_project_layer_ids(self.area_layer, self.development_site_layer)
+        SETTINGS_MANAGER.set_project_layer_ids(self.area_layer, self.development_site_layer, self.building_level_layer)
 
     def add_base_layers(self) -> None:
         """Adds the selected layer in the combo box to the canvas."""

@@ -9,6 +9,7 @@
 # (at your option) any later version.
 # ---------------------------------------------------------------------
 import os
+from pyexpat import features
 from typing import List, Union, Optional
 
 from qgis.PyQt.QtGui import QColor
@@ -147,7 +148,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
                 return
 
             table_name, ok = QInputDialog.getText(
-                self.dlg, "Name", "Input Name for Project Area:"
+                self.dlg, "Name", "Input Name:"
             )
 
             if not ok:
@@ -157,16 +158,13 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             if self.rubber_band:
                 self.clearRubberBands()
 
-            tab_name = self.dlg.tabWidget.currentWidget().objectName()
-
-            self.add_layers_to_gpkg(table_name, tab_name)
+            self.add_layers_to_gpkg(table_name, SETTINGS_MANAGER.current_digitisation_type)
 
             self.cleanup()
 
-    def add_layers_to_gpkg(self, feature_name: str, tab_name: str) -> None:
+    def add_layers_to_gpkg(self, feature_name: str, kind: str) -> None:
         """ """
-        if tab_name == "tab_development_sites":
-            kind = SETTINGS_MANAGER.development_site_prefix
+        if kind == SETTINGS_MANAGER.development_site_prefix:
             list_widget = self.dlg.listWidget_development_sites
             SETTINGS_MANAGER.set_current_development_site_parameter_table_name(
                 feature_name
@@ -174,8 +172,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             layer = QgsProject.instance().mapLayer(
                 SETTINGS_MANAGER.get_development_site_layer_id()
             )
-        elif tab_name == "tab_project_areas":
-            kind = SETTINGS_MANAGER.project_area_prefix
+        elif kind == SETTINGS_MANAGER.project_area_prefix:
             list_widget = self.dlg.listWidget_project_areas
             SETTINGS_MANAGER.set_current_project_area_parameter_table_name(feature_name)
             layer = QgsProject.instance().mapLayer(
@@ -187,18 +184,28 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             )
             sql_filter = "FALSE"
             site_layer.setSubsetString(sql_filter)
+        elif kind == SETTINGS_MANAGER.building_level_prefix:
+            list_widget = self.dlg.listWidget_building_levels
+            SETTINGS_MANAGER.set_current_building_level_parameter_table_name(feature_name)
+            layer = QgsProject.instance().mapLayer(
+                SETTINGS_MANAGER.get_building_level_layer_id()
+            )
+            SETTINGS_MANAGER.set_current_building_level_parameter_table_name(
+                feature_name
+            )
+
         else:
-            raise Exception(f"Unknown tab name: {tab_name}")
+            raise Exception(f"Unknown tab name: {kind}")
 
         items = []
         for index in range(list_widget.count()):
             item = list_widget.item(index)
             items.append(item.text())
 
-        table_name_exists = True if feature_name in items else False
+        feature_name_exists = True if feature_name in items else False
 
-        if not feature_name or table_name_exists:
-            if table_name_exists:
+        if not feature_name or feature_name_exists:
+            if feature_name_exists:
                 # TODO: Message bar here instead.
                 print("Table name already exists.")
             self.cleanup()

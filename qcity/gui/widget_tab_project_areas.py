@@ -19,7 +19,7 @@ class WidgetUtilsProjectArea(QObject):
         self.og_widget = og_widget
 
         self.og_widget.toolButton_project_area_add.clicked.connect(
-            self.action_maptool_emit
+            lambda: self.action_maptool_emit(SETTINGS_MANAGER.project_area_prefix)
         )
 
         self.og_widget.toolButton_project_area_remove.clicked.connect(
@@ -40,7 +40,7 @@ class WidgetUtilsProjectArea(QObject):
             widget.valueChanged.connect(
                 lambda value,
                 widget=widget: SETTINGS_MANAGER.save_widget_value_to_settings(
-                    widget, value, "project_areas"
+                    widget, value, SETTINGS_MANAGER.project_area_prefix
                 )
             )  # This does work indeed, despite the marked error
 
@@ -210,6 +210,7 @@ class WidgetUtilsProjectArea(QObject):
 
             self.og_widget.label_current_project_area.setText(feature_name)
 
-    def action_maptool_emit(self) -> None:
+    def action_maptool_emit(self, kind) -> None:
         """Emitted when plus button is clicked."""
+        SETTINGS_MANAGER.current_digitisation_type = kind
         SETTINGS_MANAGER.add_feature_clicked.emit(True)

@@ -1,0 +1,9 @@
+{
+    "doubleSpinBox_commercia_floorspace": 10.0,
+    "doubleSpinBox_office_floorspace": 10.0,
+    "doubleSpinBox_residential_floorspace": 10.0,
+    "spinBox_building_levels_1_bedroom_dwellings": 1,
+    "spinBox_building_levels_2_bedroom_dwellings": 1,
+    "spinBox_building_levels_3_bedroom_dwellings": 1,
+    "spinBox_building_levels_4_bedroom_dwellings": 1
+}

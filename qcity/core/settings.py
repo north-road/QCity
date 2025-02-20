@@ -31,14 +31,18 @@ class SettingsManager(QObject):
     current_project_area_parameter_name_changed = pyqtSignal(str)
     database_path_with_project_name_saved = pyqtSignal(dict)
     current_development_site_parameter_name_changed = pyqtSignal(str)
+    current_building_level_parameter_name_changed = pyqtSignal(str)
     project_layer_ids_changed = pyqtSignal(tuple)
 
     plugin_path = os.path.dirname(os.path.realpath(__file__))
     project_area_prefix = "project_areas"
     development_site_prefix = "development_sites"
+    building_level_prefix = "building_levels"
+    current_digitisation_type: Optional[str] = None
 
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
+        self._current_building_level_parameter_table_name: Optional[str] = None
         self._current_development_site_parameter_table_name: Optional[str] = None
         self._current_project_area_parameter_table_name: Optional[str] = None
         self._database_path = None
@@ -49,6 +53,9 @@ class SettingsManager(QObject):
         )
         self._default_project_development_site_path = os.path.join(
             self.plugin_path, "..", "data", "default_development_site_parameters.json"
+        )
+        self._default_project_building_level_path = os.path.join(
+            self.plugin_path, "..", "data", "default_building_level_parameters.json"
         )
 
         self.project = QgsProject().instance()
@@ -80,17 +87,17 @@ class SettingsManager(QObject):
         return self._database_path
 
     def save_widget_value_to_settings(
-        self, widget: QWidget, value: Union[float, int, str], tab: str
+        self, widget: QWidget, value: Union[float, int, str], kind: str
     ):
         """
         Sets a spinbox value from the corresponding widget-value.
         """
-        if tab == "project_areas":
+        if kind == SETTINGS_MANAGER.project_area_prefix:
             feature_name = self._current_project_area_parameter_table_name
-            kind = self.project_area_prefix
-        elif tab == "development_sites":
+        elif kind == SETTINGS_MANAGER.development_site_prefix:
             feature_name = self._current_development_site_parameter_table_name
-            kind = self.development_site_prefix
+        elif kind == SETTINGS_MANAGER.building_level_prefix:
+            feature_name = self._current_building_level_parameter_table_name
 
         if feature_name:
             gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={kind}"
@@ -124,6 +131,13 @@ class SettingsManager(QObject):
         """
         self._current_development_site_parameter_table_name = name
         self.current_development_site_parameter_name_changed.emit(name)
+
+    def set_current_building_level_parameter_table_name(self, name: str) -> None:
+        """
+        Sets the current project area parameter table name.
+        """
+        self._current_building_level_parameter_table_name = name
+        self.current_building_level_parameter_name_changed.emit(name)
 
     def save_database_path_with_project_name(self) -> None:
         """
@@ -161,15 +175,20 @@ class SettingsManager(QObject):
             json_path = self._default_project_area_parameters_path
         elif kind == "development_sites":
             json_path = self._default_project_development_site_path
+        elif kind == "building_levels":
+            json_path = self._default_project_building_level_path
+        else:
+            raise Exception(f"Unknown kind {kind}")
 
         with open(json_path, "r") as file:
             attributes = json.load(file)
 
         return attributes
 
-    def set_project_layer_ids(self, area_layer, dev_site_layer) -> None:
+    def set_project_layer_ids(self, area_layer: str, dev_site_layer: str, building_level_layer: str) -> None:
         self.area_layer_id = area_layer.id()
         self.dev_site_layer_id = dev_site_layer.id()
+        self.building_level_layer_id = building_level_layer.id()
 
         self.project_layer_ids_changed.emit((area_layer.id(), dev_site_layer.id()))
 
@@ -178,6 +197,9 @@ class SettingsManager(QObject):
 
     def get_development_site_layer_id(self) -> int:
         return self.dev_site_layer_id
+
+    def get_building_level_layer_id(self) -> int:
+        return self.building_level_layer_id
 
 
 # Settings manager singleton instance

@@ -16,63 +16,45 @@ from qgis.gui import QgsNewNameDialog
 from qcity.core import SETTINGS_MANAGER
 
 
-class WidgetUtilsDevelopmentSites(QObject):
+class WidgetUtilsBuildingLevels(QObject):
     def __init__(self, og_widget):
         super().__init__(og_widget)
         self.og_widget = og_widget
 
-        self.og_widget.toolButton_development_site_add.clicked.connect(
-            lambda: self.action_maptool_emit(SETTINGS_MANAGER.development_site_prefix)
+        self.og_widget.toolButton_building_level_add.clicked.connect(
+            lambda: self.action_maptool_emit(SETTINGS_MANAGER.building_level_prefix)
         )
 
-        self.og_widget.toolButton_development_site_remove.clicked.connect(
+        self.og_widget.toolButton_building_level_remove.clicked.connect(
             self.remove_selected_sites
         )
 
-        self.og_widget.toolButton_development_site_rename.clicked.connect(
+        self.og_widget.toolButton_building_level_rename.clicked.connect(
             self.update_site_name_gpkg
         )
 
-        self.og_widget.lineEdit_development_site_address.textChanged.connect(
-            lambda value,
-            widget=self.og_widget.lineEdit_development_site_address: SETTINGS_MANAGER.save_widget_value_to_settings(
-                widget, value, SETTINGS_MANAGER.development_site_prefix
-            )
+        self.og_widget.listWidget_building_levels.currentItemChanged.connect(
+            lambda item: self.update_building_level_parameters(item)
         )
 
-        self.og_widget.lineEdit_development_site_owner.textChanged.connect(
-            lambda value,
-            widget=self.og_widget.lineEdit_development_site_owner: SETTINGS_MANAGER.save_widget_value_to_settings(
-                widget, value, SETTINGS_MANAGER.development_site_prefix
-            )
+        self.og_widget.listWidget_building_levels.currentItemChanged.connect(
+            lambda item: self.update_building_level_listwidget(item)
         )
 
-        self.og_widget.lineEdit_development_site_year.textChanged.connect(
-            lambda value,
-            widget=self.og_widget.lineEdit_development_site_year: SETTINGS_MANAGER.save_widget_value_to_settings(
-                widget, value, SETTINGS_MANAGER.development_site_prefix
-            )
-        )
+        for widget in self.og_widget.tab_development_sites.findChildren(
+            (QSpinBox, QDoubleSpinBox)
+        ):
+            widget.valueChanged.connect(
+                lambda value,
+                widget=widget: SETTINGS_MANAGER.save_widget_value_to_settings(
+                    widget, value, SETTINGS_MANAGER.building_level_prefix
+                )
+            )  # This does work indeed, despite the marked error
 
-        self.og_widget.comboBox_development_site_status.currentIndexChanged.connect(
-            lambda value,
-            widget=self.og_widget.comboBox_development_site_status: SETTINGS_MANAGER.save_widget_value_to_settings(
-                widget, value, SETTINGS_MANAGER.development_site_prefix
-            )
-        )
-
-        self.og_widget.listWidget_development_sites.currentItemChanged.connect(
-            lambda item: self.update_development_site_parameters(item)
-        )
-
-        self.og_widget.listWidget_development_sites.currentItemChanged.connect(
-            lambda item: self.update_development_site_listwidget(item)
-        )
-
-    def update_development_site_listwidget(self, item: QListWidgetItem) -> None:
-        """Updates the listwidget of the development sites to show only development sites within the active project area."""
+    def update_building_level_listwidget(self, item: QListWidgetItem) -> None:
+        """Updates the listwidget of the building levels to show only building levels within the active project area."""
         site_layer = QgsProject.instance().mapLayer(
-            SETTINGS_MANAGER.get_development_site_layer_id()
+            SETTINGS_MANAGER.get_building_level_layer_id()
         )
         area_layer = QgsProject.instance().mapLayer(
             SETTINGS_MANAGER.get_project_area_layer_id()
@@ -95,16 +77,16 @@ class WidgetUtilsDevelopmentSites(QObject):
 
     def remove_selected_sites(self) -> None:
         """Removes selected area from Qlistwidget, map and geopackage."""
-        tbr_areas = self.og_widget.listWidget_development_sites.selectedItems()
+        tbr_areas = self.og_widget.listWidget_building_levels.selectedItems()
 
         if tbr_areas:
             rows = {
-                self.og_widget.listWidget_development_sites.row(item): item.text()
+                self.og_widget.listWidget_building_levels.row(item): item.text()
                 for item in tbr_areas
             }
 
             for key, table_name in rows.items():
-                self.og_widget.listWidget_development_sites.takeItem(key)
+                self.og_widget.listWidget_building_levels.takeItem(key)
 
                 layers = self.og_widget.project.mapLayersByName(table_name)
                 if layers:
@@ -127,10 +109,8 @@ class WidgetUtilsDevelopmentSites(QObject):
 
                 del layer
 
-            self.og_widget.label_current_development_site.setText("Development Site")
-
-            if self.og_widget.listWidget_development_sites.count() < 1:
-                SETTINGS_MANAGER.set_current_development_site_parameter_table_name(None)
+            if self.og_widget.listWidget_building_levels.count() < 1:
+                SETTINGS_MANAGER.set_current_building_level_parameter_table_name(None)
                 for widget in self.og_widget.findChildren((QSpinBox, QDoubleSpinBox)):
                     widget.setValue(0)
                     # self.og_widget.tabWidget_project_area_parameters.setEnabled(False)
@@ -139,12 +119,12 @@ class WidgetUtilsDevelopmentSites(QObject):
         """
         Updates the name of the table in the geopackage.
         """
-        widget = self.og_widget.listWidget_development_sites.selectedItems()[0]
+        widget = self.og_widget.listWidget_building_levels.selectedItems()[0]
         old_feat_name = widget.text()
 
         existing_names = [
-            self.og_widget.listWidget_development_sites.item(i).text()
-            for i in range(self.og_widget.listWidget_development_sites.count())
+            self.og_widget.listWidget_building_levels.item(i).text()
+            for i in range(self.og_widget.listWidget_building_levels.count())
         ]
 
         dialog = QgsNewNameDialog(
@@ -163,12 +143,12 @@ class WidgetUtilsDevelopmentSites(QObject):
 
         new_feat_name = dialog.name()
 
-        old_item_id = self.og_widget.listWidget_development_sites.row(widget)
-        self.og_widget.listWidget_development_sites.takeItem(old_item_id)
-        self.og_widget.listWidget_development_sites.addItem(new_feat_name)
+        old_item_id = self.og_widget.listWidget_building_levels.row(widget)
+        self.og_widget.listWidget_building_levels.takeItem(old_item_id)
+        self.og_widget.listWidget_building_levels.addItem(new_feat_name)
 
-        layer = QgsVectorLayer(f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.development_site_prefix}",
-                                                     SETTINGS_MANAGER.development_site_prefix, "ogr")
+        layer = QgsVectorLayer(f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.building_level_prefix}",
+                                                     SETTINGS_MANAGER.building_level_prefix, "ogr")
         if layer:
             layer.startEditing()
             for feature in layer.getFeatures():
@@ -178,28 +158,26 @@ class WidgetUtilsDevelopmentSites(QObject):
             layer.commitChanges()
 
         # Set selection to changed item
-        item_to_select = self.og_widget.listWidget_development_sites.findItems(
+        item_to_select = self.og_widget.listWidget_building_levels.findItems(
             new_feat_name, Qt.MatchExactly
         )[0]
-        self.og_widget.listWidget_development_sites.setCurrentItem(item_to_select)
-        SETTINGS_MANAGER.set_current_development_site_parameter_table_name(
+        self.og_widget.listWidget_building_levels.setCurrentItem(item_to_select)
+        SETTINGS_MANAGER.set_current_building_level_parameter_table_name(
             item_to_select.text()
         )
 
-        self.og_widget.label_current_development_site.setText(new_feat_name)
-
-    def update_development_site_parameters(self, item: QListWidgetItem) -> None:
+    def update_building_level_parameters(self, item: QListWidgetItem) -> None:
         """
         Updates the line edits and combobox of the development sites tab to the currently selected site.
         """
         if item:
             feature_name = item.text()
 
-            SETTINGS_MANAGER.set_current_development_site_parameter_table_name(
+            SETTINGS_MANAGER.set_current_building_level_parameter_table_name(
                 feature_name
-            )
 
-            gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.development_site_prefix}"
+            )
+            gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.building_level_prefix}"
 
             layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
             request = QgsFeatureRequest().setFilterExpression(
@@ -217,9 +195,7 @@ class WidgetUtilsDevelopmentSites(QObject):
                     pass
                 widget = self.og_widget.findChild(QWidget, widget_name)
 
-                if isinstance(widget, QLineEdit):
-                    widget.setText(widget_values_dict[widget_name])
-                elif isinstance(widget, QComboBox):
-                    widget.setCurrentIndex(int(widget_values_dict[widget_name]))
-
-            self.og_widget.label_current_development_site.setText(feature_name)
+                if isinstance(widget, QSpinBox):
+                    widget.setValue(int(widget_values_dict[widget_name]))
+                elif isinstance(widget, QDoubleSpinBox):
+                    widget.setValue(widget_values_dict[widget_name])
