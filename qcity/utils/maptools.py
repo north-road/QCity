@@ -246,7 +246,8 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
 
     def clearRubberBands(self) -> None:
         """Clears map canvas of all rubber bands and sets them to None."""
-        self.canvas().scene().removeItem(self.rubber_band)
+        if self.rubber_band:
+            self.canvas().scene().removeItem(self.rubber_band)
         self.rubber_band = None
         if self.cursor_band:
             self.canvas().scene().removeItem(self.cursor_band)
