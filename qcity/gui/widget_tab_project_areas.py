@@ -27,7 +27,7 @@ class WidgetUtilsProjectArea(QObject):
         )
 
         self.og_widget.toolButton_project_area_rename.clicked.connect(
-            self.update_layer_name_gpkg
+            self.update_area_name_gpkg
         )
 
         self.og_widget.listWidget_project_areas.itemClicked.connect(
@@ -74,8 +74,8 @@ class WidgetUtilsProjectArea(QObject):
                 if layers:
                     self.og_widget.project.removeMapLayer(layers[0].id())
 
-                gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.area_prefix}"
-                layer = QgsVectorLayer(gpkg_path, SETTINGS_MANAGER.area_prefix, "ogr")
+                gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.project_area_prefix}"
+                layer = QgsVectorLayer(gpkg_path, SETTINGS_MANAGER.project_area_prefix, "ogr")
                 layer.startEditing()
 
                 feature_ids = [
@@ -101,12 +101,12 @@ class WidgetUtilsProjectArea(QObject):
                 self.og_widget.groupbox_bike_parking.setEnabled(False)
                 self.og_widget.groupbox_dwellings.setEnabled(False)
 
-    def update_layer_name_gpkg(self) -> None:
+    def update_area_name_gpkg(self) -> None:
         """
         Updates the name of the table in the geopackage.
         """
         widget = self.og_widget.listWidget_project_areas.selectedItems()[0]
-        old_layer_name = widget.text()
+        old_feat_name = widget.text()
 
         existing_names = [
             self.og_widget.listWidget_project_areas.item(i).text()
@@ -127,52 +127,33 @@ class WidgetUtilsProjectArea(QObject):
         if dialog.exec_() != QDialog.DialogCode.Accepted:
             return
 
-        layer_name = dialog.name()
+        new_feat_name = dialog.name()
 
         old_item_id = self.og_widget.listWidget_project_areas.row(widget)
         self.og_widget.listWidget_project_areas.takeItem(old_item_id)
-        self.og_widget.listWidget_project_areas.addItem(layer_name)
+        self.og_widget.listWidget_project_areas.addItem(new_feat_name)
 
-        try:
-            database_path = SETTINGS_MANAGER.get_database_path()
-            with sqlite3.connect(database_path) as conn:
-                cursor = conn.cursor()
-
-                cursor.execute(
-                    f'ALTER TABLE "{SETTINGS_MANAGER.area_prefix}{old_layer_name}" RENAME TO "{SETTINGS_MANAGER.area_prefix}{layer_name}"'
-                )
-                cursor.execute(
-                    f"UPDATE gpkg_contents SET table_name = '{SETTINGS_MANAGER.area_prefix}{layer_name}' WHERE table_name = '{SETTINGS_MANAGER.area_prefix}{old_layer_name}';"
-                )
-                cursor.execute(
-                    f"UPDATE gpkg_geometry_columns SET table_name = '{SETTINGS_MANAGER.area_prefix}{layer_name}' WHERE table_name = '{SETTINGS_MANAGER.area_prefix}{old_layer_name}'; "
-                )
-
-                parameter_name = f"{SETTINGS_MANAGER.area_parameter_prefix}{layer_name}"
-                old_parameter_name = (
-                    f"{SETTINGS_MANAGER.area_parameter_prefix}{old_layer_name}"
-                )
-                cursor.execute(
-                    f"UPDATE gpkg_contents SET table_name = '{old_parameter_name}' WHERE table_name = '{parameter_name}';"
-                )
-                cursor.execute(
-                    f"ALTER TABLE '{old_parameter_name}' RENAME TO '{parameter_name}'"
-                )
-                conn.commit()
-
-        except Exception as e:
-            raise e
+        layer = QgsVectorLayer(
+            f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.project_area_prefix}",
+            SETTINGS_MANAGER.project_area_prefix, "ogr")
+        if layer:
+            layer.startEditing()
+            for feature in layer.getFeatures():
+                if feature["name"] == old_feat_name:
+                    feature["name"] = new_feat_name
+                    layer.updateFeature(feature)
+            layer.commitChanges()
 
         # Set selection to changed item
         item_to_select = self.og_widget.listWidget_project_areas.findItems(
-            layer_name, Qt.MatchExactly
+            new_feat_name, Qt.MatchExactly
         )[0]
         self.og_widget.listWidget_project_areas.setCurrentItem(item_to_select)
         SETTINGS_MANAGER.set_current_project_area_parameter_table_name(
             item_to_select.text()
         )
 
-        self.og_widget.label_current_project_area.setText(layer_name)
+        self.og_widget.label_current_project_area.setText(new_feat_name)
 
     def zoom_to_project_area(self, item) -> None:
         """Sets the canvas extent to the clicked layer"""
@@ -202,7 +183,7 @@ class WidgetUtilsProjectArea(QObject):
 
             SETTINGS_MANAGER.set_current_project_area_parameter_table_name(feature_name)
 
-            gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.area_prefix}"
+            gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.project_area_prefix}"
 
             layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
             request = QgsFeatureRequest().setFilterExpression(

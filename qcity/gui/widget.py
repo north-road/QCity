@@ -105,7 +105,7 @@ class TabDockWidget(QgsDockWidget):
             self.label_current_development_site.setText("Project")
 
             self.create_base_tables(
-                SETTINGS_MANAGER.area_prefix,
+                SETTINGS_MANAGER.project_area_prefix,
                 SETTINGS_MANAGER._default_project_area_parameters_path,
             )
             self.create_base_tables(
@@ -160,8 +160,8 @@ class TabDockWidget(QgsDockWidget):
         """Adds the layers from the gpkg to the canvas"""
         database_path = SETTINGS_MANAGER.get_database_path()
 
-        self.area_layer = QgsVectorLayer(f"{database_path}|layername={SETTINGS_MANAGER.area_prefix}",
-                                         SETTINGS_MANAGER.area_prefix, "ogr")
+        self.area_layer = QgsVectorLayer(f"{database_path}|layername={SETTINGS_MANAGER.project_area_prefix}",
+                                         SETTINGS_MANAGER.project_area_prefix, "ogr")
         self.development_site_layer = QgsVectorLayer(f"{database_path}|layername={SETTINGS_MANAGER.development_site_prefix}",
                                                      SETTINGS_MANAGER.development_site_prefix, "ogr")
 

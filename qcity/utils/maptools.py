@@ -175,7 +175,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
                 SETTINGS_MANAGER.get_development_site_layer_id()
             )
         elif tab_name == "tab_project_areas":
-            kind = SETTINGS_MANAGER.area_prefix
+            kind = SETTINGS_MANAGER.project_area_prefix
             list_widget = self.dlg.listWidget_project_areas
             SETTINGS_MANAGER.set_current_project_area_parameter_table_name(feature_name)
             layer = QgsProject.instance().mapLayer(

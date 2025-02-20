@@ -34,9 +34,7 @@ class SettingsManager(QObject):
     project_layer_ids_changed = pyqtSignal(tuple)
 
     plugin_path = os.path.dirname(os.path.realpath(__file__))
-    area_parameter_prefix = "project_area_parameters_"
-    area_prefix = "project_areas"
-    development_site_parameter_prefix = "development_site_parameters_"
+    project_area_prefix = "project_areas"
     development_site_prefix = "development_sites"
 
     def __init__(self, parent: Optional[QObject] = None):
@@ -89,7 +87,7 @@ class SettingsManager(QObject):
         """
         if tab == "project_areas":
             feature_name = self._current_project_area_parameter_table_name
-            kind = self.area_prefix
+            kind = self.project_area_prefix
         elif tab == "development_sites":
             feature_name = self._current_development_site_parameter_table_name
             kind = self.development_site_prefix

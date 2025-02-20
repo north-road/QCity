@@ -109,8 +109,8 @@ class WidgetUtilsDevelopmentSites(QObject):
                 if layers:
                     self.og_widget.project.removeMapLayer(layers[0].id())
 
-                gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.area_prefix}"
-                layer = QgsVectorLayer(gpkg_path, SETTINGS_MANAGER.area_prefix, "ogr")
+                gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.project_area_prefix}"
+                layer = QgsVectorLayer(gpkg_path, SETTINGS_MANAGER.project_area_prefix, "ogr")
                 layer.startEditing()
 
                 feature_ids = [
@@ -139,7 +139,7 @@ class WidgetUtilsDevelopmentSites(QObject):
         Updates the name of the table in the geopackage.
         """
         widget = self.og_widget.listWidget_development_sites.selectedItems()[0]
-        old_layer_name = widget.text()
+        old_feat_name = widget.text()
 
         existing_names = [
             self.og_widget.listWidget_development_sites.item(i).text()
@@ -160,52 +160,32 @@ class WidgetUtilsDevelopmentSites(QObject):
         if dialog.exec_() != QDialog.DialogCode.Accepted:
             return
 
-        layer_name = dialog.name()
+        new_feat_name = dialog.name()
 
         old_item_id = self.og_widget.listWidget_development_sites.row(widget)
         self.og_widget.listWidget_development_sites.takeItem(old_item_id)
-        self.og_widget.listWidget_development_sites.addItem(layer_name)
+        self.og_widget.listWidget_development_sites.addItem(new_feat_name)
 
-        try:
-            database_path = SETTINGS_MANAGER.get_database_path()
-            with sqlite3.connect(database_path) as conn:
-                cursor = conn.cursor()
-
-                cursor.execute(
-                    f'ALTER TABLE "{SETTINGS_MANAGER.development_site_prefix}{old_layer_name}" RENAME TO "{SETTINGS_MANAGER.development_site_prefix}{layer_name}"'
-                )
-                cursor.execute(
-                    f"UPDATE gpkg_contents SET table_name = '{SETTINGS_MANAGER.development_site_prefix}{layer_name}' WHERE table_name = '{SETTINGS_MANAGER.development_site_prefix}{old_layer_name}';"
-                )
-                cursor.execute(
-                    f"UPDATE gpkg_geometry_columns SET table_name = '{SETTINGS_MANAGER.development_site_prefix}{layer_name}' WHERE table_name = '{SETTINGS_MANAGER.development_site_prefix}{old_layer_name}'; "
-                )
-
-                parameter_name = (
-                    f"{SETTINGS_MANAGER.development_site_parameter_prefix}{layer_name}"
-                )
-                old_parameter_name = f"{SETTINGS_MANAGER.development_site_parameter_prefix}{old_layer_name}"
-                cursor.execute(
-                    f"UPDATE gpkg_contents SET table_name = '{old_parameter_name}' WHERE table_name = '{parameter_name}';"
-                )
-                cursor.execute(
-                    f"ALTER TABLE '{old_parameter_name}' RENAME TO '{parameter_name}'"
-                )
-                conn.commit()
-
-        except Exception as e:
-            raise e
+        layer = QgsVectorLayer(f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.development_site_prefix}",
+                                                     SETTINGS_MANAGER.development_site_prefix, "ogr")
+        if layer:
+            layer.startEditing()
+            for feature in layer.getFeatures():
+                if feature["name"] == old_feat_name:
+                    feature["name"] = new_feat_name
+                    layer.updateFeature(feature)
+            layer.commitChanges()
 
         # Set selection to changed item
         item_to_select = self.og_widget.listWidget_development_sites.findItems(
-            layer_name, Qt.MatchExactly
+            new_feat_name, Qt.MatchExactly
         )[0]
         self.og_widget.listWidget_development_sites.setCurrentItem(item_to_select)
         SETTINGS_MANAGER.set_current_development_site_parameter_table_name(
             item_to_select.text()
         )
 
-        self.og_widget.label_current_development_site.setText(layer_name)
+        self.og_widget.label_current_development_site.setText(new_feat_name)
 
     def update_development_site_parameters(self, item: QListWidgetItem) -> None:
         """
