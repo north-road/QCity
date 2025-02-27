@@ -31,6 +31,10 @@ class WidgetUtilsProjectArea(QObject):
         )
 
         self.og_widget.listWidget_project_areas.itemClicked.connect(
+            lambda item: SETTINGS_MANAGER.set_current_project_area_parameter_table_name(item.text())
+        )
+
+        self.og_widget.listWidget_project_areas.itemClicked.connect(
             lambda item: self.zoom_to_project_area(item)
         )
 
@@ -194,15 +198,19 @@ class WidgetUtilsProjectArea(QObject):
 
         self.og_widget.label_current_project_area.setText(new_feat_name)
 
-    def zoom_to_project_area(self, item) -> None:
-        """Sets the canvas extent to the clicked layer"""
-        name = item.text()
-        SETTINGS_MANAGER.set_current_project_area_parameter_table_name(name)
-        layer = QgsProject.instance().mapLayer(
+    def zoom_to_project_area(self, item: QListWidgetItem) -> None:
+        """Sets the canvas extent to the clicked project area"""
+        area_layer = QgsProject.instance().mapLayer(
             SETTINGS_MANAGER.get_project_area_layer_id()
         )
-        extent = layer.extent()
-        self.og_widget.iface.mapCanvas().setExtent(extent)
+        area_layer.setSubsetString("")
+        filter_expression = f"\"name\" = '{item.text()}'"
+        request = QgsFeatureRequest().setFilterExpression(filter_expression)
+        iterator = area_layer.getFeatures(request)
+        feature = next(iterator)
+        feature_bbox = feature.geometry().boundingBox()
+
+        self.og_widget.iface.mapCanvas().setExtent(feature_bbox)
         self.og_widget.iface.mapCanvas().refresh()
 
     def update_project_area_parameters(self, item: QListWidgetItem) -> None:

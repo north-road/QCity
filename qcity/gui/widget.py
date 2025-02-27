@@ -138,6 +138,7 @@ class TabDockWidget(QgsDockWidget):
             )
 
         if file_name and file_name.endswith(".gpkg"):
+            self.listWidget_project_areas.clear()
             SETTINGS_MANAGER.set_database_path(file_name)
             SETTINGS_MANAGER.save_database_path_with_project_name()
 
