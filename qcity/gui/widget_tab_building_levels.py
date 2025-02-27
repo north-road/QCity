@@ -10,7 +10,7 @@ from qgis.PyQt.QtWidgets import (
     QSpinBox,
     QDoubleSpinBox,
 )
-from qgis.core import QgsVectorLayer, QgsFeatureRequest, QgsProject
+from qgis.core import QgsVectorLayer, QgsFeatureRequest, QgsProject, QgsFeature
 from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER
@@ -168,11 +168,8 @@ class WidgetUtilsBuildingLevels(QObject):
             gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.building_level_prefix}"
 
             layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
-            request = QgsFeatureRequest().setFilterExpression(
-                f"\"name\" = '{feature_name}'"
-            )
-            iterator = layer.getFeatures(request)
-            feature = next(iterator)
+
+            feature = self.get_feature_of_layer_by_name(layer, item)
 
             feature_dict = feature.attributes()
             col_names = [field.name() for field in layer.fields()]
@@ -187,3 +184,11 @@ class WidgetUtilsBuildingLevels(QObject):
                     widget.setValue(int(widget_values_dict[widget_name]))
                 elif isinstance(widget, QDoubleSpinBox):
                     widget.setValue(widget_values_dict[widget_name])
+
+    def get_feature_of_layer_by_name(self, layer: QgsVectorLayer, item: QListWidgetItem) -> QgsFeature:
+        """Returns the feature with the name of the item"""
+        filter_expression = f"\"name\" = '{item.text()}'"
+        request = QgsFeatureRequest().setFilterExpression(filter_expression)
+        iterator = layer.getFeatures(request)
+
+        return next(iterator)

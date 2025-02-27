@@ -10,7 +10,7 @@ from qgis.PyQt.QtWidgets import (
     QSpinBox,
     QDoubleSpinBox,
 )
-from qgis.core import QgsVectorLayer, QgsFeatureRequest, QgsProject
+from qgis.core import QgsVectorLayer, QgsFeatureRequest, QgsProject, QgsFeature
 from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER
@@ -149,10 +149,7 @@ class WidgetUtilsDevelopmentSites(QObject):
         site_layer.setSubsetString("")
         level_layer.setSubsetString("")
 
-        filter_expression = f"\"name\" = '{item.text()}'"
-        request = QgsFeatureRequest().setFilterExpression(filter_expression)
-        iterator = site_layer.getFeatures(request)
-        filter_feature = next(iterator)
+        filter_feature = self.get_feature_of_layer_by_name(site_layer, item)
 
         names = list()
         for feat in level_layer.getFeatures():
@@ -161,7 +158,7 @@ class WidgetUtilsDevelopmentSites(QObject):
                 self.og_widget.listWidget_building_levels.addItem(name)
                 names.append(name)
 
-        site_layer.setSubsetString(filter_expression)
+        site_layer.setSubsetString(f"\"name\" = '{item.text()}'")
         name_filter = ", ".join(f"'{name}'" for name in names)
         level_layer.setSubsetString(f'name IN ({name_filter})')
 
@@ -227,11 +224,8 @@ class WidgetUtilsDevelopmentSites(QObject):
             gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.development_site_prefix}"
 
             layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
-            request = QgsFeatureRequest().setFilterExpression(
-                f"\"name\" = '{feature_name}'"
-            )
-            iterator = layer.getFeatures(request)
-            feature = next(iterator)
+
+            feature = self.get_feature_of_layer_by_name(layer, item)
 
             feature_dict = feature.attributes()
             col_names = [field.name() for field in layer.fields()]
@@ -248,3 +242,11 @@ class WidgetUtilsDevelopmentSites(QObject):
                     widget.setCurrentIndex(int(widget_values_dict[widget_name]))
 
             self.og_widget.label_current_development_site.setText(feature_name)
+
+    def get_feature_of_layer_by_name(self, layer: QgsVectorLayer, item: QListWidgetItem) -> QgsFeature:
+        """Returns the feature with the name of the item"""
+        filter_expression = f"\"name\" = '{item.text()}'"
+        request = QgsFeatureRequest().setFilterExpression(filter_expression)
+        iterator = layer.getFeatures(request)
+
+        return next(iterator)

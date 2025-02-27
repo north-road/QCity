@@ -7,6 +7,7 @@ from qgis.PyQt.QtWidgets import (
     QDialog,
 )
 from qgis.PyQt.QtCore import QObject, Qt
+from qgis._core import QgsFeature
 from qgis.core import QgsVectorLayer, QgsFeatureRequest, QgsProject
 from qgis.gui import QgsNewNameDialog
 
@@ -127,10 +128,7 @@ class WidgetUtilsProjectArea(QObject):
         area_layer.setSubsetString("")
         site_layer.setSubsetString("")
 
-        filter_expression = f"\"name\" = '{item.text()}'"
-        request = QgsFeatureRequest().setFilterExpression(filter_expression)
-        iterator = area_layer.getFeatures(request)
-        filter_feature = next(iterator)
+        filter_feature = self.get_feature_of_layer_by_name(area_layer, item)
 
         names = list()
         for feat in site_layer.getFeatures():
@@ -139,7 +137,7 @@ class WidgetUtilsProjectArea(QObject):
                 self.og_widget.listWidget_development_sites.addItem(name)
                 names.append(name)
 
-        area_layer.setSubsetString(filter_expression)
+        area_layer.setSubsetString(f"\"name\" = '{item.text()}'")
         name_filter = ", ".join(f"'{name}'" for name in names)
         site_layer.setSubsetString(f'name IN ({name_filter})')
         level_layer.setSubsetString("FALSE")
@@ -204,10 +202,8 @@ class WidgetUtilsProjectArea(QObject):
             SETTINGS_MANAGER.get_project_area_layer_id()
         )
         area_layer.setSubsetString("")
-        filter_expression = f"\"name\" = '{item.text()}'"
-        request = QgsFeatureRequest().setFilterExpression(filter_expression)
-        iterator = area_layer.getFeatures(request)
-        feature = next(iterator)
+
+        feature = self.get_feature_of_layer_by_name(area_layer, item)
         feature_bbox = feature.geometry().boundingBox()
 
         self.og_widget.iface.mapCanvas().setExtent(feature_bbox)
@@ -225,12 +221,8 @@ class WidgetUtilsProjectArea(QObject):
             gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.project_area_prefix}"
 
             layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
-            request = QgsFeatureRequest().setFilterExpression(
-                f"\"name\" = '{feature_name}'"
-            )
-            iterator = layer.getFeatures(request)
 
-            feature = next(iterator)
+            feature = self.get_feature_of_layer_by_name(layer, item)
 
             feature_dict = feature.attributes()
             col_names = [field.name() for field in layer.fields()]
@@ -253,3 +245,11 @@ class WidgetUtilsProjectArea(QObject):
         """Emitted when plus button is clicked."""
         SETTINGS_MANAGER.current_digitisation_type = kind
         SETTINGS_MANAGER.add_feature_clicked.emit(True)
+
+    def get_feature_of_layer_by_name(self, layer: QgsVectorLayer, item: QListWidgetItem) -> QgsFeature:
+        """Returns the feature with the name of the item"""
+        filter_expression = f"\"name\" = '{item.text()}'"
+        request = QgsFeatureRequest().setFilterExpression(filter_expression)
+        iterator = layer.getFeatures(request)
+
+        return next(iterator)
