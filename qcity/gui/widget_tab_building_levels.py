@@ -1,12 +1,8 @@
-import sqlite3
-
 from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtWidgets import (
     QListWidgetItem,
-    QComboBox,
     QWidget,
     QDialog,
-    QLineEdit,
     QSpinBox,
     QDoubleSpinBox,
 )
@@ -51,7 +47,9 @@ class WidgetUtilsBuildingLevels(QObject):
                 )
             )  # This does work indeed, despite the marked error
 
-    def set_subset_string_for_building_levels_layer(self, item: QListWidgetItem) -> None:
+    def set_subset_string_for_building_levels_layer(
+        self, item: QListWidgetItem
+    ) -> None:
         """Updates the listwidget of the building levels to show only building levels within the active project area."""
         level_layer = QgsProject.instance().mapLayer(
             SETTINGS_MANAGER.get_building_level_layer_id()
@@ -81,7 +79,9 @@ class WidgetUtilsBuildingLevels(QObject):
                     self.og_widget.project.removeMapLayer(layers[0].id())
 
                 gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.project_area_prefix}"
-                layer = QgsVectorLayer(gpkg_path, SETTINGS_MANAGER.project_area_prefix, "ogr")
+                layer = QgsVectorLayer(
+                    gpkg_path, SETTINGS_MANAGER.project_area_prefix, "ogr"
+                )
                 layer.startEditing()
 
                 feature_ids = [
@@ -135,8 +135,11 @@ class WidgetUtilsBuildingLevels(QObject):
         self.og_widget.listWidget_building_levels.takeItem(old_item_id)
         self.og_widget.listWidget_building_levels.addItem(new_feat_name)
 
-        layer = QgsVectorLayer(f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.building_level_prefix}",
-                                                     SETTINGS_MANAGER.building_level_prefix, "ogr")
+        layer = QgsVectorLayer(
+            f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.building_level_prefix}",
+            SETTINGS_MANAGER.building_level_prefix,
+            "ogr",
+        )
         if layer:
             layer.startEditing()
             for feature in layer.getFeatures():
@@ -163,7 +166,6 @@ class WidgetUtilsBuildingLevels(QObject):
 
             SETTINGS_MANAGER.set_current_building_level_parameter_table_name(
                 feature_name
-
             )
             gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.building_level_prefix}"
 
@@ -185,7 +187,9 @@ class WidgetUtilsBuildingLevels(QObject):
                 elif isinstance(widget, QDoubleSpinBox):
                     widget.setValue(widget_values_dict[widget_name])
 
-    def get_feature_of_layer_by_name(self, layer: QgsVectorLayer, item: QListWidgetItem) -> QgsFeature:
+    def get_feature_of_layer_by_name(
+        self, layer: QgsVectorLayer, item: QListWidgetItem
+    ) -> QgsFeature:
         """Returns the feature with the name of the item"""
         filter_expression = f"\"name\" = '{item.text()}'"
         request = QgsFeatureRequest().setFilterExpression(filter_expression)

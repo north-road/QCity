@@ -185,7 +185,9 @@ class SettingsManager(QObject):
 
         return attributes
 
-    def set_project_layer_ids(self, area_layer: str, dev_site_layer: str, building_level_layer: str) -> None:
+    def set_project_layer_ids(
+        self, area_layer: str, dev_site_layer: str, building_level_layer: str
+    ) -> None:
         self.area_layer_id = area_layer.id()
         self.dev_site_layer_id = dev_site_layer.id()
         self.building_level_layer_id = building_level_layer.id()

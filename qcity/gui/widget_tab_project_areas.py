@@ -1,5 +1,3 @@
-import sqlite3
-
 from qgis.PyQt.QtWidgets import (
     QSpinBox,
     QDoubleSpinBox,
@@ -32,7 +30,9 @@ class WidgetUtilsProjectArea(QObject):
         )
 
         self.og_widget.listWidget_project_areas.itemClicked.connect(
-            lambda item: SETTINGS_MANAGER.set_current_project_area_parameter_table_name(item.text())
+            lambda item: SETTINGS_MANAGER.set_current_project_area_parameter_table_name(
+                item.text()
+            )
         )
 
         self.og_widget.listWidget_project_areas.itemClicked.connect(
@@ -84,7 +84,9 @@ class WidgetUtilsProjectArea(QObject):
                     self.og_widget.project.removeMapLayer(layers[0].id())
 
                 gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.project_area_prefix}"
-                layer = QgsVectorLayer(gpkg_path, SETTINGS_MANAGER.project_area_prefix, "ogr")
+                layer = QgsVectorLayer(
+                    gpkg_path, SETTINGS_MANAGER.project_area_prefix, "ogr"
+                )
                 layer.startEditing()
 
                 feature_ids = [
@@ -139,7 +141,7 @@ class WidgetUtilsProjectArea(QObject):
 
         area_layer.setSubsetString(f"\"name\" = '{item.text()}'")
         name_filter = ", ".join(f"'{name}'" for name in names)
-        site_layer.setSubsetString(f'name IN ({name_filter})')
+        site_layer.setSubsetString(f"name IN ({name_filter})")
         level_layer.setSubsetString("FALSE")
 
     def update_area_name_gpkg(self) -> None:
@@ -176,7 +178,9 @@ class WidgetUtilsProjectArea(QObject):
 
         layer = QgsVectorLayer(
             f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.project_area_prefix}",
-            SETTINGS_MANAGER.project_area_prefix, "ogr")
+            SETTINGS_MANAGER.project_area_prefix,
+            "ogr",
+        )
         if layer:
             layer.startEditing()
             for feature in layer.getFeatures():
@@ -246,7 +250,9 @@ class WidgetUtilsProjectArea(QObject):
         SETTINGS_MANAGER.current_digitisation_type = kind
         SETTINGS_MANAGER.add_feature_clicked.emit(True)
 
-    def get_feature_of_layer_by_name(self, layer: QgsVectorLayer, item: QListWidgetItem) -> QgsFeature:
+    def get_feature_of_layer_by_name(
+        self, layer: QgsVectorLayer, item: QListWidgetItem
+    ) -> QgsFeature:
         """Returns the feature with the name of the item"""
         filter_expression = f"\"name\" = '{item.text()}'"
         request = QgsFeatureRequest().setFilterExpression(filter_expression)

@@ -9,7 +9,6 @@
 # (at your option) any later version.
 # ---------------------------------------------------------------------
 import os
-from pyexpat import features
 from typing import List, Union, Optional
 
 from qgis.PyQt.QtGui import QColor
@@ -147,9 +146,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
                 self.cleanup()
                 return
 
-            table_name, ok = QInputDialog.getText(
-                self.dlg, "Name", "Input Name:"
-            )
+            table_name, ok = QInputDialog.getText(self.dlg, "Name", "Input Name:")
 
             if not ok:
                 self.cleanup()
@@ -158,7 +155,9 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             if self.rubber_band:
                 self.clearRubberBands()
 
-            self.add_layers_to_gpkg(table_name, SETTINGS_MANAGER.current_digitisation_type)
+            self.add_layers_to_gpkg(
+                table_name, SETTINGS_MANAGER.current_digitisation_type
+            )
 
             self.cleanup()
 
@@ -186,7 +185,9 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             site_layer.setSubsetString(sql_filter)
         elif kind == SETTINGS_MANAGER.building_level_prefix:
             list_widget = self.dlg.listWidget_building_levels
-            SETTINGS_MANAGER.set_current_building_level_parameter_table_name(feature_name)
+            SETTINGS_MANAGER.set_current_building_level_parameter_table_name(
+                feature_name
+            )
             layer = QgsProject.instance().mapLayer(
                 SETTINGS_MANAGER.get_building_level_layer_id()
             )

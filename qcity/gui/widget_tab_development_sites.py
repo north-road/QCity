@@ -1,5 +1,3 @@
-import sqlite3
-
 from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtWidgets import (
     QListWidgetItem,
@@ -65,9 +63,10 @@ class WidgetUtilsDevelopmentSites(QObject):
             lambda item: self.update_development_site_parameters(item)
         )
 
-
         self.og_widget.listWidget_project_areas.itemClicked.connect(
-            lambda item: SETTINGS_MANAGER.set_current_development_site_parameter_table_name(item.text())
+            lambda item: SETTINGS_MANAGER.set_current_development_site_parameter_table_name(
+                item.text()
+            )
         )
 
         self.og_widget.listWidget_development_sites.itemClicked.connect(
@@ -78,7 +77,9 @@ class WidgetUtilsDevelopmentSites(QObject):
             lambda item: self.update_building_level_listwidget(item)
         )
 
-    def set_subset_string_for_development_site_layer(self, item: QListWidgetItem) -> None:
+    def set_subset_string_for_development_site_layer(
+        self, item: QListWidgetItem
+    ) -> None:
         """Sets the SubsetString for the development site layer"""
         site_layer = QgsProject.instance().mapLayer(
             SETTINGS_MANAGER.get_development_site_layer_id()
@@ -108,7 +109,9 @@ class WidgetUtilsDevelopmentSites(QObject):
                     self.og_widget.project.removeMapLayer(layers[0].id())
 
                 gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.project_area_prefix}"
-                layer = QgsVectorLayer(gpkg_path, SETTINGS_MANAGER.project_area_prefix, "ogr")
+                layer = QgsVectorLayer(
+                    gpkg_path, SETTINGS_MANAGER.project_area_prefix, "ogr"
+                )
                 layer.startEditing()
 
                 feature_ids = [
@@ -160,7 +163,7 @@ class WidgetUtilsDevelopmentSites(QObject):
 
         site_layer.setSubsetString(f"\"name\" = '{item.text()}'")
         name_filter = ", ".join(f"'{name}'" for name in names)
-        level_layer.setSubsetString(f'name IN ({name_filter})')
+        level_layer.setSubsetString(f"name IN ({name_filter})")
 
     def update_site_name_gpkg(self) -> None:
         """
@@ -194,8 +197,11 @@ class WidgetUtilsDevelopmentSites(QObject):
         self.og_widget.listWidget_development_sites.takeItem(old_item_id)
         self.og_widget.listWidget_development_sites.addItem(new_feat_name)
 
-        layer = QgsVectorLayer(f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.development_site_prefix}",
-                                                     SETTINGS_MANAGER.development_site_prefix, "ogr")
+        layer = QgsVectorLayer(
+            f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.development_site_prefix}",
+            SETTINGS_MANAGER.development_site_prefix,
+            "ogr",
+        )
         if layer:
             layer.startEditing()
             for feature in layer.getFeatures():
@@ -243,7 +249,9 @@ class WidgetUtilsDevelopmentSites(QObject):
 
             self.og_widget.label_current_development_site.setText(feature_name)
 
-    def get_feature_of_layer_by_name(self, layer: QgsVectorLayer, item: QListWidgetItem) -> QgsFeature:
+    def get_feature_of_layer_by_name(
+        self, layer: QgsVectorLayer, item: QListWidgetItem
+    ) -> QgsFeature:
         """Returns the feature with the name of the item"""
         filter_expression = f"\"name\" = '{item.text()}'"
         request = QgsFeatureRequest().setFilterExpression(filter_expression)

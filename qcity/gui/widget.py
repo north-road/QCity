@@ -5,7 +5,6 @@ import shutil
 from qgis.PyQt.QtWidgets import (
     QWidget,
     QFileDialog,
-    QListWidget,
     QGraphicsOpacityEffect,
 )
 from qgis.PyQt import uic
@@ -160,18 +159,32 @@ class TabDockWidget(QgsDockWidget):
         # TODO: Rename method to mention all layers are loaded
         database_path = SETTINGS_MANAGER.get_database_path()
 
-        self.area_layer = QgsVectorLayer(f"{database_path}|layername={SETTINGS_MANAGER.project_area_prefix}",
-                                         SETTINGS_MANAGER.project_area_prefix, "ogr")
-        self.development_site_layer = QgsVectorLayer(f"{database_path}|layername={SETTINGS_MANAGER.development_site_prefix}",
-                                                     SETTINGS_MANAGER.development_site_prefix, "ogr")
+        self.area_layer = QgsVectorLayer(
+            f"{database_path}|layername={SETTINGS_MANAGER.project_area_prefix}",
+            SETTINGS_MANAGER.project_area_prefix,
+            "ogr",
+        )
+        self.development_site_layer = QgsVectorLayer(
+            f"{database_path}|layername={SETTINGS_MANAGER.development_site_prefix}",
+            SETTINGS_MANAGER.development_site_prefix,
+            "ogr",
+        )
         self.building_level_layer = QgsVectorLayer(
             f"{database_path}|layername={SETTINGS_MANAGER.building_level_prefix}",
-            SETTINGS_MANAGER.building_level_prefix, "ogr")
+            SETTINGS_MANAGER.building_level_prefix,
+            "ogr",
+        )
 
-        for layer in (self.area_layer, self.development_site_layer, self.building_level_layer):
+        for layer in (
+            self.area_layer,
+            self.development_site_layer,
+            self.building_level_layer,
+        ):
             QgsProject.instance().addMapLayer(layer)
 
-        SETTINGS_MANAGER.set_project_layer_ids(self.area_layer, self.development_site_layer, self.building_level_layer)
+        SETTINGS_MANAGER.set_project_layer_ids(
+            self.area_layer, self.development_site_layer, self.building_level_layer
+        )
 
     def add_base_layers(self) -> None:
         """Adds the selected layer in the combo box to the canvas."""
@@ -236,15 +249,16 @@ class TabDockWidget(QgsDockWidget):
         """Creates a GeoPackage layer with attributes based on JSON data."""
         gpkg_path = SETTINGS_MANAGER.get_database_path()
 
-        get_qgis_type = lambda key: (
-            QVariant.Double
-            if "doubleSpinBox" in key
-            else QVariant.Int
-            if "spinBox" in key or "comboBox" in key
-            else QVariant.String
-            if "lineEdit" in key
-            else QVariant.String
-        )
+        def get_qgis_type(key):
+            return (
+                QVariant.Double
+                if "doubleSpinBox" in key
+                else QVariant.Int
+                if "spinBox" in key or "comboBox" in key
+                else QVariant.String
+                if "lineEdit" in key
+                else QVariant.String
+            )
 
         with open(path, "r") as file:
             data = json.load(file)
