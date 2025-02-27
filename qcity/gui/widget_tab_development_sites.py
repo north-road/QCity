@@ -65,6 +65,11 @@ class WidgetUtilsDevelopmentSites(QObject):
             lambda item: self.update_development_site_parameters(item)
         )
 
+
+        self.og_widget.listWidget_project_areas.itemClicked.connect(
+            lambda item: SETTINGS_MANAGER.set_current_development_site_parameter_table_name(item.text())
+        )
+
         self.og_widget.listWidget_development_sites.itemClicked.connect(
             lambda item: self.set_subset_string_for_development_site_layer(item)
         )
@@ -219,11 +224,6 @@ class WidgetUtilsDevelopmentSites(QObject):
         """
         if item:
             feature_name = item.text()
-
-            SETTINGS_MANAGER.set_current_development_site_parameter_table_name(
-                feature_name
-            )
-
             gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.development_site_prefix}"
 
             layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
