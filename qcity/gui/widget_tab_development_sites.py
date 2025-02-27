@@ -65,28 +65,20 @@ class WidgetUtilsDevelopmentSites(QObject):
             lambda item: self.update_development_site_parameters(item)
         )
 
-        self.og_widget.listWidget_development_sites.currentItemChanged.connect(
-            lambda item: self.update_development_site_listwidget(item)
+        self.og_widget.listWidget_development_sites.itemClicked.connect(
+            lambda item: self.set_subset_string_for_development_site_layer(item)
         )
 
-    def update_development_site_listwidget(self, item: QListWidgetItem) -> None:
-        """Updates the listwidget of the development sites to show only development sites within the active project area."""
+        self.og_widget.listWidget_development_sites.itemClicked.connect(
+            lambda item: self.update_building_level_listwidget(item)
+        )
+
+    def set_subset_string_for_development_site_layer(self, item: QListWidgetItem) -> None:
+        """Sets the SubsetString for the development site layer"""
         site_layer = QgsProject.instance().mapLayer(
             SETTINGS_MANAGER.get_development_site_layer_id()
         )
-        area_layer = QgsProject.instance().mapLayer(
-            SETTINGS_MANAGER.get_project_area_layer_id()
-        )
-
-        name = self.og_widget.listWidget_project_areas.currentItem().text()
-
-        request = QgsFeatureRequest().setFilterExpression(f"\"name\" = '{name}'")
-        iterator = area_layer.getFeatures(request)
-        filter_feature = next(iterator)
-        filter_geom_wkt = filter_feature.geometry().asWkt()
-
-        sql_filter = f"ST_Within($geometry, ST_GeomFromText('{filter_geom_wkt}', 4326)) and \"name\" = '{item.text()}'"
-        site_layer.setSubsetString(sql_filter)
+        site_layer.setSubsetString(f"\"name\" = '{item.text()}'")
 
     def action_maptool_emit(self, kind) -> None:
         """Emitted when plus button is clicked."""
@@ -134,6 +126,39 @@ class WidgetUtilsDevelopmentSites(QObject):
                 for widget in self.og_widget.findChildren((QSpinBox, QDoubleSpinBox)):
                     widget.setValue(0)
                     # self.og_widget.tabWidget_project_area_parameters.setEnabled(False)
+
+    def update_building_level_listwidget(self, item: QListWidgetItem) -> None:
+        """Updates the building levels listwidget to only contain sites within the current development site"""
+        if not item:
+            return
+
+        level_layer = QgsProject.instance().mapLayer(
+            SETTINGS_MANAGER.get_building_level_layer_id()
+        )
+
+        site_layer = QgsProject.instance().mapLayer(
+            SETTINGS_MANAGER.get_development_site_layer_id()
+        )
+
+        self.og_widget.listWidget_building_levels.clear()
+        site_layer.setSubsetString("")
+        level_layer.setSubsetString("")
+
+        filter_expression = f"\"name\" = '{item.text()}'"
+        request = QgsFeatureRequest().setFilterExpression(filter_expression)
+        iterator = site_layer.getFeatures(request)
+        filter_feature = next(iterator)
+
+        names = list()
+        for feat in level_layer.getFeatures():
+            if feat.geometry().within(filter_feature.geometry()):
+                name = feat["name"]
+                self.og_widget.listWidget_building_levels.addItem(name)
+                names.append(name)
+
+        site_layer.setSubsetString(filter_expression)
+        name_filter = ", ".join(f"'{name}'" for name in names)
+        level_layer.setSubsetString(f'name IN ({name_filter})')
 
     def update_site_name_gpkg(self) -> None:
         """

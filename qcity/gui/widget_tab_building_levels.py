@@ -37,8 +37,8 @@ class WidgetUtilsBuildingLevels(QObject):
             lambda item: self.update_building_level_parameters(item)
         )
 
-        self.og_widget.listWidget_building_levels.currentItemChanged.connect(
-            lambda item: self.update_building_level_listwidget(item)
+        self.og_widget.listWidget_building_levels.itemClicked.connect(
+            lambda item: self.set_subset_string_for_building_levels_layer(item)
         )
 
         for widget in self.og_widget.tab_development_sites.findChildren(
@@ -51,24 +51,12 @@ class WidgetUtilsBuildingLevels(QObject):
                 )
             )  # This does work indeed, despite the marked error
 
-    def update_building_level_listwidget(self, item: QListWidgetItem) -> None:
+    def set_subset_string_for_building_levels_layer(self, item: QListWidgetItem) -> None:
         """Updates the listwidget of the building levels to show only building levels within the active project area."""
-        site_layer = QgsProject.instance().mapLayer(
+        level_layer = QgsProject.instance().mapLayer(
             SETTINGS_MANAGER.get_building_level_layer_id()
         )
-        area_layer = QgsProject.instance().mapLayer(
-            SETTINGS_MANAGER.get_project_area_layer_id()
-        )
-
-        name = self.og_widget.listWidget_project_areas.currentItem().text()
-
-        request = QgsFeatureRequest().setFilterExpression(f"\"name\" = '{name}'")
-        iterator = area_layer.getFeatures(request)
-        filter_feature = next(iterator)
-        filter_geom_wkt = filter_feature.geometry().asWkt()
-
-        sql_filter = f"ST_Within($geometry, ST_GeomFromText('{filter_geom_wkt}', 4326)) and \"name\" = '{item.text()}'"
-        site_layer.setSubsetString(sql_filter)
+        level_layer.setSubsetString(f"\"name\" = '{item.text()}'")
 
     def action_maptool_emit(self, kind) -> None:
         """Emitted when plus button is clicked."""

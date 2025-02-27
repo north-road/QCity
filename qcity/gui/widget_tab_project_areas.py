@@ -48,6 +48,10 @@ class WidgetUtilsProjectArea(QObject):
             lambda item: self.update_project_area_parameters(item)
         )
 
+        self.og_widget.listWidget_project_areas.itemClicked.connect(
+            lambda item: self.update_development_site_listwidget(item)
+        )
+
         # Load associated database when project is loaded on startup
         # TODO: Connect this so it also loads when a project is loaded while in session
         self.load_saved_database_path()
@@ -100,6 +104,41 @@ class WidgetUtilsProjectArea(QObject):
                 self.og_widget.groupbox_car_parking.setEnabled(False)
                 self.og_widget.groupbox_bike_parking.setEnabled(False)
                 self.og_widget.groupbox_dwellings.setEnabled(False)
+
+    def update_development_site_listwidget(self, item: QListWidgetItem) -> None:
+        """Updates the development site listwidget to only contain sites within the current project area"""
+        area_layer = QgsProject.instance().mapLayer(
+            SETTINGS_MANAGER.get_project_area_layer_id()
+        )
+
+        site_layer = QgsProject.instance().mapLayer(
+            SETTINGS_MANAGER.get_development_site_layer_id()
+        )
+
+        level_layer = QgsProject.instance().mapLayer(
+            SETTINGS_MANAGER.get_building_level_layer_id()
+        )
+
+        self.og_widget.listWidget_development_sites.clear()
+        area_layer.setSubsetString("")
+        site_layer.setSubsetString("")
+
+        filter_expression = f"\"name\" = '{item.text()}'"
+        request = QgsFeatureRequest().setFilterExpression(filter_expression)
+        iterator = area_layer.getFeatures(request)
+        filter_feature = next(iterator)
+
+        names = list()
+        for feat in site_layer.getFeatures():
+            if feat.geometry().within(filter_feature.geometry()):
+                name = feat["name"]
+                self.og_widget.listWidget_development_sites.addItem(name)
+                names.append(name)
+
+        area_layer.setSubsetString(filter_expression)
+        name_filter = ", ".join(f"'{name}'" for name in names)
+        site_layer.setSubsetString(f'name IN ({name_filter})')
+        level_layer.setSubsetString("FALSE")
 
     def update_area_name_gpkg(self) -> None:
         """
@@ -162,14 +201,6 @@ class WidgetUtilsProjectArea(QObject):
         layer = QgsProject.instance().mapLayer(
             SETTINGS_MANAGER.get_project_area_layer_id()
         )
-        layer.setSubsetString(f"name='{name}'")
-
-        site_layer = QgsProject.instance().mapLayer(
-            SETTINGS_MANAGER.get_development_site_layer_id()
-        )
-        sql_filter = "FALSE"
-        site_layer.setSubsetString(sql_filter)
-
         extent = layer.extent()
         self.og_widget.iface.mapCanvas().setExtent(extent)
         self.og_widget.iface.mapCanvas().refresh()

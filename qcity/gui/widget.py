@@ -142,7 +142,9 @@ class TabDockWidget(QgsDockWidget):
             SETTINGS_MANAGER.save_database_path_with_project_name()
 
             self.add_area_and_site_layers_to_canvas()
-            self.add_area_and_site_layers_to_list_widgets()
+            feats = self.area_layer.getFeatures()
+            for feat in feats:
+                self.listWidget_project_areas.addItem(feat["name"])
 
         self.listWidget_project_areas.setCurrentRow(0)
 
@@ -152,22 +154,9 @@ class TabDockWidget(QgsDockWidget):
 
         self.enable_widgets()
 
-
-    def add_area_and_site_layers_to_list_widgets(self):
-        feats = self.area_layer.getFeatures()
-        for feat in feats:
-            self.listWidget_project_areas.addItem(feat["name"])
-
-        feats = self.development_site_layer.getFeatures()
-        for feat in feats:
-            self.listWidget_development_sites.addItem(feat["name"])
-
-        feats = self.building_level_layer.getFeatures()
-        for feat in feats:
-            self.listWidget_building_levels.addItem(feat["name"])
-
     def add_area_and_site_layers_to_canvas(self) -> None:
         """Adds the layers from the gpkg to the canvas"""
+        # TODO: Rename method to mention all layers are loaded
         database_path = SETTINGS_MANAGER.get_database_path()
 
         self.area_layer = QgsVectorLayer(f"{database_path}|layername={SETTINGS_MANAGER.project_area_prefix}",
