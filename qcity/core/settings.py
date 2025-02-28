@@ -122,21 +122,21 @@ class SettingsManager(QObject):
 
         self.spinbox_changed.emit((widget.objectName(), value))
 
-    def set_current_project_area_parameter_feature_name(self, name: str) -> None:
+    def set_current_project_area_feature_name(self, name: str) -> None:
         """
         Sets the current project area parameter table name.
         """
         self._current_project_area_parameter_table_name = name
         self.current_project_area_parameter_name_changed.emit(name)
 
-    def set_current_development_site_parameter_feature_name(self, name: str) -> None:
+    def set_current_development_site_feature_name(self, name: str) -> None:
         """
         Sets the current project area parameter table name.
         """
         self._current_development_site_parameter_table_name = name
         self.current_development_site_parameter_name_changed.emit(name)
 
-    def set_current_building_level_parameter_feature_name(self, name: str) -> None:
+    def set_current_building_level_feature_name(self, name: str) -> None:
         """
         Sets the current project area parameter table name.
         """

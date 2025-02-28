@@ -30,7 +30,7 @@ class WidgetUtilsProjectArea(QObject):
         )
 
         self.og_widget.listWidget_project_areas.itemClicked.connect(
-            lambda item: SETTINGS_MANAGER.set_current_project_area_parameter_feature_name(
+            lambda item: SETTINGS_MANAGER.set_current_project_area_feature_name(
                 item.text()
             )
         )
@@ -105,7 +105,7 @@ class WidgetUtilsProjectArea(QObject):
             self.og_widget.label_current_project_area.setText("Project Area")
 
             if self.og_widget.listWidget_project_areas.count() < 1:
-                SETTINGS_MANAGER.set_current_project_area_parameter_feature_name(None)
+                SETTINGS_MANAGER.set_current_project_area_feature_name(None)
                 for widget in self.og_widget.findChildren((QSpinBox, QDoubleSpinBox)):
                     widget.setValue(0)
                 self.og_widget.groupbox_car_parking.setEnabled(False)
@@ -194,7 +194,7 @@ class WidgetUtilsProjectArea(QObject):
             new_feat_name, Qt.MatchExactly
         )[0]
         self.og_widget.listWidget_project_areas.setCurrentItem(item_to_select)
-        SETTINGS_MANAGER.set_current_project_area_parameter_feature_name(
+        SETTINGS_MANAGER.set_current_project_area_feature_name(
             item_to_select.text()
         )
 
@@ -220,7 +220,7 @@ class WidgetUtilsProjectArea(QObject):
         if item:
             feature_name = item.text()
 
-            SETTINGS_MANAGER.set_current_project_area_parameter_feature_name(feature_name)
+            SETTINGS_MANAGER.set_current_project_area_feature_name(feature_name)
 
             gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.project_area_prefix}"
 
