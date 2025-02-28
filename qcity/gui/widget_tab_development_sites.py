@@ -31,6 +31,12 @@ class WidgetUtilsDevelopmentSites(QObject):
             self.update_site_name_gpkg
         )
 
+        self.og_widget.listWidget_development_sites.currentItemChanged.connect(
+            lambda item: SETTINGS_MANAGER.set_current_development_site_parameter_feature_name(
+                item.text()
+            )
+        )
+
         self.og_widget.lineEdit_development_site_address.textChanged.connect(
             lambda value,
             widget=self.og_widget.lineEdit_development_site_address: SETTINGS_MANAGER.save_widget_value_to_layer(
@@ -61,12 +67,6 @@ class WidgetUtilsDevelopmentSites(QObject):
 
         self.og_widget.listWidget_development_sites.currentItemChanged.connect(
             lambda item: self.update_development_site_parameters(item)
-        )
-
-        self.og_widget.listWidget_project_areas.itemClicked.connect(
-            lambda item: SETTINGS_MANAGER.set_current_development_site_parameter_feature_name(
-                item.text()
-            )
         )
 
         self.og_widget.listWidget_development_sites.itemClicked.connect(
