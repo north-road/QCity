@@ -98,7 +98,7 @@ class WidgetUtilsBuildingLevels(QObject):
                 del layer
 
             if self.og_widget.listWidget_building_levels.count() < 1:
-                SETTINGS_MANAGER.set_current_building_level_parameter_table_name(None)
+                SETTINGS_MANAGER.set_current_building_level_parameter_feature_name(None)
                 for widget in self.og_widget.findChildren((QSpinBox, QDoubleSpinBox)):
                     widget.setValue(0)
                     # self.og_widget.tabWidget_project_area_parameters.setEnabled(False)
@@ -153,7 +153,7 @@ class WidgetUtilsBuildingLevels(QObject):
             new_feat_name, Qt.MatchExactly
         )[0]
         self.og_widget.listWidget_building_levels.setCurrentItem(item_to_select)
-        SETTINGS_MANAGER.set_current_building_level_parameter_table_name(
+        SETTINGS_MANAGER.set_current_building_level_parameter_feature_name(
             item_to_select.text()
         )
 
@@ -164,7 +164,7 @@ class WidgetUtilsBuildingLevels(QObject):
         if item:
             feature_name = item.text()
 
-            SETTINGS_MANAGER.set_current_building_level_parameter_table_name(
+            SETTINGS_MANAGER.set_current_building_level_parameter_feature_name(
                 feature_name
             )
             gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.building_level_prefix}"

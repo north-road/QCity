@@ -64,7 +64,7 @@ class WidgetUtilsDevelopmentSites(QObject):
         )
 
         self.og_widget.listWidget_project_areas.itemClicked.connect(
-            lambda item: SETTINGS_MANAGER.set_current_development_site_parameter_table_name(
+            lambda item: SETTINGS_MANAGER.set_current_development_site_parameter_feature_name(
                 item.text()
             )
         )
@@ -130,7 +130,7 @@ class WidgetUtilsDevelopmentSites(QObject):
             self.og_widget.label_current_development_site.setText("Development Site")
 
             if self.og_widget.listWidget_development_sites.count() < 1:
-                SETTINGS_MANAGER.set_current_development_site_parameter_table_name(None)
+                SETTINGS_MANAGER.set_current_development_site_parameter_feature_name(None)
                 for widget in self.og_widget.findChildren((QSpinBox, QDoubleSpinBox)):
                     widget.setValue(0)
                     # self.og_widget.tabWidget_project_area_parameters.setEnabled(False)
@@ -215,7 +215,7 @@ class WidgetUtilsDevelopmentSites(QObject):
             new_feat_name, Qt.MatchExactly
         )[0]
         self.og_widget.listWidget_development_sites.setCurrentItem(item_to_select)
-        SETTINGS_MANAGER.set_current_development_site_parameter_table_name(
+        SETTINGS_MANAGER.set_current_development_site_parameter_feature_name(
             item_to_select.text()
         )
 
