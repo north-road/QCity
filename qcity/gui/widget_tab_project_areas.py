@@ -194,9 +194,7 @@ class WidgetUtilsProjectArea(QObject):
             new_feat_name, Qt.MatchExactly
         )[0]
         self.og_widget.listWidget_project_areas.setCurrentItem(item_to_select)
-        SETTINGS_MANAGER.set_current_project_area_feature_name(
-            item_to_select.text()
-        )
+        SETTINGS_MANAGER.set_current_project_area_feature_name(item_to_select.text())
 
         self.og_widget.label_current_project_area.setText(new_feat_name)
 

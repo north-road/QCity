@@ -17,10 +17,6 @@ from qgis.core import (
     QgsFeatureRequest,
 )
 
-from qgis.gui import (
-    QgsMessageBar
-)
-
 
 class SettingsManager(QObject):
     """

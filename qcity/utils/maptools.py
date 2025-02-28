@@ -165,9 +165,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         """ """
         if kind == SETTINGS_MANAGER.development_site_prefix:
             list_widget = self.dlg.listWidget_development_sites
-            SETTINGS_MANAGER.set_current_development_site_feature_name(
-                feature_name
-            )
+            SETTINGS_MANAGER.set_current_development_site_feature_name(feature_name)
             layer = QgsProject.instance().mapLayer(
                 SETTINGS_MANAGER.get_development_site_layer_id()
             )
@@ -185,15 +183,11 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             site_layer.setSubsetString(sql_filter)
         elif kind == SETTINGS_MANAGER.building_level_prefix:
             list_widget = self.dlg.listWidget_building_levels
-            SETTINGS_MANAGER.set_current_building_level_feature_name(
-                feature_name
-            )
+            SETTINGS_MANAGER.set_current_building_level_feature_name(feature_name)
             layer = QgsProject.instance().mapLayer(
                 SETTINGS_MANAGER.get_building_level_layer_id()
             )
-            SETTINGS_MANAGER.set_current_building_level_feature_name(
-                feature_name
-            )
+            SETTINGS_MANAGER.set_current_building_level_feature_name(feature_name)
 
         else:
             raise Exception(f"Unknown tab name: {kind}")

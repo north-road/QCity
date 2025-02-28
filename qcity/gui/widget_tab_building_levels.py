@@ -153,9 +153,7 @@ class WidgetUtilsBuildingLevels(QObject):
             new_feat_name, Qt.MatchExactly
         )[0]
         self.og_widget.listWidget_building_levels.setCurrentItem(item_to_select)
-        SETTINGS_MANAGER.set_current_building_level_feature_name(
-            item_to_select.text()
-        )
+        SETTINGS_MANAGER.set_current_building_level_feature_name(item_to_select.text())
 
     def update_building_level_parameters(self, item: QListWidgetItem) -> None:
         """
@@ -164,9 +162,7 @@ class WidgetUtilsBuildingLevels(QObject):
         if item:
             feature_name = item.text()
 
-            SETTINGS_MANAGER.set_current_building_level_feature_name(
-                feature_name
-            )
+            SETTINGS_MANAGER.set_current_building_level_feature_name(feature_name)
             gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.building_level_prefix}"
 
             layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
