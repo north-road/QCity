@@ -44,7 +44,7 @@ class WidgetUtilsProjectArea(QObject):
         ):
             widget.valueChanged.connect(
                 lambda value,
-                widget=widget: SETTINGS_MANAGER.save_widget_value_to_settings(
+                widget=widget: SETTINGS_MANAGER.save_widget_value_to_layer(
                     widget, value, SETTINGS_MANAGER.project_area_prefix
                 )
             )  # This does work indeed, despite the marked error

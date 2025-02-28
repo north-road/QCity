@@ -17,6 +17,10 @@ from qgis.core import (
     QgsFeatureRequest,
 )
 
+from qgis.gui import (
+    QgsMessageBar
+)
+
 
 class SettingsManager(QObject):
     """
@@ -86,7 +90,7 @@ class SettingsManager(QObject):
         """
         return self._database_path
 
-    def save_widget_value_to_settings(
+    def save_widget_value_to_layer(
         self, widget: QWidget, value: Union[float, int, str], kind: str
     ):
         """
