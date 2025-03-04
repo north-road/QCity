@@ -5,7 +5,13 @@ from qgis.PyQt.QtWidgets import (
     QDialog,
 )
 from qgis.PyQt.QtCore import QObject, Qt
-from qgis.core import QgsVectorLayer, QgsFeatureRequest, QgsProject, QgsCoordinateTransform, QgsFeature
+from qgis.core import (
+    QgsVectorLayer,
+    QgsFeatureRequest,
+    QgsProject,
+    QgsCoordinateTransform,
+    QgsFeature,
+)
 from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER
@@ -211,7 +217,9 @@ class WidgetUtilsProjectArea(QObject):
         feature_bbox = feature.geometry().boundingBox()
 
         if layer_crs != canvas_crs:
-            transform = QgsCoordinateTransform(layer_crs, canvas_crs, QgsProject.instance())
+            transform = QgsCoordinateTransform(
+                layer_crs, canvas_crs, QgsProject.instance()
+            )
             feature_bbox = transform.transformBoundingBox(feature_bbox)
 
         self.og_widget.iface.mapCanvas().setExtent(feature_bbox)
