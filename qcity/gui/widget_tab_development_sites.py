@@ -33,7 +33,7 @@ class WidgetUtilsDevelopmentSites(QObject):
 
         self.og_widget.listWidget_development_sites.currentItemChanged.connect(
             lambda item: SETTINGS_MANAGER.set_current_development_site_feature_name(
-                item.text()
+                item.text() if item else None
             )
         )
 
