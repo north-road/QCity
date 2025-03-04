@@ -16,6 +16,7 @@ from qgis._core import (
     QgsField,
     QgsCoordinateTransformContext,
 )
+from qgis._gui import QgsCollapsibleGroupBox
 from qgis.core import QgsVectorLayer, QgsProject
 from qgis.gui import (
     QgsDockWidget,
@@ -232,6 +233,8 @@ class TabDockWidget(QgsDockWidget):
                     self.pushButton_load_database,
                 ]:
                     continue
+                if isinstance(child, QgsCollapsibleGroupBox):
+                    child.setCollapsed(True)
                 child.setDisabled(True)
 
     @staticmethod
