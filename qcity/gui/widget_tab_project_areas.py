@@ -44,12 +44,12 @@ class WidgetUtilsProjectArea(QObject):
             lambda item: self.zoom_to_project_area(item)
         )
 
-        for widget in self.og_widget.tab_project_areas.findChildren(
+        for spinBox in self.og_widget.tab_project_areas.findChildren(
             (QSpinBox, QDoubleSpinBox)
         ):
-            widget.valueChanged.connect(
+            spinBox.valueChanged.connect(
                 lambda value,
-                widget=widget: SETTINGS_MANAGER.save_widget_value_to_layer(
+                widget=spinBox: SETTINGS_MANAGER.save_widget_value_to_layer(
                     widget, value, SETTINGS_MANAGER.project_area_prefix
                 )
             )  # This does work indeed, despite the marked error

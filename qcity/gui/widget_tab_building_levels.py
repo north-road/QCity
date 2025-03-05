@@ -37,12 +37,12 @@ class WidgetUtilsBuildingLevels(QObject):
             lambda item: self.set_subset_string_for_building_levels_layer(item)
         )
 
-        for widget in self.og_widget.tab_development_sites.findChildren(
+        for spinBox in self.og_widget.tab_development_sites.findChildren(
             (QSpinBox, QDoubleSpinBox)
         ):
-            widget.valueChanged.connect(
+            spinBox.valueChanged.connect(
                 lambda value,
-                widget=widget: SETTINGS_MANAGER.save_widget_value_to_layer(
+                widget=spinBox: SETTINGS_MANAGER.save_widget_value_to_layer(
                     widget, value, SETTINGS_MANAGER.building_level_prefix
                 )
             )  # This does work indeed, despite the marked error
