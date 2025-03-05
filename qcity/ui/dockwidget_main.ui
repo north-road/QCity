@@ -1029,7 +1029,7 @@
                   </widget>
                  </item>
                  <item row="3" column="1">
-                  <widget class="QSpinBox" name="spinBox_building__levels_1_bedroom_dwellings"/>
+                  <widget class="QSpinBox" name="spinBox_building_levels_1_bedroom_dwellings"/>
                  </item>
                  <item row="4" column="0">
                   <widget class="QLabel" name="label_26">
