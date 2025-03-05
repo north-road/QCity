@@ -77,6 +77,12 @@ class WidgetUtilsDevelopmentSites(QObject):
             lambda item: self.update_building_level_listwidget(item)
         )
 
+        self.og_widget.spinBox_dev_site_elevation.valueChanged.connect(
+            lambda value: SETTINGS_MANAGER.save_widget_value_to_layer(
+                self.og_widget.spinBox_dev_site_elevation, value, SETTINGS_MANAGER.development_site_prefix
+            )
+        )
+
     def set_subset_string_for_development_site_layer(
         self, item: QListWidgetItem
     ) -> None:
@@ -246,6 +252,12 @@ class WidgetUtilsDevelopmentSites(QObject):
                     widget.setText(widget_values_dict[widget_name])
                 elif isinstance(widget, QComboBox):
                     widget.setCurrentIndex(int(widget_values_dict[widget_name]))
+                elif isinstance(widget, QSpinBox):
+                    widget.setValue(int(widget_values_dict[widget_name]))
+                elif isinstance(widget, QDoubleSpinBox):
+                    widget.setValue(widget_values_dict[widget_name])
+                else:
+                    raise ValueError(f"Settings value: {widget_name} could not be set.")
 
             self.og_widget.label_current_development_site.setText(feature_name)
 
