@@ -110,7 +110,7 @@ class SettingsManager(QObject):
 
             layer.startEditing()
             if feature:
-                feature.setAttribute(layer.fields().indexOf(widget.objectName()), value)
+                feature[widget.objectName()] = value
                 layer.updateFeature(feature)
                 layer.commitChanges()
             else:
