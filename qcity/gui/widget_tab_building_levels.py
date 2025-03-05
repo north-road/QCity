@@ -78,9 +78,9 @@ class WidgetUtilsBuildingLevels(QObject):
                 if layers:
                     self.og_widget.project.removeMapLayer(layers[0].id())
 
-                gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.project_area_prefix}"
+                gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.building_level_prefix}"
                 layer = QgsVectorLayer(
-                    gpkg_path, SETTINGS_MANAGER.project_area_prefix, "ogr"
+                    gpkg_path, SETTINGS_MANAGER.building_level_prefix, "ogr"
                 )
                 layer.startEditing()
 

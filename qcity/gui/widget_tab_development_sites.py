@@ -1,3 +1,5 @@
+from typing import Union
+
 from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtWidgets import (
     QListWidgetItem,
@@ -256,8 +258,6 @@ class WidgetUtilsDevelopmentSites(QObject):
                     widget.setValue(int(widget_values_dict[widget_name]))
                 elif isinstance(widget, QDoubleSpinBox):
                     widget.setValue(widget_values_dict[widget_name])
-                else:
-                    raise ValueError(f"Settings value: {widget_name} could not be set.")
 
             self.og_widget.label_current_development_site.setText(feature_name)
 
