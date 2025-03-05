@@ -50,7 +50,7 @@ class WidgetUtilsBuildingLevels(QObject):
     def set_subset_string_for_building_levels_layer(
         self, item: QListWidgetItem
     ) -> None:
-        """Updates the listwidget of the building levels to show only building levels within the active project area."""
+        """Updates the listwidget of the building levels to show only building levels within the active project level."""
         level_layer = QgsProject.instance().mapLayer(
             SETTINGS_MANAGER.get_building_level_layer_id()
         )
@@ -62,13 +62,13 @@ class WidgetUtilsBuildingLevels(QObject):
         SETTINGS_MANAGER.add_feature_clicked.emit(True)
 
     def remove_selected_sites(self) -> None:
-        """Removes selected area from Qlistwidget, map and geopackage."""
-        tbr_areas = self.og_widget.listWidget_building_levels.selectedItems()
+        """Removes selected level from Qlistwidget, map and geopackage."""
+        tbr_levels = self.og_widget.listWidget_building_levels.selectedItems()
 
-        if tbr_areas:
+        if tbr_levels:
             rows = {
                 self.og_widget.listWidget_building_levels.row(item): item.text()
-                for item in tbr_areas
+                for item in tbr_levels
             }
 
             for key, table_name in rows.items():
@@ -101,7 +101,7 @@ class WidgetUtilsBuildingLevels(QObject):
                 SETTINGS_MANAGER.set_current_building_level_feature_name(None)
                 for widget in self.og_widget.findChildren((QSpinBox, QDoubleSpinBox)):
                     widget.setValue(0)
-                    # self.og_widget.tabWidget_project_area_parameters.setEnabled(False)
+                    # self.og_widget.tabWidget_project_level_parameters.setEnabled(False)
 
     def update_site_name_gpkg(self) -> None:
         """
