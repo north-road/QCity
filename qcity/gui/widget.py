@@ -23,6 +23,7 @@ from qgis.gui import (
 )
 
 from .widget_tab_building_levels import WidgetUtilsBuildingLevels
+from .widget_tab_statistics import WidgetUtilsStatistics
 from ..core import SETTINGS_MANAGER
 from ..gui.gui_utils import GuiUtils
 from qcity.gui.widget_tab_development_sites import WidgetUtilsDevelopmentSites
@@ -66,6 +67,7 @@ class TabDockWidget(QgsDockWidget):
         WidgetUtilsProjectArea(self)
         WidgetUtilsDevelopmentSites(self)
         WidgetUtilsBuildingLevels(self)
+        WidgetUtilsStatistics(self)
 
     def set_add_button_activation(self) -> None:
         """Sets the add button for the base layers enabled/disabled, based on the current item text"""

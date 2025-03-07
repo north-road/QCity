@@ -708,7 +708,7 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>336</width>
+                  <width>548</width>
                   <height>113</height>
                  </rect>
                 </property>
@@ -808,7 +808,7 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>336</width>
+                  <width>548</width>
                   <height>111</height>
                  </rect>
                 </property>
@@ -868,8 +868,8 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
-                  <width>336</width>
+                  <y>-43</y>
+                  <width>548</width>
                   <height>111</height>
                  </rect>
                 </property>
@@ -940,8 +940,8 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
-                  <width>348</width>
+                  <y>-120</y>
+                  <width>548</width>
                   <height>243</height>
                  </rect>
                 </property>
@@ -1152,7 +1152,7 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>350</width>
+                  <width>562</width>
                   <height>68</height>
                  </rect>
                 </property>
@@ -1185,7 +1185,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="tab_statistics">
        <attribute name="title">
         <string>Statistics</string>
        </attribute>
@@ -1246,82 +1246,18 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>350</width>
-                  <height>243</height>
+                  <width>562</width>
+                  <height>183</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_18">
-                 <item row="2" column="0">
-                  <widget class="QLabel" name="label_36">
-                   <property name="text">
-                    <string>Residential ﬂoorspace</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="1">
-                  <widget class="QSpinBox" name="spinBox_statistics_dev_stats_2_bedroom_dwellings"/>
-                 </item>
                  <item row="6" column="1">
-                  <widget class="QSpinBox" name="spinBox_statistics_dev_stats_4_bedroom_dwellings"/>
-                 </item>
-                 <item row="6" column="0">
-                  <widget class="QLabel" name="label_40">
+                  <widget class="QLabel" name="label_statistics_dev_stats_4_bedroom_dwellings">
                    <property name="text">
-                    <string> Number of 4 bedroom dwellings</string>
+                    <string>0</string>
                    </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="label_34">
-                   <property name="text">
-                    <string>Commercial ﬂoorspace</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="1">
-                  <widget class="QSpinBox" name="spinBox_statistics_dev_stats_1_bedroom_dwellings"/>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="label_35">
-                   <property name="text">
-                    <string>Oﬃce ﬂoorspace</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="0">
-                  <widget class="QLabel" name="label_38">
-                   <property name="text">
-                    <string> Number of 2 bedroom dwellings</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="5" column="1">
-                  <widget class="QSpinBox" name="spinBox_statistics_dev_stats_3_bedroom_dwellings"/>
-                 </item>
-                 <item row="3" column="0">
-                  <widget class="QLabel" name="label_37">
-                   <property name="text">
-                    <string> Number of 1 bedroom dwellings</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="5" column="0">
-                  <widget class="QLabel" name="label_39">
-                   <property name="text">
-                    <string> Number of 3 bedroom dwellings</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="2">
-                  <widget class="QLabel" name="label_47">
-                   <property name="maximumSize">
-                    <size>
-                     <width>20</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>m²</string>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -1338,6 +1274,70 @@
                    </property>
                   </widget>
                  </item>
+                 <item row="4" column="0">
+                  <widget class="QLabel" name="label_38">
+                   <property name="text">
+                    <string> Number of 2 bedroom dwellings</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QLabel" name="label_statistics_dev_stats_residential_floorspace">
+                   <property name="text">
+                    <string>0</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="0">
+                  <widget class="QLabel" name="label_37">
+                   <property name="text">
+                    <string> Number of 1 bedroom dwellings</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_36">
+                   <property name="text">
+                    <string>Residential ﬂoorspace</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLabel" name="label_statistics_dev_stats_commercial_floorspace">
+                   <property name="text">
+                    <string>0</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="2">
+                  <widget class="QLabel" name="label_47">
+                   <property name="maximumSize">
+                    <size>
+                     <width>20</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>m²</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="1">
+                  <widget class="QLabel" name="label_statistics_dev_stats_1_bedroom_dwellings">
+                   <property name="text">
+                    <string>0</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
                  <item row="2" column="2">
                   <widget class="QLabel" name="label_49">
                    <property name="maximumSize">
@@ -1351,14 +1351,63 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="2" column="1">
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_statistics_dev_stats_residential_floorspace"/>
+                 <item row="5" column="1">
+                  <widget class="QLabel" name="label_statistics_dev_stats_3_bedroom_dwellings">
+                   <property name="text">
+                    <string>0</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_35">
+                   <property name="text">
+                    <string>Oﬃce ﬂoorspace</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="5" column="0">
+                  <widget class="QLabel" name="label_39">
+                   <property name="text">
+                    <string> Number of 3 bedroom dwellings</string>
+                   </property>
+                  </widget>
                  </item>
                  <item row="1" column="1">
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_statistics_dev_stats_office_floorspace"/>
+                  <widget class="QLabel" name="label_statistics_dev_stats_office_floorspace">
+                   <property name="text">
+                    <string>0</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
                  </item>
-                 <item row="0" column="1">
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_statistics_dev_stats_commercial_floorspace"/>
+                 <item row="6" column="0">
+                  <widget class="QLabel" name="label_40">
+                   <property name="text">
+                    <string> Number of 4 bedroom dwellings</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_34">
+                   <property name="text">
+                    <string>Commercial ﬂoorspace</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="1">
+                  <widget class="QLabel" name="label_statistics_dev_stats_2_bedroom_dwellings">
+                   <property name="text">
+                    <string>0</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -1386,25 +1435,18 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>350</width>
-                  <height>142</height>
+                  <width>562</width>
+                  <height>162</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_20">
-                 <item row="1" column="2">
-                  <widget class="QLabel" name="label_42">
+                 <item row="0" column="3">
+                  <widget class="QLabel" name="label_statistics_car_parking_stats_commercial_car_parks">
                    <property name="text">
-                    <string>Office car bays</string>
+                    <string>0</string>
                    </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="3">
-                  <widget class="QSpinBox" name="spinBox_statistics_car_parking_stats_office_car_bays"/>
-                 </item>
-                 <item row="2" column="2">
-                  <widget class="QLabel" name="label_43">
-                   <property name="text">
-                    <string>Residential car bays</string>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -1415,11 +1457,39 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="2" column="3">
-                  <widget class="QSpinBox" name="spinBox_statistics_car_parking_stats_residential_car_bays"/>
+                 <item row="2" column="2">
+                  <widget class="QLabel" name="label_43">
+                   <property name="text">
+                    <string>Residential car bays</string>
+                   </property>
+                  </widget>
                  </item>
-                 <item row="0" column="3">
-                  <widget class="QSpinBox" name="spinBox_statistics_car_parking_stats_commercial_car_parks"/>
+                 <item row="1" column="3">
+                  <widget class="QLabel" name="label_statistics_car_parking_stats_office_car_bays">
+                   <property name="text">
+                    <string>0</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="3">
+                  <widget class="QLabel" name="label_statistics_car_parking_stats_residential_car_bays">
+                   <property name="text">
+                    <string>0</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="2">
+                  <widget class="QLabel" name="label_42">
+                   <property name="text">
+                    <string>Office car bays</string>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -1460,23 +1530,20 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>350</width>
-                  <height>142</height>
+                  <width>562</width>
+                  <height>162</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_21">
-                 <item row="2" column="0">
-                  <widget class="QLabel" name="label_44">
+                 <item row="2" column="1">
+                  <widget class="QLabel" name="label_statistics_bike_parking_stats_office_bike_bays">
                    <property name="text">
-                    <string>Office bike bays</string>
+                    <string>0</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                   </widget>
-                 </item>
-                 <item row="2" column="1">
-                  <widget class="QSpinBox" name="spinBox_statistics_bike_parking_stats_office_bike_bays"/>
-                 </item>
-                 <item row="3" column="1">
-                  <widget class="QSpinBox" name="spinBox_statistics_bike_parking_stats_residential_bike_bays"/>
                  </item>
                  <item row="3" column="0">
                   <widget class="QLabel" name="label_46">
@@ -1492,8 +1559,32 @@
                    </property>
                   </widget>
                  </item>
+                 <item row="3" column="1">
+                  <widget class="QLabel" name="label_statistics_bike_parking_stats_residential_bike_bays">
+                   <property name="text">
+                    <string>0</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_44">
+                   <property name="text">
+                    <string>Office bike bays</string>
+                   </property>
+                  </widget>
+                 </item>
                  <item row="0" column="1">
-                  <widget class="QSpinBox" name="spinBox_statistics_bike_parking_stats_commercial_bike_parks"/>
+                  <widget class="QLabel" name="label_statistics_bike_parking_stats_commercial_bike_parks">
+                   <property name="text">
+                    <string>0</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
