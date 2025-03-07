@@ -1,3 +1,6 @@
+import csv
+
+from PyQt5.QtWidgets import QFileDialog, QMessageBox
 from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QLabel
 from qgis.PyQt.QtCore import QObject
 from qgis.core import QgsVectorLayer
@@ -7,6 +10,7 @@ from qcity.core import SETTINGS_MANAGER
 class WidgetUtilsStatistics(QObject):
     def __init__(self, og_widget):
         super().__init__(og_widget)
+        self.totals = dict()
         self.og_widget = og_widget
 
         for box in [
@@ -17,6 +21,10 @@ class WidgetUtilsStatistics(QObject):
             for child in box.findChildren((QSpinBox, QDoubleSpinBox)):
                 print(child.objectName())
                 child.valueChanged.connect(self.update_development_statistics)
+
+        self.og_widget.pushButton_csv_export.clicked.connect(
+            self.export_statistics_csv
+        )
 
     def update_development_statistics(self) -> None:
         """Accumulates the values of all spinBoxes belonging to building levels and sets the values in the statistics tab"""
@@ -39,13 +47,28 @@ class WidgetUtilsStatistics(QObject):
             "label_statistics_bike_parking_stats_residential_bike_bays": "spinBox_building_levels_residential_bike_bays",
         }
 
-        totals = {widget_name: 0 for widget_name in stats_mapping}
+        self.totals = {widget_name: 0 for widget_name in stats_mapping}
 
         for feat in layer.getFeatures():
             for widget_name, attr in stats_mapping.items():
-                totals[widget_name] += feat[attr]
+                self.totals[widget_name] += feat[attr]
 
-        for widget_name, total in totals.items():
+        for widget_name, total in self.totals.items():
             label = self.og_widget.findChild(QLabel, widget_name)
             if label:
                 label.setText(str(total))
+
+    def export_statistics_csv(self):
+        """Exports the statistics tab to a CSV file."""
+        csv_filename, _ = QFileDialog.getSaveFileName(self.og_widget, self.tr("Choose CSV Path"), "*.csv")
+
+        if csv_filename and csv_filename.endswith(".csv"):
+            with open(csv_filename, 'w', newline='') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(["Statistic", "Value"])
+
+                for key, value in self.totals.items():
+                    clean_key = key.replace("label_statistics_", "")
+                    writer.writerow([clean_key, value])
+        else:
+            QMessageBox.warning(self.og_widget, "Could not save csv file!", "Wrong filename specified.")
