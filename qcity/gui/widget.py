@@ -150,10 +150,15 @@ class TabDockWidget(QgsDockWidget):
                 self.listWidget_project_areas.addItem(feat["name"])
 
         # Click on first project area item to initialize all other listwidgets
-        self.listWidget_project_areas.setCurrentRow(0)
-        item = self.listWidget_project_areas.currentItem()
-        if item:
-            self.listWidget_project_areas.itemClicked.emit(item)
+        for widget in [
+            self.listWidget_project_areas,
+            self.listWidget_development_sites,
+            self.listWidget_building_levels,
+        ]:
+            widget.setCurrentRow(0)
+            item = widget.currentItem()
+            if item:
+                widget.itemClicked.emit(item)
 
         self.groupbox_dwellings.setEnabled(True)
         self.groupbox_car_parking.setEnabled(True)
