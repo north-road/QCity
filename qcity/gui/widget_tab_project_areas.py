@@ -52,7 +52,7 @@ class WidgetUtilsProjectArea(QObject):
                 widget=spinBox: SETTINGS_MANAGER.save_widget_value_to_layer(
                     widget, value, SETTINGS_MANAGER.project_area_prefix
                 )
-            )  # This does work indeed, despite the marked error
+            )
 
         self.og_widget.listWidget_project_areas.currentItemChanged.connect(
             lambda item: self.update_project_area_parameters(item)
