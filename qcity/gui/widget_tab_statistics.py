@@ -19,7 +19,6 @@ class WidgetUtilsStatistics(QObject):
             self.og_widget.collapsibleGroupBox_building_levels_bike_parking_statistics,
         ]:
             for child in box.findChildren((QSpinBox, QDoubleSpinBox)):
-                print(child.objectName())
                 child.valueChanged.connect(self.update_development_statistics)
 
         self.og_widget.pushButton_csv_export.clicked.connect(
