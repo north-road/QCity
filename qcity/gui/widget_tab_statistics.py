@@ -58,7 +58,7 @@ class WidgetUtilsStatistics(QObject):
             if label:
                 label.setText(str(total))
 
-    def export_statistics_csv(self):
+    def export_statistics_csv(self) -> None:
         """Exports the statistics tab to a CSV file."""
         csv_filename, _ = QFileDialog.getSaveFileName(self.og_widget, self.tr("Choose CSV Path"), "*.csv")
 

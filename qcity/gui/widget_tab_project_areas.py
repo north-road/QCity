@@ -66,7 +66,7 @@ class WidgetUtilsProjectArea(QObject):
         # TODO: Connect this so it also loads when a project is loaded while in session
         self.load_saved_database_path()
 
-    def load_saved_database_path(self):
+    def load_saved_database_path(self) -> None:
         path = SETTINGS_MANAGER.get_database_path_with_project_name()
         if path:
             self.load_project_database(path)
@@ -257,7 +257,7 @@ class WidgetUtilsProjectArea(QObject):
 
             self.og_widget.label_current_project_area.setText(feature_name)
 
-    def action_maptool_emit(self, kind) -> None:
+    def action_maptool_emit(self, kind: str) -> None:
         """Emitted when plus button is clicked."""
         SETTINGS_MANAGER.current_digitisation_type = kind
         SETTINGS_MANAGER.add_feature_clicked.emit(True)

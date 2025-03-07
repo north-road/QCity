@@ -245,7 +245,7 @@ class TabDockWidget(QgsDockWidget):
                 child.setDisabled(True)
 
     @staticmethod
-    def tr(message) -> str:
+    def tr(message: str) -> str:
         """Get the translation for a string using Qt translation API.
 
         We implement this ourselves since we do not inherit QObject.
@@ -259,7 +259,7 @@ class TabDockWidget(QgsDockWidget):
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate("X", message)
 
-    def create_base_tables(self, table_name: str, path: str) -> QgsVectorLayer:
+    def create_base_tables(self, table_name: str, path: str) -> None:
         """Creates a GeoPackage layer with attributes based on JSON data."""
         gpkg_path = SETTINGS_MANAGER.get_database_path()
 
