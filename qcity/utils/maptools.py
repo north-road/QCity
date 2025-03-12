@@ -103,7 +103,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         # things up
         QgsMapToolCaptureLayerGeometry.deactivate(self)
 
-    def createRubberBand(self, cursor_point: QgsPointXY) -> None:
+    def createCursorBand(self, cursor_point: QgsPointXY) -> None:
         """Creates the moving dotted line rubber band."""
         if self.cursor_band:
             self.canvas().scene().removeItem(self.cursor_band)
@@ -112,25 +112,26 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         self.cursor_band.setLineStyle(Qt.DotLine)
 
         if self.points:
-            self.cursor_band.addPoint(self.points[0])
-            self.cursor_band.addPoint(self.points[-1])
-            self.cursor_band.addPoint(cursor_point)
+            for p in [self.points[0], self.points[-1], cursor_point]:
+                p_map = self.toMapCoordinates(self.layer, p)
+                self.cursor_band.addPoint(p_map)
 
-    def showLine(self):
+    def createRubberBand(self):
         """Builds rubber band from all points and adds it to the map canvas."""
         self.rubber_band = QgsRubberBand(self.map_canvas, QgsWkbTypes.PolygonGeometry)
         self.rubber_band.setColor(self.default_color)
 
         for point in self.points:
+            point_m = self.toMapCoordinates(self.layer, point)
             if point == self.points[-1]:
-                self.rubber_band.addPoint(point, True)
-            self.rubber_band.addPoint(point, False)
+                self.rubber_band.addPoint(point_m, True)
+            self.rubber_band.addPoint(point_m, False)
         self.rubber_band.show()
 
     def canvasMoveEvent(self, event: QgsMapMouseEvent) -> None:
         move_map_point = event.snapPoint()
         self.snap_indicator.setMatch(event.mapPointMatch())
-        self.createRubberBand(move_map_point)
+        self.createCursorBand(move_map_point)
 
     def canvasReleaseEvent(self, event: QgsMapMouseEvent) -> None:
         if event.button() == Qt.LeftButton:
@@ -139,7 +140,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             self.points.append(v_point)
             if self.rubber_band:
                 self.canvas().scene().removeItem(self.rubber_band)
-            self.showLine()
+            self.createRubberBand()
 
         if event.button() == Qt.RightButton:
             if len(self.points) < 3:
