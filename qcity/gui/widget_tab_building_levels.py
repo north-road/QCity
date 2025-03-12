@@ -6,7 +6,7 @@ from qgis.PyQt.QtWidgets import (
     QSpinBox,
     QDoubleSpinBox,
 )
-from qgis.core import QgsVectorLayer, QgsFeatureRequest, QgsProject, QgsFeature
+from qgis.core import QgsVectorLayer, QgsProject
 from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER
@@ -54,7 +54,14 @@ class WidgetUtilsBuildingLevels(QObject):
         level_layer = QgsProject.instance().mapLayer(
             SETTINGS_MANAGER.get_building_level_layer_id()
         )
-        level_layer.setSubsetString(f"\"name\" = '{item.text()}'")
+
+        level_layer.setSubsetString("")
+
+        filter_feature = self.og_widget.get_feature_of_layer_by_name(level_layer, item)
+
+        level_layer.setSubsetString(
+            f"\"name\" = '{item.text()}' and ST_Touches(geom, ST_GeomFromText('{filter_feature.geometry().asWkt()}', {level_layer.crs().postgisSrid()}))"
+        )
 
     def action_maptool_emit(self, kind) -> None:
         """Emitted when plus button is clicked."""
@@ -167,7 +174,7 @@ class WidgetUtilsBuildingLevels(QObject):
 
             layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
 
-            feature = self.get_feature_of_layer_by_name(layer, item)
+            feature = self.og_widget.get_feature_of_layer_by_name(layer, item)
 
             feature_dict = feature.attributes()
             col_names = [field.name() for field in layer.fields()]
@@ -182,13 +189,3 @@ class WidgetUtilsBuildingLevels(QObject):
                     widget.setValue(int(widget_values_dict[widget_name]))
                 elif isinstance(widget, QDoubleSpinBox):
                     widget.setValue(widget_values_dict[widget_name])
-
-    def get_feature_of_layer_by_name(
-        self, layer: QgsVectorLayer, item: QListWidgetItem
-    ) -> QgsFeature:
-        """Returns the feature with the name of the item"""
-        filter_expression = f"\"name\" = '{item.text()}'"
-        request = QgsFeatureRequest().setFilterExpression(filter_expression)
-        iterator = layer.getFeatures(request)
-
-        return next(iterator)

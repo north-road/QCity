@@ -6,21 +6,22 @@ from qgis.PyQt.QtWidgets import (
     QWidget,
     QFileDialog,
     QGraphicsOpacityEffect,
+    QListWidgetItem,
 )
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QCoreApplication, Qt, QVariant
 from qgis.PyQt.QtGui import QColor
-from qgis._core import (
+from qgis.core import (
     QgsVectorFileWriter,
     QgsFields,
     QgsField,
     QgsCoordinateTransformContext,
+    QgsFeatureRequest,
+    QgsVectorLayer,
+    QgsProject,
+    QgsFeature,
 )
-from qgis._gui import QgsCollapsibleGroupBox
-from qgis.core import QgsVectorLayer, QgsProject
-from qgis.gui import (
-    QgsDockWidget,
-)
+from qgis.gui import QgsDockWidget, QgsCollapsibleGroupBox
 
 from .widget_tab_building_levels import WidgetUtilsBuildingLevels
 from .widget_tab_statistics import WidgetUtilsStatistics
@@ -297,3 +298,13 @@ class TabDockWidget(QgsDockWidget):
 
         if not error[0] == QgsVectorFileWriter.NoError:
             raise Exception(f"Error adding layer to GeoPackage: {error[1]}")
+
+    def get_feature_of_layer_by_name(
+        self, layer: QgsVectorLayer, item: QListWidgetItem
+    ) -> QgsFeature:
+        """Returns the feature with the name of the item"""
+        filter_expression = f"\"name\" = '{item.text()}'"
+        request = QgsFeatureRequest().setFilterExpression(filter_expression)
+        iterator = layer.getFeatures(request)
+
+        return next(iterator)

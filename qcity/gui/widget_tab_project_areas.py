@@ -7,10 +7,8 @@ from qgis.PyQt.QtWidgets import (
 from qgis.PyQt.QtCore import QObject, Qt
 from qgis.core import (
     QgsVectorLayer,
-    QgsFeatureRequest,
     QgsProject,
     QgsCoordinateTransform,
-    QgsFeature,
 )
 from qgis.gui import QgsNewNameDialog
 
@@ -135,7 +133,7 @@ class WidgetUtilsProjectArea(QObject):
         area_layer.setSubsetString("")
         site_layer.setSubsetString("")
 
-        filter_feature = self.get_feature_of_layer_by_name(area_layer, item)
+        filter_feature = self.og_widget.get_feature_of_layer_by_name(area_layer, item)
 
         names = list()
         for feat in site_layer.getFeatures():
@@ -213,7 +211,7 @@ class WidgetUtilsProjectArea(QObject):
         canvas_crs = self.og_widget.iface.mapCanvas().mapSettings().destinationCrs()
         layer_crs = area_layer.crs()
 
-        feature = self.get_feature_of_layer_by_name(area_layer, item)
+        feature = self.og_widget.get_feature_of_layer_by_name(area_layer, item)
         feature_bbox = feature.geometry().boundingBox()
 
         if layer_crs != canvas_crs:
@@ -238,7 +236,7 @@ class WidgetUtilsProjectArea(QObject):
 
             layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
 
-            feature = self.get_feature_of_layer_by_name(layer, item)
+            feature = self.og_widget.get_feature_of_layer_by_name(layer, item)
 
             feature_dict = feature.attributes()
             col_names = [field.name() for field in layer.fields()]
@@ -261,13 +259,3 @@ class WidgetUtilsProjectArea(QObject):
         """Emitted when plus button is clicked."""
         SETTINGS_MANAGER.current_digitisation_type = kind
         SETTINGS_MANAGER.add_feature_clicked.emit(True)
-
-    def get_feature_of_layer_by_name(
-        self, layer: QgsVectorLayer, item: QListWidgetItem
-    ) -> QgsFeature:
-        """Returns the feature with the name of the item"""
-        filter_expression = f"\"name\" = '{item.text()}'"
-        request = QgsFeatureRequest().setFilterExpression(filter_expression)
-        iterator = layer.getFeatures(request)
-
-        return next(iterator)

@@ -1,4 +1,3 @@
-
 from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtWidgets import (
     QListWidgetItem,
@@ -9,7 +8,7 @@ from qgis.PyQt.QtWidgets import (
     QSpinBox,
     QDoubleSpinBox,
 )
-from qgis.core import QgsVectorLayer, QgsFeatureRequest, QgsProject, QgsFeature
+from qgis.core import QgsVectorLayer, QgsProject
 from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER
@@ -161,18 +160,24 @@ class WidgetUtilsDevelopmentSites(QObject):
         site_layer.setSubsetString("")
         level_layer.setSubsetString("")
 
-        filter_feature = self.get_feature_of_layer_by_name(site_layer, item)
+        filter_feature = self.og_widget.get_feature_of_layer_by_name(site_layer, item)
 
         names = list()
         for feat in level_layer.getFeatures():
-            if feat.geometry().within(filter_feature.geometry()):
+            if (
+                feat.geometry().within(filter_feature.geometry())
+                or feat.geometry().touches(filter_feature.geometry())
+                or feat.geometry().equals(filter_feature.geometry())
+            ):
                 name = feat["name"]
                 self.og_widget.listWidget_building_levels.addItem(name)
                 names.append(name)
 
         site_layer.setSubsetString(f"\"name\" = '{item.text()}'")
         name_filter = ", ".join(f"'{name}'" for name in names)
-        level_layer.setSubsetString(f"name IN ({name_filter})")
+        level_layer.setSubsetString(
+            f"name IN ({name_filter}) and ST_Touches(geom, ST_GeomFromText('{filter_feature.geometry().asWkt()}', {site_layer.crs().postgisSrid()}))"
+        )
 
     def update_site_name_gpkg(self) -> None:
         """
@@ -240,7 +245,7 @@ class WidgetUtilsDevelopmentSites(QObject):
 
             layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
 
-            feature = self.get_feature_of_layer_by_name(layer, item)
+            feature = self.og_widget.get_feature_of_layer_by_name(layer, item)
 
             feature_dict = feature.attributes()
             col_names = [field.name() for field in layer.fields()]
@@ -261,13 +266,3 @@ class WidgetUtilsDevelopmentSites(QObject):
                     widget.setValue(widget_values_dict[widget_name])
 
             self.og_widget.label_current_development_site.setText(feature_name)
-
-    def get_feature_of_layer_by_name(
-        self, layer: QgsVectorLayer, item: QListWidgetItem
-    ) -> QgsFeature:
-        """Returns the feature with the name of the item"""
-        filter_expression = f"\"name\" = '{item.text()}'"
-        request = QgsFeatureRequest().setFilterExpression(filter_expression)
-        iterator = layer.getFeatures(request)
-
-        return next(iterator)
