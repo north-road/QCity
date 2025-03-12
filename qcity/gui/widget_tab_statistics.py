@@ -62,10 +62,12 @@ class WidgetUtilsStatistics(QObject):
 
     def export_statistics_csv(self) -> None:
         """Exports the statistics tab to a CSV file."""
-        csv_filename, _ = QFileDialog.getSaveFileName(self.og_widget, self.tr("Choose CSV Path"), "*.csv")
+        csv_filename, _ = QFileDialog.getSaveFileName(
+            self.og_widget, self.tr("Choose CSV Path"), "*.csv"
+        )
 
         if csv_filename and csv_filename.endswith(".csv"):
-            with open(csv_filename, 'w', newline='') as csvfile:
+            with open(csv_filename, "w", newline="") as csvfile:
                 writer = csv.writer(csvfile)
                 writer.writerow(["Statistic", "Value"])
 
@@ -73,16 +75,20 @@ class WidgetUtilsStatistics(QObject):
                     clean_key = key.replace("label_statistics_", "")
                     writer.writerow([clean_key, value])
         else:
-            QMessageBox.warning(self.og_widget, "Could not save csv file!", "Wrong filename specified.")
-
+            QMessageBox.warning(
+                self.og_widget, "Could not save csv file!", "Wrong filename specified."
+            )
 
     def get_levels(self) -> list[str]:
         """Returns building levels of the current project area by geometry"""
         gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.project_area_prefix}"
-        area_layer = QgsVectorLayer(gpkg_path, SETTINGS_MANAGER.project_area_prefix, "ogr")
+        area_layer = QgsVectorLayer(
+            gpkg_path, SETTINGS_MANAGER.project_area_prefix, "ogr"
+        )
         gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.building_level_prefix}"
-        level_layer = QgsVectorLayer(gpkg_path, SETTINGS_MANAGER.building_level_prefix, "ogr")
-
+        level_layer = QgsVectorLayer(
+            gpkg_path, SETTINGS_MANAGER.building_level_prefix, "ogr"
+        )
 
         selected_area_name = self.og_widget.comboBox_statistics_projects.currentText()
 
@@ -103,14 +109,15 @@ class WidgetUtilsStatistics(QObject):
 
         return feats
 
-
     def populate_export_combo_box(self) -> None:
         area_layer = QgsProject.instance().mapLayer(
             SETTINGS_MANAGER.get_project_area_layer_id()
         )
         old_subset_string = area_layer.subsetString()
         area_layer.setSubsetString("")
-        names = {feature["name"] for feature in area_layer.getFeatures() if feature["name"]}
+        names = {
+            feature["name"] for feature in area_layer.getFeatures() if feature["name"]
+        }
         area_layer.setSubsetString(old_subset_string)
         self.og_widget.comboBox_statistics_projects.clear()
         self.og_widget.comboBox_statistics_projects.addItems(names)

@@ -1,4 +1,3 @@
-from typing import Union
 
 from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtWidgets import (
@@ -81,7 +80,9 @@ class WidgetUtilsDevelopmentSites(QObject):
 
         self.og_widget.spinBox_dev_site_elevation.valueChanged.connect(
             lambda value: SETTINGS_MANAGER.save_widget_value_to_layer(
-                self.og_widget.spinBox_dev_site_elevation, value, SETTINGS_MANAGER.development_site_prefix
+                self.og_widget.spinBox_dev_site_elevation,
+                value,
+                SETTINGS_MANAGER.development_site_prefix,
             )
         )
 
