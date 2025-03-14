@@ -67,7 +67,7 @@ class WidgetUtilsProjectArea(QObject):
     def load_saved_database_path(self) -> None:
         path = SETTINGS_MANAGER.get_database_path_with_project_name()
         if path:
-            self.load_project_database(path)
+            self.og_widget.load_project_database(path)
 
     def remove_selected_areas(self) -> None:
         """Removes selected area from QListwidget, map and geopackage."""
