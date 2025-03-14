@@ -304,6 +304,8 @@ class WidgetUtilsDevelopmentSites(QObject):
                 self.og_widget.spinBox_dev_site_elevation.setValue(sample_value)
                 self.og_widget.spinBox_dev_site_elevation.setEnabled(False)
                 layer.updateFeature(feature)
+            except AttributeError:
+                return
             except Exception as e:
                 # TODO: Catch various exceptions here
                 raise e
