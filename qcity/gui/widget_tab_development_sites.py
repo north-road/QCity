@@ -98,8 +98,7 @@ class WidgetUtilsDevelopmentSites(QObject):
         )
         self.og_widget.listWidget_development_sites.currentItemChanged.connect(
             lambda item: SETTINGS_MANAGER.restore_checkbox_state(
-                self.og_widget.checkBox_auto_elevation,
-                item
+                self.og_widget.checkBox_auto_elevation, item
             )
         )
 
