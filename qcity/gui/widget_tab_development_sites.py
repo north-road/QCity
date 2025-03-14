@@ -8,7 +8,7 @@ from qgis.PyQt.QtWidgets import (
     QSpinBox,
     QDoubleSpinBox,
 )
-from qgis.core import QgsVectorLayer, QgsProject, QgsRasterLayer, QgsMapLayerType
+from qgis.core import QgsVectorLayer, QgsProject, QgsMapLayerType
 from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER
@@ -87,8 +87,21 @@ class WidgetUtilsDevelopmentSites(QObject):
 
         self.og_widget.comboBox_auto_elevation.setAllowEmptyLayer(True)
         self.og_widget.comboBox_auto_elevation.setFilters(QgsMapLayerType.RasterLayer)
-        self.og_widget.comboBox_auto_elevation.setEmptyText("Select a DEM Layer")
-
+        self.og_widget.checkBox_auto_elevation.toggled.connect(
+            self.get_elevation_from_dem
+        )
+        self.og_widget.checkBox_auto_elevation.toggled.connect(
+            lambda: SETTINGS_MANAGER.save_checkbox_state(
+                self.og_widget.checkBox_auto_elevation,
+                self.og_widget.listWidget_development_sites.currentItem(),
+            )
+        )
+        self.og_widget.listWidget_development_sites.currentItemChanged.connect(
+            lambda item: SETTINGS_MANAGER.restore_checkbox_state(
+                self.og_widget.checkBox_auto_elevation,
+                item
+            )
+        )
 
     def set_subset_string_for_development_site_layer(
         self, item: QListWidgetItem
@@ -271,3 +284,29 @@ class WidgetUtilsDevelopmentSites(QObject):
                     widget.setValue(widget_values_dict[widget_name])
 
             self.og_widget.label_current_development_site.setText(feature_name)
+
+    def get_elevation_from_dem(self, checked) -> None:
+        """Gets the elevation for a centroid in a polygon feature and sets it as an attribute."""
+        if checked:
+            try:
+                gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.development_site_prefix}"
+                layer = QgsVectorLayer(gpkg_path, "", "ogr")
+                name = self.og_widget.listWidget_development_sites.currentItem()
+
+                dem_layer = self.og_widget.comboBox_auto_elevation.currentLayer()
+                provider = dem_layer.dataProvider()
+
+                feature = self.og_widget.get_feature_of_layer_by_name(layer, name)
+                geom = feature.geometry()
+                centroid = geom.centroid().asPoint()
+                sample_value = int(provider.sample(centroid, 1)[0])
+                feature["elevation"] = sample_value
+                self.og_widget.spinBox_dev_site_elevation.setValue(sample_value)
+                self.og_widget.spinBox_dev_site_elevation.setEnabled(False)
+                layer.updateFeature(feature)
+            except Exception as e:
+                # TODO: Catch various exceptions here
+                raise e
+        else:
+            self.og_widget.spinBox_dev_site_elevation.setValue(0)
+            self.og_widget.spinBox_dev_site_elevation.setEnabled(True)
