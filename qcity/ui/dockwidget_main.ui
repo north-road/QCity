@@ -1152,27 +1152,46 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>562</width>
-                  <height>68</height>
+                  <width>548</width>
+                  <height>77</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_26">
+                 <item row="1" column="0">
+                  <widget class="QCheckBox" name="checkBox_auto_elevation">
+                   <property name="layoutDirection">
+                    <enum>Qt::RightToLeft</enum>
+                   </property>
+                   <property name="text">
+                    <string>Snap to digital elevation model</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QSpinBox" name="spinBox_dev_site_elevation"/>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QgsMapLayerComboBox" name="comboBox_auto_elevation"/>
+                 </item>
+                 <item row="0" column="2">
+                  <widget class="QLabel" name="label_51">
+                   <property name="maximumSize">
+                    <size>
+                     <width>15</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>m</string>
+                   </property>
+                  </widget>
+                 </item>
                  <item row="0" column="0">
                   <widget class="QLabel" name="label_50">
                    <property name="text">
                     <string>Manual Elevation</string>
                    </property>
                   </widget>
-                 </item>
-                 <item row="0" column="2">
-                  <widget class="QLabel" name="label_51">
-                   <property name="text">
-                    <string>m</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QSpinBox" name="spinBox_dev_site_elevation"/>
                  </item>
                 </layout>
                </widget>
@@ -1619,6 +1638,12 @@
   <customwidget>
    <class>QgsCollapsibleGroupBox</class>
    <extends>QGroupBox</extends>
+   <header>qgis.gui</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QgsMapLayerComboBox</class>
+   <extends>QComboBox</extends>
    <header>qgis.gui</header>
    <container>1</container>
   </customwidget>

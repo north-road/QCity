@@ -8,7 +8,7 @@ from qgis.PyQt.QtWidgets import (
     QSpinBox,
     QDoubleSpinBox,
 )
-from qgis.core import QgsVectorLayer, QgsProject
+from qgis.core import QgsVectorLayer, QgsProject, QgsRasterLayer, QgsMapLayerType
 from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER
@@ -84,6 +84,11 @@ class WidgetUtilsDevelopmentSites(QObject):
                 SETTINGS_MANAGER.development_site_prefix,
             )
         )
+
+        self.og_widget.comboBox_auto_elevation.setAllowEmptyLayer(True)
+        self.og_widget.comboBox_auto_elevation.setFilters(QgsMapLayerType.RasterLayer)
+        self.og_widget.comboBox_auto_elevation.setEmptyText("Select a DEM Layer")
+
 
     def set_subset_string_for_development_site_layer(
         self, item: QListWidgetItem
