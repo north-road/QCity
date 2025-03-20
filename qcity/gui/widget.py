@@ -20,6 +20,7 @@ from qgis.core import (
     QgsVectorLayer,
     QgsProject,
     QgsFeature,
+    Qgis,
 )
 from qgis.gui import QgsDockWidget, QgsCollapsibleGroupBox
 
@@ -85,70 +86,82 @@ class TabDockWidget(QgsDockWidget):
         """Opens a QFileDialog and returns the path to the new project Geopackage."""
         # Have the file_name as an argument to enable testing
         if not file_name:
-            file_name, _ = QFileDialog.getSaveFileName(
+            file_name, selected_filter = QFileDialog.getSaveFileName(
                 self,
                 self.tr("Choose Project Database Path"),
-                "*.gpkg",
-            )
-        if file_name and file_name.endswith(".gpkg"):
-            SETTINGS_MANAGER.set_database_path(file_name)
-            SETTINGS_MANAGER.save_database_path_with_project_name()
-            shutil.copyfile(
-                os.path.join(
-                    SETTINGS_MANAGER.plugin_path,
-                    "..",
-                    "data",
-                    "base_project_database.gpkg",
-                ),
-                file_name,
+                "",
+                "GeoPackage (*.gpkg)"
             )
 
-            self.listWidget_project_areas.clear()
-            self.label_current_project_area.setText("Project")
+        filename_check = self.check_filename(file_name, selected_filter)
+        if not filename_check:
+            return
 
-            self.listWidget_development_sites.clear()
-            self.label_current_development_site.setText("Project")
+        SETTINGS_MANAGER.set_database_path(file_name)
+        SETTINGS_MANAGER.save_database_path_with_project_name()
+        shutil.copyfile(
+            os.path.join(
+                SETTINGS_MANAGER.plugin_path,
+                "..",
+                "data",
+                "base_project_database.gpkg",
+            ),
+            file_name,
+        )
 
-            self.create_base_tables(
-                SETTINGS_MANAGER.project_area_prefix,
-                SETTINGS_MANAGER._default_project_area_parameters_path,
-            )
-            self.create_base_tables(
-                SETTINGS_MANAGER.development_site_prefix,
-                SETTINGS_MANAGER._default_project_development_site_path,
-            )
-            self.create_base_tables(
-                SETTINGS_MANAGER.building_level_prefix,
-                SETTINGS_MANAGER._default_project_building_level_path,
-            )
+        self.listWidget_project_areas.clear()
+        self.label_current_project_area.setText("Project")
 
-            self.enable_widgets()
+        self.listWidget_development_sites.clear()
+        self.label_current_development_site.setText("Project")
 
-            self.add_area_and_site_layers_to_canvas()
+        self.create_base_tables(
+            SETTINGS_MANAGER.project_area_prefix,
+            SETTINGS_MANAGER._default_project_area_parameters_path,
+        )
+        self.create_base_tables(
+            SETTINGS_MANAGER.development_site_prefix,
+            SETTINGS_MANAGER._default_project_development_site_path,
+        )
+        self.create_base_tables(
+            SETTINGS_MANAGER.building_level_prefix,
+            SETTINGS_MANAGER._default_project_building_level_path,
+        )
 
-        else:
-            # TODO: message bar here
-            print("not a gpkg file")
+        self.enable_widgets()
+
+        self.add_area_and_site_layers_to_canvas()
+
+        self.iface.messageBar().pushMessage(
+            self.tr("Success"),
+            self.tr(f"Project database created: {file_name}"),
+            level=Qgis.Success,
+        )
+
 
     def load_project_database(self, file_name: str = "") -> None:
         """Loads a project database from a .gpkg file."""
         # Have the file_name as an argument to enable testing
         if not file_name:
-            file_name, _ = QFileDialog.getOpenFileName(
+            file_name, selected_filter = QFileDialog.getOpenFileName(
                 self,
                 self.tr("Choose Project Database Path"),
-                "*.gpkg",
+                "",
+                "GeoPackage (*.gpkg)"
             )
 
-        if file_name and file_name.endswith(".gpkg"):
-            self.listWidget_project_areas.clear()
-            SETTINGS_MANAGER.set_database_path(file_name)
-            SETTINGS_MANAGER.save_database_path_with_project_name()
+        filename_check = self.check_filename(file_name, selected_filter)
+        if not filename_check:
+            return
 
-            self.add_area_and_site_layers_to_canvas()
-            feats = self.area_layer.getFeatures()
-            for feat in feats:
-                self.listWidget_project_areas.addItem(feat["name"])
+        self.listWidget_project_areas.clear()
+        SETTINGS_MANAGER.set_database_path(file_name)
+        SETTINGS_MANAGER.save_database_path_with_project_name()
+
+        self.add_area_and_site_layers_to_canvas()
+        feats = self.area_layer.getFeatures()
+        for feat in feats:
+            self.listWidget_project_areas.addItem(feat["name"])
 
         # Click on first project area item to initialize all other listwidgets
         for widget in [
@@ -166,6 +179,12 @@ class TabDockWidget(QgsDockWidget):
         self.groupbox_bike_parking.setEnabled(True)
 
         self.enable_widgets()
+
+        self.iface.messageBar().pushMessage(
+            self.tr("Success"),
+            self.tr(f"Project database loaded: {file_name}"),
+            level=Qgis.Success,
+        )
 
     def add_area_and_site_layers_to_canvas(self) -> None:
         """Adds the layers from the gpkg to the canvas"""
@@ -308,3 +327,17 @@ class TabDockWidget(QgsDockWidget):
         iterator = layer.getFeatures(request)
 
         return next(iterator)
+
+    def check_filename(self, file_name: str, selected_filter: str) -> bool:
+        """Checks if the filename is set correctly."""
+        if file_name == "":
+            return False
+
+        if "gpkg" not in selected_filter or not file_name.endswith(".gpkg") :
+            self.iface.messageBar().pushMessage(
+                self.tr("Invalid file selection"),
+                self.tr("Please choose a valid .gpkg file."),
+                level=Qgis.Warning,
+            )
+            return False
+        return True
