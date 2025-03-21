@@ -186,7 +186,7 @@ class SettingsManager(QObject):
         return attributes
 
     def set_project_layer_ids(
-        self, area_layer: str, dev_site_layer: str, building_level_layer: str
+        self, area_layer: QgsVectorLayer, dev_site_layer: QgsVectorLayer, building_level_layer: QgsVectorLayer
     ) -> None:
         self.area_layer_id = area_layer.id()
         self.dev_site_layer_id = dev_site_layer.id()
