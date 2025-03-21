@@ -208,7 +208,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             return
 
         if not layer.isValid():
-            raise Exception(f"Layer {feature_name} is not valid!")
+            raise Exception(f"Layer is not valid!")
 
         feature = QgsFeature()
         feature.setFields(layer.fields())

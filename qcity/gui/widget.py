@@ -140,7 +140,7 @@ class TabDockWidget(QgsDockWidget):
         )
 
 
-    def load_project_database(self, file_name: str = "") -> None:
+    def load_project_database(self, file_name: str, selected_filter: str) -> None:
         """Loads a project database from a .gpkg file."""
         # Have the file_name as an argument to enable testing
         if not file_name:

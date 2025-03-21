@@ -2,6 +2,7 @@ import math
 import os
 import unittest
 from typing import Union
+from unittest.mock import patch
 
 import numpy as np
 from qgis.PyQt.QtCore import Qt, QEvent, QPoint, QCoreApplication
@@ -20,13 +21,10 @@ from qgis.core import (
     QgsSettings,
 )
 
-from slope_digitizing_tools.gui.widget import (
-    SlopeDigitizingConfigDockWidget,
-    SlopeDigitizingLiveResultsDockWidget,
-)
-from slope_digitizing_tools.test.utilities import get_qgis_app
-from slope_digitizing_tools.utils.maptools import DrawLineTool
-from slope_digitizing_tools.core import SETTINGS_MANAGER, SlopeType
+from qcity.core import SETTINGS_MANAGER
+from qcity.gui.widget import TabDockWidget
+from qcity.test.utilities import get_qgis_app
+from qcity.utils.maptools import DrawPolygonTool
 
 test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
 
@@ -42,7 +40,6 @@ class MapToolsTest(unittest.TestCase):
 
         _, __, cls.iface, cls.PARENT = get_qgis_app()
         QgsSettings().clear()
-        SETTINGS_MANAGER.reload()
 
         cls.project = QgsProject.instance()
 
@@ -53,10 +50,9 @@ class MapToolsTest(unittest.TestCase):
         assert cls.CANVAS.width() == 600
         assert cls.CANVAS.height() == 400
 
-    def test_digitizing(self) -> None:
-        raster_layer = QgsRasterLayer(test_data_path + "/dem.tif", "raster")
-        self.assertTrue(raster_layer.isValid())
-        self.project.addMapLayer(raster_layer)
+    @patch('qgis.PyQt.QtWidgets.QInputDialog.getText')
+    def test_digitizing(self, mock_get_text) -> None:
+        mock_get_text.return_value = ('test', "gpkg")
 
         self.CANVAS.setReferencedExtent(
             QgsReferencedRectangle(
@@ -66,91 +62,40 @@ class MapToolsTest(unittest.TestCase):
                     -344918.46147615037625656,
                     6633917.53619999997317791,
                 ),
-                raster_layer.crs(),
+                QgsCoordinateReferenceSystem(3857),
             )
         )
 
-        dlg_config = SlopeDigitizingConfigDockWidget()
+        self.widget = TabDockWidget(self.project, self.iface)
         message_bar = self.iface.messageBar()
-        dlg_live_display = SlopeDigitizingLiveResultsDockWidget()
 
-        vector_layer = QgsVectorLayer("LineString?crs=EPSG:4326", "lineLayer", "memory")
-        self.assertTrue(vector_layer.isValid())
-
-        vector_layer.startEditing()
-        self.project.addMapLayer(vector_layer)
-        cad_dock_widget = QgsAdvancedDigitizingDockWidget(self.CANVAS, self.PARENT)
-
-        self.map_tool = DrawLineTool(
-            map_canvas=self.CANVAS,
-            cad_dock_widget=cad_dock_widget,
+        self.map_tool = DrawPolygonTool(
+            map_canvas=self.iface.mapCanvas(),
+            cad_dock_widget=QgsAdvancedDigitizingDockWidget(self.CANVAS),
             message_bar=message_bar,
-            dlg_live_display=dlg_live_display,
-            dlg_config=dlg_config.config_widget,
+            dlg=self.widget,
             iface=self.iface,
         )
 
-        points = [
-            QgsPointXY(-3.11693883358920898, 51.06443827159174731),
-            QgsPointXY(-3.11420457677549445, 51.06271990702814634),
-            QgsPointXY(-3.11420457677549445, 51.06100147867827133),
-        ]
-        # no raster, no error
-        self.map_tool.canvasReleaseEvent(self.click_from_middle())
-        SETTINGS_MANAGER.set_dem_layer(raster_layer)
+        self.widget.load_project_database("test_data/empty_test_database.gpkg", "gpkg")
+        self.widget.toolButton_project_area_add.clicked.emit()
+
+        points = [QgsPointXY(-346976.04375941428588703, 6632700.0318903774023056), QgsPointXY(-346915.16854393307585269, 6632639.15667489636689425), QgsPointXY(-346884.73093619249993935, 6632608.71906715538352728)]
 
         self.map_tool.canvasReleaseEvent(self.click_from_middle())
-        np.testing.assert_almost_equal(self.map_tool.points, [points[0]], decimal=4)
-        self.assertAlmostEqual(self.map_tool.last_click_raster_value, 93.0, delta=1)
+        self.map_tool.canvasReleaseEvent(self.click_from_middle(x=10, y=10))
+        self.map_tool.canvasReleaseEvent(self.click_from_middle(x=15, y=15))
 
-        # test slope
-        rise = 2
-        SETTINGS_MANAGER.set_slope_type(SlopeType.Percent)
-        slope_percent = self.map_tool.get_slope_in_percent(
-            QgsPointXY(-346671.66768200841033831, 6632395.65581297129392624), rise
-        )
-        self.assertAlmostEqual(slope_percent, -21.14052922875632, delta=1)
-        slope_user_units = self.map_tool.convert_slope_in_percent_to_target_units(
-            slope_percent
-        )
-        self.assertAlmostEqual(slope_user_units, -21.14052922875632, delta=1)
-        SETTINGS_MANAGER.set_slope_type(SlopeType.Degrees)
-        slope_percent = self.map_tool.get_slope_in_percent(
-            QgsPointXY(-346671.66768200841033831, 6632395.65581297129392624), rise
-        )
-        self.assertAlmostEqual(slope_percent, -21.14052922875632, delta=1)
-        slope_user_units = self.map_tool.convert_slope_in_percent_to_target_units(
-            slope_percent
-        )
-        self.assertAlmostEqual(slope_user_units, -11.93687376414342, delta=1)
-        self.assertEqual(math.degrees(math.atan(slope_percent / 100)), slope_user_units)
+        np.testing.assert_almost_equal(self.map_tool.points, points, decimal=4)
 
-        self.map_tool.canvasReleaseEvent(self.click_from_middle(x=50, y=50))
-        self.assertEqual(self.map_tool.last_click_raster_value, 68.0)
-        self.assertAlmostEqual(self.map_tool.last_map_point.x(), -346671, delta=10)
-        self.assertAlmostEqual(self.map_tool.last_map_point.y(), 6632395, delta=10)
-
-        np.testing.assert_almost_equal(self.map_tool.points, points[:2], decimal=4)
-
-        dlg_config.config_widget.comboBox_distance_unit.setCurrentIndex(0)
-        self.assertEqual(SETTINGS_MANAGER.get_distance_unit(), Qgis.DistanceUnit.Meters)
-
-        self.map_tool.canvasReleaseEvent(self.click_from_middle(x=50, y=100))
-        self.assertEqual(len(self.map_tool.rubber_bands), 2)
-        self.assertEqual(
-            self.map_tool.og_widget.lineEdit_overallDistance.text(), "4.93 mm"
+        self.map_tool.canvasReleaseEvent(
+            self.click_from_middle(type="right")
         )
 
-        self.map_tool.canvasReleaseEvent(self.click_from_middle("right", 100, 50))
-        vector_layer.commitChanges()
-        np.testing.assert_almost_equal(
-            vector_layer.getFeatures().__next__().geometry().asPolyline(),
-            points,
-            decimal=4,
-        )
+        self.assertTrue(self.widget.listWidget_project_areas.item(0), 'test')
 
     def click_from_middle(
-        self, type: str = "left", x: int = 0, y: int = 0
+            self, type: str = "left", x: int = 0, y: int = 0
     ) -> Union[QgsMapMouseEvent, None]:
         if type == "left":
             click = Qt.LeftButton
