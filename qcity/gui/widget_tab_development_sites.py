@@ -20,7 +20,7 @@ class WidgetUtilsDevelopmentSites(QObject):
         self.og_widget = og_widget
 
         self.og_widget.toolButton_development_site_add.clicked.connect(
-            lambda: self.action_maptool_emit(SETTINGS_MANAGER.development_site_prefix)
+            lambda: self.og_widget.action_maptool_emit(SETTINGS_MANAGER.development_site_prefix)
         )
 
         self.og_widget.toolButton_development_site_remove.clicked.connect(
@@ -110,11 +110,6 @@ class WidgetUtilsDevelopmentSites(QObject):
             SETTINGS_MANAGER.get_development_site_layer_id()
         )
         site_layer.setSubsetString(f"\"name\" = '{item.text()}'")
-
-    def action_maptool_emit(self, kind) -> None:
-        """Emitted when plus button is clicked."""
-        SETTINGS_MANAGER.current_digitisation_type = kind
-        SETTINGS_MANAGER.add_feature_clicked.emit(True)
 
     def remove_selected_sites(self) -> None:
         """Removes selected area from Qlistwidget, map and geopackage."""

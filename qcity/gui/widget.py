@@ -341,3 +341,9 @@ class TabDockWidget(QgsDockWidget):
             )
             return False
         return True
+
+    def action_maptool_emit(self, kind: str) -> None:
+        """Emitted when plus button is clicked."""
+        print(f"action_maptool_emit: {kind}")
+        SETTINGS_MANAGER.current_digitisation_type = kind
+        SETTINGS_MANAGER.add_feature_clicked.emit(True)

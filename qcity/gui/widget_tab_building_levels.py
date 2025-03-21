@@ -18,7 +18,7 @@ class WidgetUtilsBuildingLevels(QObject):
         self.og_widget = og_widget
 
         self.og_widget.toolButton_building_level_add.clicked.connect(
-            lambda: self.action_maptool_emit(SETTINGS_MANAGER.building_level_prefix)
+            lambda: self.og_widget.action_maptool_emit(SETTINGS_MANAGER.building_level_prefix)
         )
 
         self.og_widget.toolButton_building_level_remove.clicked.connect(
@@ -62,11 +62,6 @@ class WidgetUtilsBuildingLevels(QObject):
         level_layer.setSubsetString(
             f"\"name\" = '{item.text()}' and ST_Touches(geom, ST_GeomFromText('{filter_feature.geometry().asWkt()}', {level_layer.crs().postgisSrid()}))"
         )
-
-    def action_maptool_emit(self, kind) -> None:
-        """Emitted when plus button is clicked."""
-        SETTINGS_MANAGER.current_digitisation_type = kind
-        SETTINGS_MANAGER.add_feature_clicked.emit(True)
 
     def remove_selected_sites(self) -> None:
         """Removes selected level from Qlistwidget, map and geopackage."""

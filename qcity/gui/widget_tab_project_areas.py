@@ -21,7 +21,7 @@ class WidgetUtilsProjectArea(QObject):
         self.og_widget = og_widget
 
         self.og_widget.toolButton_project_area_add.clicked.connect(
-            lambda: self.action_maptool_emit(SETTINGS_MANAGER.project_area_prefix)
+            lambda: self.og_widget.action_maptool_emit(SETTINGS_MANAGER.project_area_prefix)
         )
 
         self.og_widget.toolButton_project_area_remove.clicked.connect(
@@ -254,8 +254,3 @@ class WidgetUtilsProjectArea(QObject):
                     widget.setValue(widget_values_dict[widget_name])
 
             self.og_widget.label_current_project_area.setText(feature_name)
-
-    def action_maptool_emit(self, kind: str) -> None:
-        """Emitted when plus button is clicked."""
-        SETTINGS_MANAGER.current_digitisation_type = kind
-        SETTINGS_MANAGER.add_feature_clicked.emit(True)
