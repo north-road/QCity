@@ -31,6 +31,7 @@ from ..gui.gui_utils import GuiUtils
 from qcity.gui.widget_tab_development_sites import WidgetUtilsDevelopmentSites
 
 from qcity.gui.widget_tab_project_areas import WidgetUtilsProjectArea
+from ..utils.utils import get_qgis_type
 
 
 class TabDockWidget(QgsDockWidget):
@@ -282,17 +283,6 @@ class TabDockWidget(QgsDockWidget):
     def create_base_tables(self, table_name: str, path: str) -> None:
         """Creates a GeoPackage layer with attributes based on JSON data."""
         gpkg_path = SETTINGS_MANAGER.get_database_path()
-
-        def get_qgis_type(key):
-            return (
-                QVariant.Double
-                if "doubleSpinBox" in key
-                else QVariant.Int
-                if "spinBox" in key or "comboBox" in key
-                else QVariant.String
-                if "lineEdit" in key
-                else QVariant.String
-            )
 
         with open(path, "r") as file:
             data = json.load(file)
