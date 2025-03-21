@@ -3,8 +3,10 @@ from qgis.PyQt.QtWidgets import (
     QDoubleSpinBox,
     QListWidgetItem,
     QDialog,
+    QFileDialog,
 )
 from qgis.PyQt.QtCore import QObject, Qt
+from qgis._core import QgsField, QgsFields, QgsFeature
 from qgis.core import (
     QgsVectorLayer,
     QgsProject,
@@ -13,6 +15,7 @@ from qgis.core import (
 from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER
+from qcity.utils.utils import get_qgis_type
 
 
 class WidgetUtilsProjectArea(QObject):
@@ -40,6 +43,10 @@ class WidgetUtilsProjectArea(QObject):
 
         self.og_widget.listWidget_project_areas.itemClicked.connect(
             lambda item: self.zoom_to_project_area(item)
+        )
+
+        self.og_widget.pushButton_import_project_areas.clicked.connect(
+            self.import_project_area_geometries
         )
 
         for spinBox in self.og_widget.tab_project_areas.findChildren(
@@ -254,3 +261,52 @@ class WidgetUtilsProjectArea(QObject):
                     widget.setValue(widget_values_dict[widget_name])
 
             self.og_widget.label_current_project_area.setText(feature_name)
+
+    def import_project_area_geometries(self):
+        """Imports geometries as project areas from a file."""
+        file_path, _ = QFileDialog.getOpenFileName(None, "Select Vector File", "",
+                                                   "Vector Files (*.shp *.geojson *.gpkg *.kml)")
+
+        layer = QgsVectorLayer(file_path, "Loaded Layer", "ogr")
+
+        area_layer = QgsProject.instance().mapLayer(
+            SETTINGS_MANAGER.get_project_area_layer_id()
+        )
+
+        for feature in layer.getFeatures():
+            items = []
+            for index in range(self.og_widget.listWidget_project_areas.count()):
+                item = self.og_widget.listWidget_project_areas.item(index)
+                items.append(item.text())
+
+            feature_name = str(feature.id())
+
+            if not feature_name or feature_name in items:
+                if feature_name in items:
+                    # TODO: Replace with a proper message bar notification
+                    print("Table name already exists.")
+                continue
+
+            attributes = SETTINGS_MANAGER.get_attributes_from_json("project_areas")
+
+            new_feature = QgsFeature()
+            new_feature.setGeometry(feature.geometry())
+
+            new_feature.setAttributes([None] * len(area_layer.fields()))
+            for key, value in attributes.items():
+                if key in area_layer.fields().names():
+                    new_feature.setAttribute(area_layer.fields().indexFromName(key), value)
+            new_feature.setAttribute(area_layer.fields().indexFromName("name"), feature_name)
+
+            area_layer.startEditing()
+            area_layer.addFeature(new_feature)
+            area_layer.commitChanges()
+
+            self.og_widget.listWidget_project_areas.addItem(feature_name)
+
+        item = self.og_widget.listWidget_project_areas.findItems(feature_name, Qt.MatchExactly)[0]
+        row = self.og_widget.listWidget_project_areas.row(item)
+        self.og_widget.listWidget_project_areas.setCurrentRow(row)
+
+        if not self.og_widget.listWidget_project_areas.isEnabled():
+            self.og_widget.listWidget_project_areas.setEnabled(True)
