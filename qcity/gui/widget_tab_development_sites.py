@@ -174,15 +174,10 @@ class WidgetUtilsDevelopmentSites(QObject):
         site_layer.setSubsetString("")
         level_layer.setSubsetString("")
 
-        filter_feature = self.og_widget.get_feature_of_layer_by_name(site_layer, item)
-
         names = list()
+        pk = SETTINGS_MANAGER.get_pk(SETTINGS_MANAGER.building_level_prefix)
         for feat in level_layer.getFeatures():
-            if (
-                feat.geometry().within(filter_feature.geometry())
-                or feat.geometry().touches(filter_feature.geometry())
-                or feat.geometry().equals(filter_feature.geometry())
-            ):
+            if feat.id() == pk:
                 name = feat["name"]
                 self.og_widget.listWidget_building_levels.addItem(name)
                 names.append(name)
@@ -190,7 +185,7 @@ class WidgetUtilsDevelopmentSites(QObject):
         site_layer.setSubsetString(f"\"name\" = '{item.text()}'")
         name_filter = ", ".join(f"'{name}'" for name in names)
         level_layer.setSubsetString(
-            f"name IN ({name_filter}) and ST_Touches(geom, ST_GeomFromText('{filter_feature.geometry().asWkt()}', {site_layer.crs().postgisSrid()}))"
+            f"name IN ({name_filter})"
         )
 
     def update_site_name_gpkg(self) -> None:

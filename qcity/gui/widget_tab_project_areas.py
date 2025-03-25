@@ -141,11 +141,10 @@ class WidgetUtilsProjectArea(QObject):
         area_layer.setSubsetString("")
         site_layer.setSubsetString("")
 
-        filter_feature = self.og_widget.get_feature_of_layer_by_name(area_layer, item)
-
         names = list()
+        pk = SETTINGS_MANAGER.get_pk(SETTINGS_MANAGER.development_site_prefix)
         for feat in site_layer.getFeatures():
-            if feat.geometry().within(filter_feature.geometry()):
+            if feat.id() == pk:
                 name = feat["name"]
                 self.og_widget.listWidget_development_sites.addItem(name)
                 names.append(name)
