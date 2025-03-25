@@ -43,8 +43,8 @@ class SettingsManager(QObject):
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
         self._current_building_level_parameter_table_name: Optional[str] = None
-        self._current_development_site_parameter_table_name: Optional[str] = None
-        self._current_project_area_parameter_table_name: Optional[str] = None
+        self._current_development_site_parameter_feature_name: Optional[str] = None
+        self._current_project_area_parameter_feature_name: Optional[str] = None
         self._database_path = None
 
         self.plugin_path = os.path.dirname(os.path.realpath(__file__))
@@ -93,9 +93,9 @@ class SettingsManager(QObject):
         Sets a spinbox value from the corresponding widget-value.
         """
         if kind == SETTINGS_MANAGER.project_area_prefix:
-            feature_name = self._current_project_area_parameter_table_name
+            feature_name = self._current_project_area_parameter_feature_name
         elif kind == SETTINGS_MANAGER.development_site_prefix:
-            feature_name = self._current_development_site_parameter_table_name
+            feature_name = self._current_development_site_parameter_feature_name
         elif kind == SETTINGS_MANAGER.building_level_prefix:
             feature_name = self._current_building_level_parameter_table_name
 
@@ -122,14 +122,14 @@ class SettingsManager(QObject):
         """
         Sets the current project area parameter table name.
         """
-        self._current_project_area_parameter_table_name = name
+        self._current_project_area_parameter_feature_name = name
         self.current_project_area_parameter_name_changed.emit(name)
 
     def set_current_development_site_feature_name(self, name: str) -> None:
         """
         Sets the current project area parameter table name.
         """
-        self._current_development_site_parameter_table_name = name
+        self._current_development_site_parameter_feature_name = name
         self.current_development_site_parameter_name_changed.emit(name)
 
     def set_current_building_level_feature_name(self, name: str) -> None:
@@ -227,9 +227,9 @@ class SettingsManager(QObject):
         """Gets the primary key of the current parent feature."""
         if kind == self.development_site_prefix:
             gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={self.project_area_prefix}"
-            name = self._current_project_area_parameter_table_name
+            name = self._current_project_area_parameter_feature_name
         elif kind == self.building_level_prefix:
-            name = self._current_development_site_parameter_table_name
+            name = self._current_development_site_parameter_feature_name
             gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={self.development_site_prefix}"
 
         layer = QgsVectorLayer(gpkg_path, "", "ogr")
