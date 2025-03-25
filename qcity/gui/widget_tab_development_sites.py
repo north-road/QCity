@@ -20,7 +20,9 @@ class WidgetUtilsDevelopmentSites(QObject):
         self.og_widget = og_widget
 
         self.og_widget.toolButton_development_site_add.clicked.connect(
-            lambda: self.og_widget.action_maptool_emit(SETTINGS_MANAGER.development_site_prefix)
+            lambda: self.og_widget.action_maptool_emit(
+                SETTINGS_MANAGER.development_site_prefix
+            )
         )
 
         self.og_widget.toolButton_development_site_remove.clicked.connect(

@@ -88,10 +88,7 @@ class TabDockWidget(QgsDockWidget):
         # Have the file_name as an argument to enable testing
         if not file_name:
             file_name, selected_filter = QFileDialog.getSaveFileName(
-                self,
-                self.tr("Choose Project Database Path"),
-                "",
-                "GeoPackage (*.gpkg)"
+                self, self.tr("Choose Project Database Path"), "", "GeoPackage (*.gpkg)"
             )
 
         filename_check = self.check_filename(file_name, selected_filter)
@@ -139,16 +136,12 @@ class TabDockWidget(QgsDockWidget):
             level=Qgis.Success,
         )
 
-
     def load_project_database(self, file_name: str, selected_filter: str = "") -> None:
         """Loads a project database from a .gpkg file."""
         # Have the file_name as an argument to enable testing
         if not file_name:
             file_name, selected_filter = QFileDialog.getOpenFileName(
-                self,
-                self.tr("Choose Project Database Path"),
-                "",
-                "GeoPackage (*.gpkg)"
+                self, self.tr("Choose Project Database Path"), "", "GeoPackage (*.gpkg)"
             )
 
         filename_check = self.check_filename(file_name, selected_filter)
@@ -323,7 +316,7 @@ class TabDockWidget(QgsDockWidget):
         if file_name == "":
             return False
 
-        if "gpkg" not in selected_filter or not file_name.endswith(".gpkg") :
+        if "gpkg" not in selected_filter or not file_name.endswith(".gpkg"):
             self.iface.messageBar().pushMessage(
                 self.tr("Invalid file selection"),
                 self.tr("Please choose a valid .gpkg file."),

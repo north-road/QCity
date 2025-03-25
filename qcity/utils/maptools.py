@@ -24,7 +24,6 @@ from qgis.core import (
     Qgis,
     QgsFeature,
     QgsWkbTypes,
-    QgsFeatureRequest,
 )
 
 from qgis.gui import (
@@ -209,7 +208,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             return
 
         if not layer.isValid():
-            raise Exception(f"Layer is not valid!")
+            raise Exception("Layer is not valid!")
 
         feature = QgsFeature()
         feature.setFields(layer.fields())

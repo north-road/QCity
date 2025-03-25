@@ -18,7 +18,9 @@ class WidgetUtilsBuildingLevels(QObject):
         self.og_widget = og_widget
 
         self.og_widget.toolButton_building_level_add.clicked.connect(
-            lambda: self.og_widget.action_maptool_emit(SETTINGS_MANAGER.building_level_prefix)
+            lambda: self.og_widget.action_maptool_emit(
+                SETTINGS_MANAGER.building_level_prefix
+            )
         )
 
         self.og_widget.toolButton_building_level_remove.clicked.connect(

@@ -1,4 +1,3 @@
-import math
 import os
 import unittest
 from typing import Union
@@ -10,18 +9,14 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsPointXY,
     QgsReferencedRectangle,
-    Qgis,
 )
 from qgis.gui import QgsMapMouseEvent, QgsMapCanvas, QgsAdvancedDigitizingDockWidget
 from qgis.core import (
-    QgsVectorLayer,
-    QgsRasterLayer,
     QgsProject,
     QgsRectangle,
     QgsSettings,
 )
 
-from qcity.core import SETTINGS_MANAGER
 from qcity.gui.widget import TabDockWidget
 from qcity.test.utilities import get_qgis_app
 from qcity.utils.maptools import DrawPolygonTool
@@ -50,9 +45,9 @@ class MapToolsTest(unittest.TestCase):
         assert cls.CANVAS.width() == 600
         assert cls.CANVAS.height() == 400
 
-    @patch('qgis.PyQt.QtWidgets.QInputDialog.getText')
+    @patch("qgis.PyQt.QtWidgets.QInputDialog.getText")
     def test_digitizing(self, mock_get_text) -> None:
-        mock_get_text.return_value = ('test', "gpkg")
+        mock_get_text.return_value = ("test", "gpkg")
 
         self.CANVAS.setReferencedExtent(
             QgsReferencedRectangle(
@@ -80,7 +75,11 @@ class MapToolsTest(unittest.TestCase):
         self.widget.load_project_database("test_data/empty_test_database.gpkg", "gpkg")
         self.widget.toolButton_project_area_add.clicked.emit()
 
-        points = [QgsPointXY(-346976.04375941428588703, 6632700.0318903774023056), QgsPointXY(-346915.16854393307585269, 6632639.15667489636689425), QgsPointXY(-346884.73093619249993935, 6632608.71906715538352728)]
+        points = [
+            QgsPointXY(-346976.04375941428588703, 6632700.0318903774023056),
+            QgsPointXY(-346915.16854393307585269, 6632639.15667489636689425),
+            QgsPointXY(-346884.73093619249993935, 6632608.71906715538352728),
+        ]
 
         self.map_tool.canvasReleaseEvent(self.click_from_middle())
         self.map_tool.canvasReleaseEvent(self.click_from_middle(x=10, y=10))
@@ -88,14 +87,12 @@ class MapToolsTest(unittest.TestCase):
 
         np.testing.assert_almost_equal(self.map_tool.points, points, decimal=4)
 
-        self.map_tool.canvasReleaseEvent(
-            self.click_from_middle(type="right")
-        )
+        self.map_tool.canvasReleaseEvent(self.click_from_middle(type="right"))
 
-        self.assertTrue(self.widget.listWidget_project_areas.item(0), 'test')
+        self.assertTrue(self.widget.listWidget_project_areas.item(0), "test")
 
     def click_from_middle(
-            self, type: str = "left", x: int = 0, y: int = 0
+        self, type: str = "left", x: int = 0, y: int = 0
     ) -> Union[QgsMapMouseEvent, None]:
         if type == "left":
             click = Qt.LeftButton

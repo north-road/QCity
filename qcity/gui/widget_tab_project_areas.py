@@ -6,7 +6,7 @@ from qgis.PyQt.QtWidgets import (
     QFileDialog,
 )
 from qgis.PyQt.QtCore import QObject, Qt
-from qgis._core import QgsField, QgsFields, QgsFeature
+from qgis._core import QgsFeature
 from qgis.core import (
     QgsVectorLayer,
     QgsProject,
@@ -15,7 +15,6 @@ from qgis.core import (
 from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER
-from qcity.utils.utils import get_qgis_type
 
 
 class WidgetUtilsProjectArea(QObject):
@@ -24,7 +23,9 @@ class WidgetUtilsProjectArea(QObject):
         self.og_widget = og_widget
 
         self.og_widget.toolButton_project_area_add.clicked.connect(
-            lambda: self.og_widget.action_maptool_emit(SETTINGS_MANAGER.project_area_prefix)
+            lambda: self.og_widget.action_maptool_emit(
+                SETTINGS_MANAGER.project_area_prefix
+            )
         )
 
         self.og_widget.toolButton_project_area_remove.clicked.connect(
@@ -264,8 +265,12 @@ class WidgetUtilsProjectArea(QObject):
 
     def import_project_area_geometries(self):
         """Imports geometries as project areas from a file."""
-        file_path, _ = QFileDialog.getOpenFileName(None, "Select Vector File", "",
-                                                   "Vector Files (*.shp *.geojson *.gpkg *.kml)")
+        file_path, _ = QFileDialog.getOpenFileName(
+            None,
+            "Select Vector File",
+            "",
+            "Vector Files (*.shp *.geojson *.gpkg *.kml)",
+        )
 
         layer = QgsVectorLayer(file_path, "Loaded Layer", "ogr")
 
@@ -295,8 +300,12 @@ class WidgetUtilsProjectArea(QObject):
             new_feature.setAttributes([None] * len(area_layer.fields()))
             for key, value in attributes.items():
                 if key in area_layer.fields().names():
-                    new_feature.setAttribute(area_layer.fields().indexFromName(key), value)
-            new_feature.setAttribute(area_layer.fields().indexFromName("name"), feature_name)
+                    new_feature.setAttribute(
+                        area_layer.fields().indexFromName(key), value
+                    )
+            new_feature.setAttribute(
+                area_layer.fields().indexFromName("name"), feature_name
+            )
 
             area_layer.startEditing()
             area_layer.addFeature(new_feature)
@@ -304,7 +313,9 @@ class WidgetUtilsProjectArea(QObject):
 
             self.og_widget.listWidget_project_areas.addItem(feature_name)
 
-        item = self.og_widget.listWidget_project_areas.findItems(feature_name, Qt.MatchExactly)[0]
+        item = self.og_widget.listWidget_project_areas.findItems(
+            feature_name, Qt.MatchExactly
+        )[0]
         row = self.og_widget.listWidget_project_areas.row(item)
         self.og_widget.listWidget_project_areas.setCurrentRow(row)
 
