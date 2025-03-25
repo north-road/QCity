@@ -21,6 +21,7 @@ from qgis.core import (
     QgsProject,
     QgsFeature,
     Qgis,
+    QgsFileUtils,
 )
 from qgis.gui import QgsDockWidget, QgsCollapsibleGroupBox
 
@@ -91,9 +92,7 @@ class TabDockWidget(QgsDockWidget):
                 self, self.tr("Choose Project Database Path"), "", "GeoPackage (*.gpkg)"
             )
 
-        filename_check = self.check_filename(file_name, selected_filter)
-        if not filename_check:
-            return
+        file_name = QgsFileUtils.addExtensionFromFilter(file_name, selected_filter)
 
         SETTINGS_MANAGER.set_database_path(file_name)
         SETTINGS_MANAGER.save_database_path_with_project_name()
@@ -144,9 +143,7 @@ class TabDockWidget(QgsDockWidget):
                 self, self.tr("Choose Project Database Path"), "", "GeoPackage (*.gpkg)"
             )
 
-        filename_check = self.check_filename(file_name, selected_filter)
-        if not filename_check:
-            return
+        file_name = QgsFileUtils.addExtensionFromFilter(file_name, selected_filter)
 
         self.listWidget_project_areas.clear()
         SETTINGS_MANAGER.set_database_path(file_name)
@@ -310,20 +307,6 @@ class TabDockWidget(QgsDockWidget):
         iterator = layer.getFeatures(request)
 
         return next(iterator)
-
-    def check_filename(self, file_name: str, selected_filter: str) -> bool:
-        """Checks if the filename is set correctly."""
-        if file_name == "":
-            return False
-
-        if "gpkg" not in selected_filter or not file_name.endswith(".gpkg"):
-            self.iface.messageBar().pushMessage(
-                self.tr("Invalid file selection"),
-                self.tr("Please choose a valid .gpkg file."),
-                level=Qgis.Warning,
-            )
-            return False
-        return True
 
     def action_maptool_emit(self, kind: str) -> None:
         """Emitted when plus button is clicked."""
