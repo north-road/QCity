@@ -224,8 +224,7 @@ class SettingsManager(QObject):
         )
 
     def get_pk(self, kind: str) -> int:
-        """Gets the primary key of the current feature."""
-
+        """Gets the primary key of the current parent feature."""
         if kind == self.development_site_prefix:
             gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={self.project_area_prefix}"
             name = self._current_project_area_parameter_table_name
@@ -237,8 +236,6 @@ class SettingsManager(QObject):
 
         request = QgsFeatureRequest().setFilterExpression(f"\"name\" = '{name}'")
         feat = next(layer.getFeatures(request))
-
-        print(feat.id())
 
         return feat.id()
 
