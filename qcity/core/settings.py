@@ -220,6 +220,25 @@ class SettingsManager(QObject):
             section=QgsSettings.Plugins,
         )
 
+    def get_pk(self, kind: str) -> int:
+        """Gets the primary key of the current feature."""
+
+        if kind == self.development_site_prefix:
+            gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={self.project_area_prefix}"
+            name = self._current_project_area_parameter_table_name
+        elif kind == self.building_level_prefix:
+            name = self._current_development_site_parameter_table_name
+            gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={self.development_site_prefix}"
+
+        layer = QgsVectorLayer(gpkg_path, "", "ogr")
+
+        request = QgsFeatureRequest().setFilterExpression(f'"name" = \'{name}\'')
+        feat = next(layer.getFeatures(request))
+
+        print(feat.id())
+
+        return feat.id()
+
 
 # Settings manager singleton instance
 SETTINGS_MANAGER = SettingsManager()

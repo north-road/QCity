@@ -24,6 +24,7 @@ from qgis.core import (
     Qgis,
     QgsFeature,
     QgsWkbTypes,
+    QgsFeatureRequest,
 )
 
 from qgis.gui import (
@@ -216,9 +217,13 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         attributes = SETTINGS_MANAGER.get_attributes_from_json(kind)
 
         feature.setAttribute("name", feature_name)
+
         for key, value in attributes.items():
             if key in layer.fields().names():
                 feature.setAttribute(key, value)
+
+        if not kind == SETTINGS_MANAGER.project_area_prefix:
+            feature.setAttribute("pk", SETTINGS_MANAGER.get_pk(kind))
 
         polygon = QgsGeometry.fromPolygonXY(
             [[QgsPointXY(x, y) for x, y in self.points]]
