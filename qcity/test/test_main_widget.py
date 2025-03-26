@@ -41,12 +41,13 @@ class QCityProjectMainWidgetTest(unittest.TestCase):
         path = os.path.join(test_data_path, "test_database.gpkg")
         widget.create_new_project_database(path)
 
-        self.assertTrue(
-            os.path.exists(os.path.join(test_data_path, "test_database.gpkg"))
-        )
-        self.assertEqual(widget.label_current_project_area.text(), "Project")
-
-        os.remove(path)
+        try:
+            self.assertTrue(
+                os.path.exists(os.path.join(test_data_path, "test_database.gpkg"))
+            )
+            self.assertEqual(widget.label_current_project_area.text(), "Project")
+        finally:
+            os.remove(path)
 
     def test_add_base_layers(self) -> None:
         widget = TabDockWidget(self.project, self.iface)

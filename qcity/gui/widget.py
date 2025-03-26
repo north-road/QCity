@@ -85,7 +85,7 @@ class TabDockWidget(QgsDockWidget):
         """Adds all possible base layers to the selection combobox"""
         self.comboBox_base_layers.addItems(SETTINGS_MANAGER.get_base_layers_items())
 
-    def create_new_project_database(self, file_name: str = "") -> None:
+    def create_new_project_database(self, file_name: str = "", selected_filter: str = ".gpkg") -> None:
         """Opens a QFileDialog and returns the path to the new project Geopackage."""
         # Have the file_name as an argument to enable testing
         if not file_name:
@@ -214,7 +214,7 @@ class TabDockWidget(QgsDockWidget):
             self.development_site_layer,
             self.building_level_layer,
         ):
-            QgsProject.instance().addMapLayer(layer)
+            self.project.addMapLayer(layer)
 
         SETTINGS_MANAGER.set_project_layer_ids(
             self.area_layer, self.development_site_layer, self.building_level_layer

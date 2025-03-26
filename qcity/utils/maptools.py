@@ -222,7 +222,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
                 feature.setAttribute(key, value)
 
         if not kind == SETTINGS_MANAGER.project_area_prefix:
-            feature.setAttribute("pk", SETTINGS_MANAGER.get_pk(kind))
+            feature.setAttribute("primary_key", SETTINGS_MANAGER.get_pk(kind))
 
         polygon = QgsGeometry.fromPolygonXY(
             [[QgsPointXY(x, y) for x, y in self.points]]
