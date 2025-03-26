@@ -29,9 +29,9 @@ class MapToolsTest(unittest.TestCase):
     def setUpClass(cls):
         """Run before all tests"""
         super().setUpClass()
-        QCoreApplication.setOrganizationName("Slope_Digitizing_Test")
-        QCoreApplication.setOrganizationDomain("slope_digitizing")
-        QCoreApplication.setApplicationName("slope_digitizing")
+        QCoreApplication.setOrganizationName("QCity_Digitizing_Test")
+        QCoreApplication.setOrganizationDomain("qcity_digitizing")
+        QCoreApplication.setApplicationName("qcity_digitizing")
 
         _, __, cls.iface, cls.PARENT = get_qgis_app()
         QgsSettings().clear()
