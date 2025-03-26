@@ -22,6 +22,7 @@ from qgis.core import (
     QgsFeature,
     Qgis,
     QgsFileUtils,
+    QgsRelation,
 )
 from qgis.gui import QgsDockWidget, QgsCollapsibleGroupBox
 
@@ -129,6 +130,8 @@ class TabDockWidget(QgsDockWidget):
 
         self.add_area_and_site_layers_to_canvas()
 
+        self.add_layer_relations()
+
         self.iface.messageBar().pushMessage(
             self.tr("Success"),
             self.tr(f"Project database created: {file_name}"),
@@ -170,6 +173,8 @@ class TabDockWidget(QgsDockWidget):
         self.groupbox_bike_parking.setEnabled(True)
 
         self.enable_widgets()
+
+        self.add_layer_relations()
 
         self.iface.messageBar().pushMessage(
             self.tr("Success"),
@@ -312,3 +317,30 @@ class TabDockWidget(QgsDockWidget):
         """Emitted when plus button is clicked."""
         SETTINGS_MANAGER.current_digitisation_type = kind
         SETTINGS_MANAGER.add_feature_clicked.emit(True)
+
+    def add_layer_relations(self) -> None:
+        """Adds relations between layers to the QGIS project."""
+        relation_manager = self.project.relationManager()
+        existing_relations = {rel.name() for rel in relation_manager.relations().values()}
+
+        if "project_area_to_development_sites" in existing_relations and "development_sites_to_building_levels" in existing_relations:
+            return None
+
+        project_area_layer = self.project.mapLayer(SETTINGS_MANAGER.get_project_area_layer_id())
+        development_site_layer = self.project.mapLayer(SETTINGS_MANAGER.get_development_site_layer_id())
+        building_level_layer = self.project.mapLayer(SETTINGS_MANAGER.get_building_level_layer_id())
+
+        relations = [
+            ("project_area_to_development_sites", project_area_layer, development_site_layer),
+            ("development_sites_to_building_levels", development_site_layer, building_level_layer),
+        ]
+
+        for name, ref_layer, refg_layer in relations:
+            relation = QgsRelation()
+            relation.setName(name)
+            relation.setReferencedLayer(ref_layer.id())
+            relation.setReferencingLayer(refg_layer.id())
+            relation.addFieldPair("primary_key", "fid")
+            relation.setId(f"relation_id_{refg_layer.name()}_{ref_layer.name()}")
+            relation.setStrength(QgsRelation.Association)
+            relation_manager.addRelation(relation)
