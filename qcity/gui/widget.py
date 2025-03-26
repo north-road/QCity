@@ -93,6 +93,9 @@ class TabDockWidget(QgsDockWidget):
                 self, self.tr("Choose Project Database Path"), "", "GeoPackage (*.gpkg)"
             )
 
+        if file_name == "":
+            return None
+
         file_name = QgsFileUtils.addExtensionFromFilter(file_name, selected_filter)
 
         SETTINGS_MANAGER.set_database_path(file_name)
@@ -145,6 +148,9 @@ class TabDockWidget(QgsDockWidget):
             file_name, selected_filter = QFileDialog.getOpenFileName(
                 self, self.tr("Choose Project Database Path"), "", "GeoPackage (*.gpkg)"
             )
+
+        if file_name == "":
+            return None
 
         file_name = QgsFileUtils.addExtensionFromFilter(file_name, selected_filter)
 
