@@ -24,16 +24,17 @@ class GradientDigitizerPlugin:
         self.handler = None
 
     def initGui(self) -> None:
-        self.action = QAction("QCity", self.iface.mainWindow())
-        self.action.setIcon(GuiUtils.get_icon("plugin.svg"))
+        self.widget = TabDockWidget(self.project, self.iface)
 
+        self.action = QAction("QCity")
+        self.action.setCheckable(True)
+        self.action.setIcon(GuiUtils.get_icon("plugin.svg"))
         self.actions.append(self.action)
+        self.widget.setToggleVisibilityAction(self.action)
 
         self.iface.pluginToolBar().addAction(self.action)
 
-        self.widget = TabDockWidget(self.project, self.iface)
         self.iface.addDockWidget(Qt.RightDockWidgetArea, self.widget)
-        self.action.triggered.connect(self.widget_display)
 
         self.action_maptool = QAction("QCity", self.iface.mainWindow())
 
@@ -53,12 +54,6 @@ class GradientDigitizerPlugin:
 
         self.widget.show()
 
-    def widget_display(self) -> None:
-        """
-        shows the widget.
-        """
-        self.widget.show()
-
     def unload(self) -> None:
         """Removes the plugin menu item and icon from QGIS GUI."""
         if self.widget:
@@ -70,7 +65,6 @@ class GradientDigitizerPlugin:
             self.handler = None
 
         if self.action:
-            self.iface.removeToolBarIcon(self.action)
             self.action.deleteLater()
             self.action = None
 
