@@ -1,3 +1,5 @@
+from typing import Optional
+
 import json
 import os
 import shutil
@@ -86,7 +88,7 @@ class TabDockWidget(QgsDockWidget):
         """Adds all possible base layers to the selection combobox"""
         self.comboBox_base_layers.addItems(SETTINGS_MANAGER.get_base_layers_items())
 
-    def create_new_project_database(self, file_name: str = "", selected_filter: str = ".gpkg") -> None:
+    def create_new_project_database(self, file_name: Optional[str] = None, selected_filter: str = ".gpkg") -> None:
         """Opens a QFileDialog and returns the path to the new project Geopackage."""
         # Have the file_name as an argument to enable testing
         if not file_name:
@@ -94,22 +96,13 @@ class TabDockWidget(QgsDockWidget):
                 self, self.tr("Choose Project Database Path"), "", "GeoPackage (*.gpkg)"
             )
 
-        if file_name == "":
+        if not file_name:
             return None
 
         file_name = QgsFileUtils.addExtensionFromFilter(file_name, selected_filter)
 
         SETTINGS_MANAGER.set_database_path(file_name)
         SETTINGS_MANAGER.save_database_path_with_project_name()
-        shutil.copyfile(
-            os.path.join(
-                SETTINGS_MANAGER.plugin_path,
-                "..",
-                "data",
-                "base_project_database.gpkg",
-            ),
-            file_name,
-        )
 
         self.listWidget_project_areas.clear()
         self.label_current_project_area.setText("Project")
@@ -120,19 +113,7 @@ class TabDockWidget(QgsDockWidget):
         gpkg_path = SETTINGS_MANAGER.get_database_path()
 
         DatabaseUtils.create_base_tables(
-            gpkg_path,
-            SETTINGS_MANAGER.project_area_prefix,
-            SETTINGS_MANAGER._default_project_area_parameters_path,
-        )
-        DatabaseUtils.create_base_tables(
-            gpkg_path,
-            SETTINGS_MANAGER.development_site_prefix,
-            SETTINGS_MANAGER._default_project_development_site_path,
-        )
-        DatabaseUtils.create_base_tables(
-            gpkg_path,
-            SETTINGS_MANAGER.building_level_prefix,
-            SETTINGS_MANAGER._default_project_building_level_path,
+            gpkg_path
         )
 
         self.enable_widgets()
