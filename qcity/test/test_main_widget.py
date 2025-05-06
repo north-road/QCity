@@ -59,7 +59,7 @@ class QCityProjectMainWidgetTest(unittest.TestCase):
 
     def test_load_project(self) -> None:
         path = os.path.join(test_data_path, "filled_test_database.gpkg")
-        widget = TabDockWidget(self.project, self.iface)
+        widget = TabDockWidget(QgsProject.instance(), self.iface)
         widget.load_project_database(path)
 
         # This needs to be updated if the base layers are changed
