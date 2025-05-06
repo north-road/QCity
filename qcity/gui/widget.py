@@ -83,6 +83,15 @@ class TabDockWidget(QgsDockWidget):
         WidgetUtilsBuildingLevels(self)
         WidgetUtilsStatistics(self)
 
+        # set associated database when plugin is started
+        self.restore_saved_database_path()
+        self.project.readProject.connect(self.restore_saved_database_path)
+
+    def restore_saved_database_path(self) -> None:
+        path = ProjectUtils.associated_database_path(self.project)
+        if path:
+            self.load_project_database(path, add_layers=False)
+
     def set_add_button_activation(self) -> None:
         """Sets the add button for the base layers enabled/disabled, based on the current item text"""
         if self.comboBox_base_layers.currentIndex() == "Add base layers":
@@ -136,7 +145,7 @@ class TabDockWidget(QgsDockWidget):
             level=Qgis.Success,
         )
 
-    def load_project_database(self, file_name: str, selected_filter: str = "") -> None:
+    def load_project_database(self, file_name: str, selected_filter: str = "", add_layers: bool = True) -> None:
         """Loads a project database from a .gpkg file."""
         # Have the file_name as an argument to enable testing
         if not file_name:
@@ -156,7 +165,9 @@ class TabDockWidget(QgsDockWidget):
         SETTINGS_MANAGER.set_database_path(file_name)
 
         ProjectUtils.set_associated_database_path(self.project, file_name)
-        ProjectUtils.add_database_layers_to_project(self.project, file_name)
+        if add_layers:
+            ProjectUtils.add_database_layers_to_project(self.project, file_name)
+
         area_layer = ProjectUtils.get_project_area_layer(self.project)
         feats = area_layer.getFeatures()
         for feat in feats:
