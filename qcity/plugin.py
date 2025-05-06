@@ -17,6 +17,11 @@ class GradientDigitizerPlugin:
         self.iface = iface
         self.actions = list()
         self.project = QgsProject.instance()
+        self.widget = None
+        self.action = None
+        self.action_maptool = None
+        self.map_tool = None
+        self.handler = None
 
     def initGui(self) -> None:
         self.action = QAction("QCity", self.iface.mainWindow())
@@ -56,12 +61,18 @@ class GradientDigitizerPlugin:
 
     def unload(self) -> None:
         """Removes the plugin menu item and icon from QGIS GUI."""
-        self.widget.close()
+        if self.widget:
+            self.widget.deleteLater()
+            self.widget = None
 
-        self.iface.unregisterMapToolHandler(self.handler)
+        if self.handler:
+            self.iface.unregisterMapToolHandler(self.handler)
+            self.handler = None
 
-        self.iface.removeToolBarIcon(self.action)
-        del self.action
+        if self.action:
+            self.iface.removeToolBarIcon(self.action)
+            self.action.deleteLater()
+            self.action = None
 
         for a in self.actions:
             a.deleteLater()
