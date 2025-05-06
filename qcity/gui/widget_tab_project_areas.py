@@ -4,10 +4,11 @@ from qgis.PyQt.QtWidgets import (
     QListWidgetItem,
     QDialog,
     QFileDialog,
+    QWidget
 )
 from qgis.PyQt.QtCore import QObject, Qt
-from qgis._core import QgsFeature
 from qgis.core import (
+    QgsFeature,
     QgsVectorLayer,
     QgsProject,
     QgsCoordinateTransform,
@@ -227,20 +228,22 @@ class WidgetUtilsProjectArea(QObject):
 
             feature = self.og_widget.get_feature_of_layer_by_name(layer, item)
 
-            feature_dict = feature.attributes()
-            col_names = [field.name() for field in layer.fields()]
-            widget_values_dict = dict(zip(col_names, feature_dict))
+            widget_values = feature.attributeMap()
 
-            for widget_name in widget_values_dict.keys():
-                if widget_name in ["fid", "name"]:
+            for field_name, value in widget_values.items():
+                if field_name in ["fid", "name"]:
                     continue
+
+                widget_name = field_name
                 widget = self.og_widget.findChild(
-                    (QSpinBox, QDoubleSpinBox), widget_name
+                    (QWidget), widget_name
                 )
                 if isinstance(widget, QSpinBox):
-                    widget.setValue(int(widget_values_dict[widget_name]))
+                    widget.setValue(int(value))
+                elif isinstance(widget, QDoubleSpinBox):
+                    widget.setValue(float(value))
                 else:
-                    widget.setValue(widget_values_dict[widget_name])
+                    assert False
 
             self.og_widget.label_current_project_area.setText(feature_name)
 
