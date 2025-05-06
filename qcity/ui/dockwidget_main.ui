@@ -554,7 +554,7 @@
       </widget>
       <widget class="QWidget" name="tab_development_sites">
        <attribute name="title">
-        <string>Developement Sites</string>
+        <string>Development Sites</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
