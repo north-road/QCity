@@ -12,6 +12,7 @@ from qgis.core import (
     QgsVectorLayer,
     QgsProject,
     QgsCoordinateTransform,
+    QgsReferencedRectangle
 )
 from qgis.gui import QgsNewNameDialog
 
@@ -198,19 +199,10 @@ class WidgetUtilsProjectArea(QObject):
         area_layer = ProjectUtils.get_project_area_layer(QgsProject.instance())
         area_layer.setSubsetString("")
 
-        canvas_crs = self.og_widget.iface.mapCanvas().mapSettings().destinationCrs()
-        layer_crs = area_layer.crs()
-
         feature = self.og_widget.get_feature_of_layer_by_name(area_layer, item)
-        feature_bbox = feature.geometry().boundingBox()
+        feature_bbox = QgsReferencedRectangle(feature.geometry().boundingBox(), area_layer.crs())
 
-        if layer_crs != canvas_crs:
-            transform = QgsCoordinateTransform(
-                layer_crs, canvas_crs, QgsProject.instance()
-            )
-            feature_bbox = transform.transformBoundingBox(feature_bbox)
-
-        self.og_widget.iface.mapCanvas().setExtent(feature_bbox)
+        self.og_widget.iface.mapCanvas().setReferencedExtent(feature_bbox)
         self.og_widget.iface.mapCanvas().refresh()
 
     def update_project_area_parameters(self, item: QListWidgetItem) -> None:
