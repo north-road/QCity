@@ -1,5 +1,6 @@
 import unittest
 import os
+import tempfile
 
 from qgis.PyQt.QtCore import QCoreApplication
 
@@ -38,16 +39,14 @@ class QCityProjectMainWidgetTest(unittest.TestCase):
 
     def test_create_database(self) -> None:
         widget = TabDockWidget(self.project, self.iface)
-        path = os.path.join(test_data_path, "test_database.gpkg")
-        widget.create_new_project_database(path)
 
-        try:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = os.path.join(temp_dir, "test_database.gpkg")
+            widget.create_new_project_database(path)
             self.assertTrue(
-                os.path.exists(os.path.join(test_data_path, "test_database.gpkg"))
+                os.path.exists(os.path.join(temp_dir, "test_database.gpkg"))
             )
             self.assertEqual(widget.label_current_project_area.text(), "Project")
-        finally:
-            os.remove(path)
 
     def test_add_base_layers(self) -> None:
         widget = TabDockWidget(self.project, self.iface)
