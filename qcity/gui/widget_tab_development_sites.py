@@ -40,30 +40,30 @@ class WidgetUtilsDevelopmentSites(QObject):
             )
         )
 
-        self.og_widget.lineEdit_development_site_address.textChanged.connect(
+        self.og_widget.address.textChanged.connect(
             lambda value,
-            widget=self.og_widget.lineEdit_development_site_address: SETTINGS_MANAGER.save_widget_value_to_layer(
+            widget=self.og_widget.address: SETTINGS_MANAGER.save_widget_value_to_layer(
                 widget, value, SETTINGS_MANAGER.development_site_prefix
             )
         )
 
-        self.og_widget.lineEdit_development_site_owner.textChanged.connect(
+        self.og_widget.site_owner.textChanged.connect(
             lambda value,
-            widget=self.og_widget.lineEdit_development_site_owner: SETTINGS_MANAGER.save_widget_value_to_layer(
+            widget=self.og_widget.site_owner: SETTINGS_MANAGER.save_widget_value_to_layer(
                 widget, value, SETTINGS_MANAGER.development_site_prefix
             )
         )
 
-        self.og_widget.lineEdit_development_site_year.textChanged.connect(
+        self.og_widget.date.textChanged.connect(
             lambda value,
-            widget=self.og_widget.lineEdit_development_site_year: SETTINGS_MANAGER.save_widget_value_to_layer(
+            widget=self.og_widget.date: SETTINGS_MANAGER.save_widget_value_to_layer(
                 widget, value, SETTINGS_MANAGER.development_site_prefix
             )
         )
 
-        self.og_widget.comboBox_development_site_status.currentIndexChanged.connect(
+        self.og_widget.site_status.currentIndexChanged.connect(
             lambda value,
-            widget=self.og_widget.comboBox_development_site_status: SETTINGS_MANAGER.save_widget_value_to_layer(
+            widget=self.og_widget.site_status: SETTINGS_MANAGER.save_widget_value_to_layer(
                 widget, value, SETTINGS_MANAGER.development_site_prefix
             )
         )
@@ -80,9 +80,9 @@ class WidgetUtilsDevelopmentSites(QObject):
             lambda item: self.update_building_level_listwidget(item)
         )
 
-        self.og_widget.spinBox_dev_site_elevation.valueChanged.connect(
+        self.og_widget.site_elevation.valueChanged.connect(
             lambda value: SETTINGS_MANAGER.save_widget_value_to_layer(
-                self.og_widget.spinBox_dev_site_elevation,
+                self.og_widget.site_elevation,
                 value,
                 SETTINGS_MANAGER.development_site_prefix,
             )
