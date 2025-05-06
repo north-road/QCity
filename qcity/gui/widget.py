@@ -169,7 +169,8 @@ class TabDockWidget(QgsDockWidget):
         if add_layers:
             ProjectUtils.add_database_layers_to_project(self.project, file_name)
 
-        area_layer = ProjectUtils.get_project_area_layer(self.project)
+        area_layer = ProjectUtils.get_project_area_layer(self.project).clone()
+        area_layer.setSubsetString('')
         feats = area_layer.getFeatures()
         for feat in feats:
             self.listWidget_project_areas.addItem(feat["name"])
