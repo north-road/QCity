@@ -1,17 +1,61 @@
 {
-    "doubleSpinBox_building_levels_commercial_floorspace": 10.0,
-    "doubleSpinBox_building_levels_office_floorspace": 10.0,
-    "doubleSpinBox_building_levels_residential_floorspace": 10.0,
-    "spinBox_building_levels_1_bedroom_dwellings": 1,
-    "spinBox_building_levels_2_bedroom_dwellings": 1,
-    "spinBox_building_levels_3_bedroom_dwellings": 1,
-    "spinBox_building_levels_4_bedroom_dwellings": 1,
-    "spinBox_building_levels_commercial_car_parks": 1,
-    "spinBox_building_levels_office_car_bays": 1,
-    "spinBox_building_levels_residential_car_bays": 1,
-    "spinBox_building_levels_commercial_bike_parks": 1,
-    "spinBox_building_levels_office_bike_bays": 1,
-    "spinBox_building_levels_residential_bike_bays": 1,
-    "spinBox_dev_site_elevation": 1,
-    "primary_key": 0
+    "development_site_pk": {
+        "type": "int"
+    },
+    "commercial_floorspace": {
+        "type": "double",
+        "widget": "spinbox"
+    },
+    "office_floorspace": {
+        "type": "double",
+        "widget": "spinbox"
+    },
+    "residential_floorspace": {
+        "type": "double",
+        "widget": "spinbox"
+    },
+    "count_1_bedroom_dwellings": {
+        "type": "int",
+        "widget": "spinbox"
+    },
+    "count_2_bedroom_dwellings": {
+        "type": "int",
+        "widget": "spinbox"
+    },
+    "count_3_bedroom_dwellings": {
+        "type": "int",
+        "widget": "spinbox"
+    },
+    "count_4_bedroom_dwellings": {
+        "type": "int",
+        "widget": "spinbox"
+    },
+    "commercial_car_bays": {
+        "type": "int",
+        "widget": "spinbox"
+    },
+    "office_car_bays": {
+        "type": "int",
+        "widget": "spinbox"
+    },
+    "residential_car_bays": {
+        "type": "int",
+        "widget": "spinbox"
+    },
+    "commercial_bicycle_bays": {
+        "type": "int",
+        "widget": "spinbox"
+    },
+    "office_bicycle_bays": {
+        "type": "int",
+        "widget": "spinbox"
+    },
+    "residential_bicycle_bays": {
+        "type": "int",
+        "widget": "spinbox"
+    },
+    "level_height": {
+        "type": "double",
+        "widget": "spinbox"
+    }
 }

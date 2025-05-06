@@ -1,9 +1,24 @@
 {
-    "lineEdit_development_site_address": "",
-    "comboBox_development_site_status": 0,
-    "lineEdit_development_site_year": "01/01/2000",
-    "lineEdit_development_site_owner": "",
-    "spinBox_dev_site_elevation": 0,
-    "elevation": 0,
-    "primary_key":  0
+    "project_area_pk": {
+        "type": "int"
+    },
+    "address": {
+        "type": "string",
+        "widget": "lineedit"
+    },
+    "site_status": {
+        "type": "int",
+        "widget": "combo"
+    },
+    "date": {
+        "type": "date",
+        "widget": "dateedit"
+    },
+    "site_owner": {
+        "type": "string",
+        "widget": "lineedit"
+    },
+    "site_elevation": {
+        "type": "double"
+    }
 }

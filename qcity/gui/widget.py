@@ -34,6 +34,7 @@ from qcity.gui.widget_tab_development_sites import WidgetUtilsDevelopmentSites
 
 from qcity.gui.widget_tab_project_areas import WidgetUtilsProjectArea
 from ..utils.utils import get_qgis_type
+from ..core.database import DatabaseUtils
 
 
 class TabDockWidget(QgsDockWidget):
@@ -116,15 +117,20 @@ class TabDockWidget(QgsDockWidget):
         self.listWidget_development_sites.clear()
         self.label_current_development_site.setText("Project")
 
-        self.create_base_tables(
+        gpkg_path = SETTINGS_MANAGER.get_database_path()
+
+        DatabaseUtils.create_base_tables(
+            gpkg_path,
             SETTINGS_MANAGER.project_area_prefix,
             SETTINGS_MANAGER._default_project_area_parameters_path,
         )
-        self.create_base_tables(
+        DatabaseUtils.create_base_tables(
+            gpkg_path,
             SETTINGS_MANAGER.development_site_prefix,
             SETTINGS_MANAGER._default_project_development_site_path,
         )
-        self.create_base_tables(
+        DatabaseUtils.create_base_tables(
+            gpkg_path,
             SETTINGS_MANAGER.building_level_prefix,
             SETTINGS_MANAGER._default_project_building_level_path,
         )
@@ -280,34 +286,6 @@ class TabDockWidget(QgsDockWidget):
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate("X", message)
-
-    def create_base_tables(self, table_name: str, path: str) -> None:
-        """Creates a GeoPackage layer with attributes based on JSON data."""
-        gpkg_path = SETTINGS_MANAGER.get_database_path()
-
-        with open(path, "r") as file:
-            data = json.load(file)
-
-        fields = QgsFields()
-        fields.append(QgsField("name", QVariant.String))
-        for key in data.keys():
-            fields.append(QgsField(key, get_qgis_type(key)))
-
-        layer = QgsVectorLayer("Polygon?crs=EPSG:4326", table_name, "memory")
-        layer.dataProvider().addAttributes(fields)
-        layer.updateFields()
-
-        options = QgsVectorFileWriter.SaveVectorOptions()
-        options.driverName = "GPKG"
-        options.layerName = table_name
-        options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
-
-        error = QgsVectorFileWriter.writeAsVectorFormatV2(
-            layer, gpkg_path, QgsCoordinateTransformContext(), options
-        )
-
-        if not error[0] == QgsVectorFileWriter.NoError:
-            raise Exception(f"Error adding layer to GeoPackage: {error[1]}")
 
     def get_feature_of_layer_by_name(
         self, layer: QgsVectorLayer, item: QListWidgetItem
