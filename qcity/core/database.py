@@ -6,7 +6,8 @@ from qgis.core import (
     QgsField,
     QgsVectorLayer,
     QgsVectorFileWriter,
-    QgsCoordinateTransformContext
+    QgsCoordinateTransformContext,
+    QgsProject
 )
 
 from .settings import SETTINGS_MANAGER
@@ -80,3 +81,4 @@ class DatabaseUtils:
 
         if not error == QgsVectorFileWriter.NoError:
             raise Exception(f"Error adding layer to GeoPackage {gpkg_path}: {error_message}")
+

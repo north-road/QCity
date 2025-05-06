@@ -12,6 +12,7 @@ from qgis.core import QgsVectorLayer, QgsProject, QgsMapLayerType
 from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER
+from qcity.core.project import ProjectUtils
 
 
 class WidgetUtilsDevelopmentSites(QObject):
@@ -108,9 +109,7 @@ class WidgetUtilsDevelopmentSites(QObject):
         self, item: QListWidgetItem
     ) -> None:
         """Sets the SubsetString for the development site layer"""
-        site_layer = QgsProject.instance().mapLayer(
-            SETTINGS_MANAGER.get_development_site_layer_id()
-        )
+        site_layer = ProjectUtils.get_development_sites_layer(QgsProject.instance())
         site_layer.setSubsetString(f"\"name\" = '{item.text()}'")
 
     def remove_selected_sites(self) -> None:
@@ -162,13 +161,8 @@ class WidgetUtilsDevelopmentSites(QObject):
         if not item:
             return
 
-        level_layer = QgsProject.instance().mapLayer(
-            SETTINGS_MANAGER.get_building_level_layer_id()
-        )
-
-        site_layer = QgsProject.instance().mapLayer(
-            SETTINGS_MANAGER.get_development_site_layer_id()
-        )
+        level_layer = ProjectUtils.get_building_levels_layer(QgsProject.instance())
+        site_layer = ProjectUtils.get_development_sites_layer(QgsProject.instance())
 
         self.og_widget.listWidget_building_levels.clear()
         site_layer.setSubsetString("")

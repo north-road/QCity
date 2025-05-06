@@ -43,6 +43,7 @@ from qgis.gui import (
 
 from ..core import SETTINGS_MANAGER
 from ..gui.widget import TabDockWidget
+from ..core.project import ProjectUtils
 
 
 class DrawPolygonTool(QgsMapToolDigitizeFeature):
@@ -167,27 +168,19 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         if kind == SETTINGS_MANAGER.development_site_prefix:
             list_widget = self.dlg.listWidget_development_sites
             SETTINGS_MANAGER.set_current_development_site_feature_name(feature_name)
-            layer = QgsProject.instance().mapLayer(
-                SETTINGS_MANAGER.get_development_site_layer_id()
-            )
+            layer = ProjectUtils.get_development_sites_layer(QgsProject.instance())
         elif kind == SETTINGS_MANAGER.project_area_prefix:
             list_widget = self.dlg.listWidget_project_areas
             SETTINGS_MANAGER.set_current_project_area_feature_name(feature_name)
-            layer = QgsProject.instance().mapLayer(
-                SETTINGS_MANAGER.get_project_area_layer_id()
-            )
+            layer = ProjectUtils.get_project_area_layer(QgsProject.instance())
 
-            site_layer = QgsProject.instance().mapLayer(
-                SETTINGS_MANAGER.get_development_site_layer_id()
-            )
+            site_layer = ProjectUtils.get_development_sites_layer(QgsProject.instance())
             sql_filter = "FALSE"
             site_layer.setSubsetString(sql_filter)
         elif kind == SETTINGS_MANAGER.building_level_prefix:
             list_widget = self.dlg.listWidget_building_levels
             SETTINGS_MANAGER.set_current_building_level_feature_name(feature_name)
-            layer = QgsProject.instance().mapLayer(
-                SETTINGS_MANAGER.get_building_level_layer_id()
-            )
+            layer = ProjectUtils.get_building_levels_layer(QgsProject.instance())
             SETTINGS_MANAGER.set_current_building_level_feature_name(feature_name)
 
         else:

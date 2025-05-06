@@ -15,6 +15,7 @@ from qgis.core import (
 from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER
+from qcity.core.project import ProjectUtils
 
 
 class WidgetUtilsProjectArea(QObject):
@@ -125,17 +126,9 @@ class WidgetUtilsProjectArea(QObject):
 
     def update_development_site_listwidget(self, item: QListWidgetItem) -> None:
         """Updates the development site listwidget to only contain sites within the current project area"""
-        area_layer = QgsProject.instance().mapLayer(
-            SETTINGS_MANAGER.get_project_area_layer_id()
-        )
-
-        site_layer = QgsProject.instance().mapLayer(
-            SETTINGS_MANAGER.get_development_site_layer_id()
-        )
-
-        level_layer = QgsProject.instance().mapLayer(
-            SETTINGS_MANAGER.get_building_level_layer_id()
-        )
+        area_layer = ProjectUtils.get_project_area_layer(QgsProject.instance())
+        site_layer = ProjectUtils.get_development_sites_layer(QgsProject.instance())
+        level_layer = ProjectUtils.get_building_levels_layer(QgsProject.instance())
 
         self.og_widget.listWidget_development_sites.clear()
         area_layer.setSubsetString("")
@@ -210,9 +203,7 @@ class WidgetUtilsProjectArea(QObject):
 
     def zoom_to_project_area(self, item: QListWidgetItem) -> None:
         """Sets the canvas extent to the clicked project area"""
-        area_layer = QgsProject.instance().mapLayer(
-            SETTINGS_MANAGER.get_project_area_layer_id()
-        )
+        area_layer = ProjectUtils.get_project_area_layer(QgsProject.instance())
         area_layer.setSubsetString("")
 
         canvas_crs = self.og_widget.iface.mapCanvas().mapSettings().destinationCrs()
@@ -273,9 +264,7 @@ class WidgetUtilsProjectArea(QObject):
 
         layer = QgsVectorLayer(file_path, "Loaded Layer", "ogr")
 
-        area_layer = QgsProject.instance().mapLayer(
-            SETTINGS_MANAGER.get_project_area_layer_id()
-        )
+        area_layer = ProjectUtils.get_project_area_layer(QgsProject.instance())
 
         for feature in layer.getFeatures():
             items = []

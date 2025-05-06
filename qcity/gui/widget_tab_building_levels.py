@@ -10,6 +10,7 @@ from qgis.core import QgsVectorLayer, QgsProject
 from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER
+from qcity.core.project import ProjectUtils
 
 
 class WidgetUtilsBuildingLevels(QObject):
@@ -53,9 +54,7 @@ class WidgetUtilsBuildingLevels(QObject):
         self, item: QListWidgetItem
     ) -> None:
         """Updates the listwidget of the building levels to show only building levels within the active project level."""
-        level_layer = QgsProject.instance().mapLayer(
-            SETTINGS_MANAGER.get_building_level_layer_id()
-        )
+        level_layer = ProjectUtils.get_building_levels_layer(QgsProject.instance())
 
         level_layer.setSubsetString("")
 

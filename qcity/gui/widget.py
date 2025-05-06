@@ -37,6 +37,7 @@ from qcity.gui.widget_tab_development_sites import WidgetUtilsDevelopmentSites
 from qcity.gui.widget_tab_project_areas import WidgetUtilsProjectArea
 from ..utils.utils import get_qgis_type
 from ..core.database import DatabaseUtils
+from ..core.project import ProjectUtils
 
 
 class TabDockWidget(QgsDockWidget):
@@ -118,9 +119,8 @@ class TabDockWidget(QgsDockWidget):
 
         self.enable_widgets()
 
-        self.add_area_and_site_layers_to_canvas()
-
-        self.add_layer_relations()
+        ProjectUtils.add_database_layers_to_project(self.project, gpkg_path)
+        ProjectUtils.create_layer_relations(self.project)
 
         self.iface.messageBar().pushMessage(
             self.tr("Success"),
@@ -145,8 +145,9 @@ class TabDockWidget(QgsDockWidget):
         SETTINGS_MANAGER.set_database_path(file_name)
         SETTINGS_MANAGER.save_database_path_with_project_name()
 
-        self.add_area_and_site_layers_to_canvas()
-        feats = self.area_layer.getFeatures()
+        ProjectUtils.add_database_layers_to_project(self.project, file_name)
+        area_layer = ProjectUtils.get_project_area_layer(self.project)
+        feats = area_layer.getFeatures()
         for feat in feats:
             self.listWidget_project_areas.addItem(feat["name"])
 
@@ -167,44 +168,12 @@ class TabDockWidget(QgsDockWidget):
 
         self.enable_widgets()
 
-        self.add_layer_relations()
+        ProjectUtils.create_layer_relations(self.project)
 
         self.iface.messageBar().pushMessage(
             self.tr("Success"),
             self.tr(f"Project database loaded: {file_name}"),
             level=Qgis.Success,
-        )
-
-    def add_area_and_site_layers_to_canvas(self) -> None:
-        """Adds the layers from the gpkg to the canvas"""
-        # TODO: Rename method to mention all layers are loaded
-        database_path = SETTINGS_MANAGER.get_database_path()
-
-        self.area_layer = QgsVectorLayer(
-            f"{database_path}|layername={SETTINGS_MANAGER.project_area_prefix}",
-            SETTINGS_MANAGER.project_area_prefix,
-            "ogr",
-        )
-        self.development_site_layer = QgsVectorLayer(
-            f"{database_path}|layername={SETTINGS_MANAGER.development_site_prefix}",
-            SETTINGS_MANAGER.development_site_prefix,
-            "ogr",
-        )
-        self.building_level_layer = QgsVectorLayer(
-            f"{database_path}|layername={SETTINGS_MANAGER.building_level_prefix}",
-            SETTINGS_MANAGER.building_level_prefix,
-            "ogr",
-        )
-
-        for layer in (
-            self.area_layer,
-            self.development_site_layer,
-            self.building_level_layer,
-        ):
-            self.project.addMapLayer(layer)
-
-        SETTINGS_MANAGER.set_project_layer_ids(
-            self.area_layer, self.development_site_layer, self.building_level_layer
         )
 
     def add_base_layers(self) -> None:
@@ -282,30 +251,3 @@ class TabDockWidget(QgsDockWidget):
         """Emitted when plus button is clicked."""
         SETTINGS_MANAGER.current_digitisation_type = kind
         SETTINGS_MANAGER.add_feature_clicked.emit(True)
-
-    def add_layer_relations(self) -> None:
-        """Adds relations between layers to the QGIS project."""
-        relation_manager = self.project.relationManager()
-        existing_relations = {rel.name() for rel in relation_manager.relations().values()}
-
-        if "project_area_to_development_sites" in existing_relations and "development_sites_to_building_levels" in existing_relations:
-            return None
-
-        project_area_layer = self.project.mapLayer(SETTINGS_MANAGER.get_project_area_layer_id())
-        development_site_layer = self.project.mapLayer(SETTINGS_MANAGER.get_development_site_layer_id())
-        building_level_layer = self.project.mapLayer(SETTINGS_MANAGER.get_building_level_layer_id())
-
-        relations = [
-            ("project_area_to_development_sites", project_area_layer, development_site_layer),
-            ("development_sites_to_building_levels", development_site_layer, building_level_layer),
-        ]
-
-        for name, ref_layer, refg_layer in relations:
-            relation = QgsRelation()
-            relation.setName(name)
-            relation.setReferencedLayer(ref_layer.id())
-            relation.setReferencingLayer(refg_layer.id())
-            relation.addFieldPair("primary_key", "fid")
-            relation.setId(f"relation_id_{refg_layer.name()}_{ref_layer.name()}")
-            relation.setStrength(QgsRelation.Association)
-            relation_manager.addRelation(relation)

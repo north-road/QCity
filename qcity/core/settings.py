@@ -32,7 +32,6 @@ class SettingsManager(QObject):
     database_path_with_project_name_saved = pyqtSignal(dict)
     current_development_site_parameter_name_changed = pyqtSignal(str)
     current_building_level_parameter_name_changed = pyqtSignal(str)
-    project_layer_ids_changed = pyqtSignal(tuple)
 
     plugin_path = os.path.dirname(os.path.realpath(__file__))
     project_area_prefix = "project_areas"
@@ -184,27 +183,6 @@ class SettingsManager(QObject):
             attributes = json.load(file)
 
         return attributes
-
-    def set_project_layer_ids(
-        self,
-        area_layer: QgsVectorLayer,
-        dev_site_layer: QgsVectorLayer,
-        building_level_layer: QgsVectorLayer,
-    ) -> None:
-        self.area_layer_id = area_layer.id()
-        self.dev_site_layer_id = dev_site_layer.id()
-        self.building_level_layer_id = building_level_layer.id()
-
-        self.project_layer_ids_changed.emit((area_layer.id(), dev_site_layer.id()))
-
-    def get_project_area_layer_id(self) -> int:
-        return self.area_layer_id
-
-    def get_development_site_layer_id(self) -> int:
-        return self.dev_site_layer_id
-
-    def get_building_level_layer_id(self) -> int:
-        return self.building_level_layer_id
 
     def restore_checkbox_state(self, checkbox, item) -> None:
         state = QgsSettings().value(

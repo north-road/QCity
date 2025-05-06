@@ -5,15 +5,10 @@ import tempfile
 from qgis.PyQt.QtCore import QVariant
 
 from qgis.core import (
-    QgsVectorLayer,
-    QgsSettings,
-    QgsCoordinateReferenceSystem,
+    QgsVectorLayer
 )
 
 from qcity.core.database import DatabaseUtils
-from qcity.core.settings import SETTINGS_MANAGER
-
-from qcity.test.utilities import get_qgis_app
 
 test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
 
