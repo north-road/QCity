@@ -103,7 +103,6 @@ class TabDockWidget(QgsDockWidget):
         file_name = QgsFileUtils.addExtensionFromFilter(file_name, selected_filter)
 
         SETTINGS_MANAGER.set_database_path(file_name)
-        SETTINGS_MANAGER.save_database_path_with_project_name()
 
         self.listWidget_project_areas.clear()
         self.label_current_project_area.setText("Project")
@@ -119,6 +118,7 @@ class TabDockWidget(QgsDockWidget):
 
         self.enable_widgets()
 
+        ProjectUtils.set_associated_database_path(self.project, gpkg_path)
         ProjectUtils.add_database_layers_to_project(self.project, gpkg_path)
         ProjectUtils.create_layer_relations(self.project)
 
@@ -143,8 +143,8 @@ class TabDockWidget(QgsDockWidget):
 
         self.listWidget_project_areas.clear()
         SETTINGS_MANAGER.set_database_path(file_name)
-        SETTINGS_MANAGER.save_database_path_with_project_name()
 
+        ProjectUtils.set_associated_database_path(self.project, file_name)
         ProjectUtils.add_database_layers_to_project(self.project, file_name)
         area_layer = ProjectUtils.get_project_area_layer(self.project)
         feats = area_layer.getFeatures()

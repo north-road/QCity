@@ -138,36 +138,6 @@ class SettingsManager(QObject):
         self._current_building_level_parameter_table_name = name
         self.current_building_level_parameter_name_changed.emit(name)
 
-    def save_database_path_with_project_name(self) -> None:
-        """
-        Saves the database path with the QGIS project name to the settings.
-        """
-        project_name = os.path.basename(self.project.fileName())
-
-        if project_name:
-            QgsSettings().setValue(
-                f"{self.SETTINGS_KEY}/database_path_{project_name}",
-                self._database_path,
-                section=QgsSettings.Plugins,
-            )
-
-            self.database_path_with_project_name_saved.emit(
-                {project_name: self._database_path}
-            )
-
-    def get_database_path_with_project_name(self) -> Optional[dict]:
-        """
-        Gets the database path with the QGIS project name from the settings.
-        """
-        project_name = os.path.basename(self.project.fileName())
-        if project_name:
-            database_path = QgsSettings().value(
-                f"{self.SETTINGS_KEY}/database_path_{project_name}",
-                section=QgsSettings.Plugins,
-            )
-            self.set_database_path(database_path)
-            return database_path
-
     def get_attributes_from_json(self, kind: str) -> dict:
         """Gets the attributes of the default values from the json files"""
         if kind == "project_areas":

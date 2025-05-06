@@ -106,3 +106,18 @@ class ProjectUtils:
             relation.setStrength(QgsRelation.Association)
             assert relation.isValid(), relation.validationError()
             relation_manager.addRelation(relation)
+
+    @staticmethod
+    def set_associated_database_path(project: QgsProject, path: str):
+        """
+        Sets the database path which is associated with a project
+        """
+        project.writeEntry('qcity', 'database_path', path)
+
+    @staticmethod
+    def associated_database_path(project: QgsProject) -> str:
+        """
+        Returns the database path associated with a project
+        """
+        return project.readEntry('qcity', 'database_path')[0]
+

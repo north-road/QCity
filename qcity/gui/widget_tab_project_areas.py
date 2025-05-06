@@ -69,15 +69,6 @@ class WidgetUtilsProjectArea(QObject):
             lambda item: self.update_development_site_listwidget(item)
         )
 
-        # Load associated database when project is loaded on startup
-        # TODO: Connect this so it also loads when a project is loaded while in session
-        self.load_saved_database_path()
-
-    def load_saved_database_path(self) -> None:
-        path = SETTINGS_MANAGER.get_database_path_with_project_name()
-        if path:
-            self.og_widget.load_project_database(path)
-
     def remove_selected_areas(self) -> None:
         """Removes selected area from QListwidget, map and geopackage."""
         tbr_areas = self.og_widget.listWidget_project_areas.selectedItems()

@@ -76,3 +76,18 @@ class TestProjectUtils(unittest.TestCase):
             self.assertEqual(area_to_site.referencingLayer(), ProjectUtils.get_development_sites_layer(p))
             site_to_level = [p.relationManager().relation(r) for r in p.relationManager().relations() if p.relationManager().relation(r).referencedLayer() == ProjectUtils.get_development_sites_layer(p)][0]
             self.assertEqual(site_to_level.referencingLayer(), ProjectUtils.get_building_levels_layer(p))
+
+    def test_project_database_path(self):
+        """
+        Test associated database path
+        """
+        p = QgsProject()
+        self.assertFalse(ProjectUtils.associated_database_path(p))
+
+        ProjectUtils.set_associated_database_path(p, 'xxx')
+        self.assertEqual(ProjectUtils.associated_database_path(p), 'xxx')
+
+        p2 = QgsProject()
+        self.assertEqual(ProjectUtils.associated_database_path(p), 'xxx')
+        self.assertFalse(ProjectUtils.associated_database_path(p2))
+
