@@ -51,6 +51,11 @@ class TabDockWidget(QgsDockWidget):
 
         uic.loadUi(GuiUtils.get_ui_file_path("dockwidget_main.ui"), self)
 
+        self.toolButton_project_area_add.setIcon(GuiUtils.get_icon('add.svg'))
+        self.toolButton_project_area_remove.setIcon(GuiUtils.get_icon('remove.svg'))
+        self.toolButton_project_area_rename.setIcon(GuiUtils.get_icon('rename.svg'))
+        self.pushButton_import_project_areas.setIcon(GuiUtils.get_icon('import.svg'))
+
         self.project = project
         self.iface = iface
         self.set_base_layer_items()
