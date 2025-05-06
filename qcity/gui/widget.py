@@ -94,13 +94,16 @@ class TabDockWidget(QgsDockWidget):
         # Have the file_name as an argument to enable testing
         if not file_name:
             file_name, selected_filter = QFileDialog.getSaveFileName(
-                self, self.tr("Choose Project Database Path"), "", "GeoPackage (*.gpkg)"
+                self, self.tr("Choose Project Database Path"),
+                SETTINGS_MANAGER.last_used_database_folder(),
+                "GeoPackage (*.gpkg)"
             )
 
         if not file_name:
             return None
 
         file_name = QgsFileUtils.addExtensionFromFilter(file_name, selected_filter)
+        SETTINGS_MANAGER.set_last_used_database_folder(os.path.split(file_name)[0])
 
         SETTINGS_MANAGER.set_database_path(file_name)
 
@@ -133,13 +136,16 @@ class TabDockWidget(QgsDockWidget):
         # Have the file_name as an argument to enable testing
         if not file_name:
             file_name, selected_filter = QFileDialog.getOpenFileName(
-                self, self.tr("Choose Project Database Path"), "", "GeoPackage (*.gpkg)"
+                self, self.tr("Choose Project Database Path"),
+                SETTINGS_MANAGER.last_used_database_folder(),
+                "GeoPackage (*.gpkg)"
             )
 
         if file_name == "":
             return None
 
         file_name = QgsFileUtils.addExtensionFromFilter(file_name, selected_filter)
+        SETTINGS_MANAGER.set_last_used_database_folder(os.path.split(file_name)[0])
 
         self.listWidget_project_areas.clear()
         SETTINGS_MANAGER.set_database_path(file_name)

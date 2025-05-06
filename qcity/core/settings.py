@@ -7,7 +7,7 @@ import os
 from typing import Optional, List, Union
 
 from qgis.PyQt.QtWidgets import QWidget
-from qgis.PyQt.QtCore import QObject, pyqtSignal
+from qgis.PyQt.QtCore import QObject, pyqtSignal, QDir
 from qgis.PyQt.QtGui import QColor
 
 from qgis.core import (
@@ -70,6 +70,25 @@ class SettingsManager(QObject):
                 project_paths.append(path.removesuffix(".qgz"))
 
         return project_paths
+
+    def set_last_used_database_folder(self, folder: str):
+        """
+        Sets the last used database folder
+        """
+        QgsSettings().setValue(
+            f"{self.SETTINGS_KEY}/last_used_database_folder",
+            folder,
+            section=QgsSettings.Plugins,
+        )
+
+    def last_used_database_folder(self) -> str:
+        """
+        Returns the last used database folder
+        """
+        return QgsSettings().value(
+            f"{self.SETTINGS_KEY}/last_used_database_folder",
+            QDir.homePath(), section=QgsSettings.Plugins
+        )
 
     def set_database_path(self, database_path: str) -> None:
         """

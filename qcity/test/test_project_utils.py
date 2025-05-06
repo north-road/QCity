@@ -90,4 +90,3 @@ class TestProjectUtils(unittest.TestCase):
         p2 = QgsProject()
         self.assertEqual(ProjectUtils.associated_database_path(p), 'xxx')
         self.assertFalse(ProjectUtils.associated_database_path(p2))
-

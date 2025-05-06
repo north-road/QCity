@@ -2,7 +2,7 @@ import os
 import unittest
 import tempfile
 
-from qgis.PyQt.QtCore import QCoreApplication
+from qgis.PyQt.QtCore import QCoreApplication, QDir
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtTest import QSignalSpy
 
@@ -27,8 +27,15 @@ class TestSettingsManager(unittest.TestCase):
         QgsSettings().clear()
         cls.settings_manager = SettingsManager()
 
-    def test_pass(self) -> None:
-        pass
+    def test_last_used_db_folder(self):
+        """
+        Test last used database folder
+        """
+        self.assertEqual(self.settings_manager.last_used_database_folder(),
+                         QDir.homePath())
+        self.settings_manager.set_last_used_database_folder('/home/test/dbs')
+        self.assertEqual(self.settings_manager.last_used_database_folder(),
+                         '/home/test/dbs')
 
 
 if __name__ == "__main__":
