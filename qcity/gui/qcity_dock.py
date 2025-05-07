@@ -28,13 +28,13 @@ from qgis.core import (
 )
 from qgis.gui import QgsDockWidget, QgsCollapsibleGroupBox
 
-from .widget_tab_building_levels import WidgetUtilsBuildingLevels
+from .widget_tab_building_levels import BuildingLevelsPageController
 from .widget_tab_statistics import WidgetUtilsStatistics
 from ..core import SETTINGS_MANAGER
 from ..gui.gui_utils import GuiUtils
-from qcity.gui.widget_tab_development_sites import WidgetUtilsDevelopmentSites
+from qcity.gui.widget_tab_development_sites import DevelopmentSitesPageController
 
-from qcity.gui.widget_tab_project_areas import WidgetUtilsProjectArea
+from qcity.gui.widget_tab_project_areas import ProjectAreasPageController
 from ..utils.utils import get_qgis_type
 from ..core.database import DatabaseUtils
 from ..core.project import ProjectUtils
@@ -79,9 +79,9 @@ class QCityDockWidget(QgsDockWidget):
         )
 
         # Initialize tabs
-        WidgetUtilsProjectArea(self)
-        WidgetUtilsDevelopmentSites(self)
-        WidgetUtilsBuildingLevels(self)
+        ProjectAreasPageController(self)
+        DevelopmentSitesPageController(self)
+        BuildingLevelsPageController(self)
         WidgetUtilsStatistics(self)
 
         # set associated database when plugin is started

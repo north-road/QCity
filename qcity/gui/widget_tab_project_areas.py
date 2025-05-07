@@ -18,12 +18,15 @@ from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER
 from qcity.core.project import ProjectUtils
+from .page_controller import PageController
 
 
-class WidgetUtilsProjectArea(QObject):
+class ProjectAreasPageController(PageController):
+    """
+    Page controller for the project areas page
+    """
     def __init__(self, og_widget):
         super().__init__(og_widget)
-        self.og_widget = og_widget
 
         self.og_widget.toolButton_project_area_add.clicked.connect(
             lambda: self.og_widget.action_maptool_emit(

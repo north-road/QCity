@@ -12,7 +12,7 @@ from qgis.core import (
 
 from qcity.gui.qcity_dock import QCityDockWidget
 from qcity.test.utilities import get_qgis_app
-from qcity.gui.widget_tab_project_areas import WidgetUtilsProjectArea
+from qcity.gui.widget_tab_project_areas import ProjectAreasPageController
 
 test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
 
@@ -51,7 +51,7 @@ class QCityProjectAreaTest(unittest.TestCase):
         self.assertEqual(value, 3)
 
         item = widget.listWidget_project_areas.item(1)
-        WidgetUtilsProjectArea(widget).update_project_area_parameters(item)
+        ProjectAreasPageController(widget).update_project_area_parameters(item)
 
         for sub_widget in widget.findChildren((QSpinBox, QDoubleSpinBox)):
             self.assertNotEqual(sub_widget.value(), 0)
