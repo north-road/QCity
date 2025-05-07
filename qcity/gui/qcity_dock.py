@@ -40,14 +40,14 @@ from ..core.database import DatabaseUtils
 from ..core.project import ProjectUtils
 
 
-class TabDockWidget(QgsDockWidget):
+class QCityDockWidget(QgsDockWidget):
     """
     Main dock widget.
     """
 
     def __init__(self, project, iface) -> None:
-        super(TabDockWidget, self).__init__()
-        self.setObjectName("MainDockWidget")
+        super(QCityDockWidget, self).__init__()
+        self.setObjectName("QCityDockWidget")
 
         uic.loadUi(GuiUtils.get_ui_file_path("dockwidget_main.ui"), self)
 

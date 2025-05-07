@@ -6,8 +6,8 @@ from .core import SETTINGS_MANAGER
 from .utils.maptools import DrawPolygonTool, MapToolHandler
 
 from .gui.gui_utils import GuiUtils
-from .gui.widget import (
-    TabDockWidget,
+from .gui.qcity_dock import (
+    QCityDockWidget,
 )
 
 
@@ -24,7 +24,7 @@ class GradientDigitizerPlugin:
         self.handler = None
 
     def initGui(self) -> None:
-        self.widget = TabDockWidget(self.project, self.iface)
+        self.widget = QCityDockWidget(self.project, self.iface)
 
         self.action = QAction("QCity")
         self.action.setCheckable(True)

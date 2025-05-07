@@ -42,7 +42,7 @@ from qgis.gui import (
 )
 
 from ..core import SETTINGS_MANAGER
-from ..gui.widget import TabDockWidget
+from ..gui.qcity_dock import QCityDockWidget
 from ..core.project import ProjectUtils
 
 
@@ -56,7 +56,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         map_canvas: QgsMapCanvas,
         cad_dock_widget: QgsAdvancedDigitizingDockWidget,
         message_bar: QgsMessageBar,
-        dlg: TabDockWidget,
+        dlg: QCityDockWidget,
         iface: QgisInterface,
     ) -> None:
         super().__init__(map_canvas, cad_dock_widget, QgsMapToolCapture.CaptureLine)

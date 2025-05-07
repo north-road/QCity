@@ -10,7 +10,7 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
 )
 
-from qcity.gui.widget import TabDockWidget
+from qcity.gui.qcity_dock import QCityDockWidget
 from qcity.test.utilities import get_qgis_app
 
 test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
@@ -38,7 +38,7 @@ class QCityProjectMainWidgetTest(unittest.TestCase):
         assert cls.CANVAS.height() == 400
 
     def test_create_database(self) -> None:
-        widget = TabDockWidget(self.project, self.iface)
+        widget = QCityDockWidget(self.project, self.iface)
 
         with tempfile.TemporaryDirectory() as temp_dir:
             path = os.path.join(temp_dir, "test_database.gpkg")
@@ -49,7 +49,7 @@ class QCityProjectMainWidgetTest(unittest.TestCase):
             self.assertEqual(widget.label_current_project_area.text(), "Project")
 
     def test_add_base_layers(self) -> None:
-        widget = TabDockWidget(self.project, self.iface)
+        widget = QCityDockWidget(self.project, self.iface)
         widget.add_base_layers()
 
         # This needs to be updated if the base layers are changed
@@ -59,7 +59,7 @@ class QCityProjectMainWidgetTest(unittest.TestCase):
 
     def test_load_project(self) -> None:
         path = os.path.join(test_data_path, "filled_test_database.gpkg")
-        widget = TabDockWidget(QgsProject.instance(), self.iface)
+        widget = QCityDockWidget(QgsProject.instance(), self.iface)
         widget.load_project_database(path)
 
         # This needs to be updated if the base layers are changed

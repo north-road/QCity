@@ -10,7 +10,7 @@ from qgis.core import (
     QgsSettings,
 )
 
-from qcity.gui.widget import TabDockWidget
+from qcity.gui.qcity_dock import QCityDockWidget
 from qcity.test.utilities import get_qgis_app
 from qcity.gui.widget_tab_project_areas import WidgetUtilsProjectArea
 
@@ -40,7 +40,7 @@ class QCityProjectAreaTest(unittest.TestCase):
 
     def test_update_project_area_parameters(self):
         path = os.path.join(test_data_path, "filled_test_database.gpkg")
-        widget = TabDockWidget(self.project, self.iface)
+        widget = QCityDockWidget(self.project, self.iface)
 
         value = widget.spinBox_dwellings_size_1.value()
         self.assertEqual(value, 0)

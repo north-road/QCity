@@ -17,7 +17,7 @@ from qgis.core import (
     QgsSettings,
 )
 
-from qcity.gui.widget import TabDockWidget
+from qcity.gui.qcity_dock import QCityDockWidget
 from qcity.test.utilities import get_qgis_app
 from qcity.utils.maptools import DrawPolygonTool
 
@@ -61,7 +61,7 @@ class MapToolsTest(unittest.TestCase):
             )
         )
 
-        self.widget = TabDockWidget(self.project, self.iface)
+        self.widget = QCityDockWidget(self.project, self.iface)
         message_bar = self.iface.messageBar()
 
         self.map_tool = DrawPolygonTool(
