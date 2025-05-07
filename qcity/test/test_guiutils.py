@@ -23,9 +23,9 @@ class GuiUtilsTest(unittest.TestCase):
         """
         Tests get_ui_file_path svg path
         """
-        self.assertTrue(GuiUtils.get_ui_file_path("dockwidget_config.ui"))
+        self.assertTrue(GuiUtils.get_ui_file_path("dockwidget_main.ui"))
         self.assertIn(
-            "dockwidget_config.ui", GuiUtils.get_ui_file_path("dockwidget_config.ui")
+            "dockwidget_main.ui", GuiUtils.get_ui_file_path("dockwidget_main.ui")
         )
         self.assertFalse(GuiUtils.get_ui_file_path("not_a_form.ui"))
 

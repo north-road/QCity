@@ -8,10 +8,13 @@ from qgis.core import (
 from .settings import SETTINGS_MANAGER
 from .enums import LayerType
 
-class ProjectUtils:
+class ProjectController:
     """
-    Contains utility functions for working with QCity projects
+    Controller for working with QCity projects
     """
+
+    def __init__(self, project: QgsProject):
+        self.project = project
 
     @staticmethod
     def add_database_layers_to_project(project: QgsProject, database_path: str) -> None:
@@ -42,64 +45,59 @@ class ProjectUtils:
 
         project.addMapLayers([area_layer, development_site_layer, building_level_layer])
 
-    @staticmethod
-    def get_project_area_layer(project: QgsProject) -> Optional[QgsVectorLayer]:
+    def get_project_area_layer(self) -> Optional[QgsVectorLayer]:
         """
         Retrieves the project area layer from a project
         """
-        for _, layer in project.mapLayers().items():
+        for _, layer in self.project.mapLayers().items():
             if layer.customProperty('_qcity_role') == 'project_areas':
                 return layer
 
         return None
 
-    @staticmethod
-    def get_development_sites_layer(project: QgsProject) -> Optional[QgsVectorLayer]:
+    def get_development_sites_layer(self) -> Optional[QgsVectorLayer]:
         """
         Retrieves the development sites layer from a project
         """
-        for _, layer in project.mapLayers().items():
+        for _, layer in self.project.mapLayers().items():
             if layer.customProperty('_qcity_role') == 'development_sites':
                 return layer
 
         return None
 
-    @staticmethod
-    def get_building_levels_layer(project: QgsProject) -> Optional[QgsVectorLayer]:
+    def get_building_levels_layer(self) -> Optional[QgsVectorLayer]:
         """
         Retrieves the building levels layer from a project
         """
-        for _, layer in project.mapLayers().items():
+        for _, layer in self.project.mapLayers().items():
             if layer.customProperty('_qcity_role') == 'building_levels':
                 return layer
 
         return None
 
-    @staticmethod
-    def get_layer(project: QgsProject, layer: LayerType) -> Optional[QgsVectorLayer]:
+    def get_layer(self, layer: LayerType) -> Optional[QgsVectorLayer]:
         """
         Retrieves the specified QCity layer from a project
         """
         if layer == LayerType.ProjectAreas:
-            return ProjectUtils.get_project_area_layer(project)
+            return self.get_project_area_layer()
         if layer == LayerType.DevelopmentSites:
-            return ProjectUtils.get_development_sites_layer(project)
+            return self.get_development_sites_layer()
         if layer == LayerType.BuildingLevels:
-            return ProjectUtils.get_building_levels_layer(project)
+            return self.get_building_levels_layer()
         return None
 
-    @staticmethod
-    def create_layer_relations(project: QgsProject):
+    def create_layer_relations(self):
         """Adds relations between layers to the QGIS project."""
-        relation_manager = project.relationManager()
+        relation_manager = self.project.relationManager()
         existing_relations = {rel.name() for rel in relation_manager.relations().values()}
 
         if "project_area_to_development_sites" in existing_relations and "development_sites_to_building_levels" in existing_relations:
             return
 
-        project_area_layer = ProjectUtils.get_project_area_layer(project)
-        development_site_layer = ProjectUtils.get_development_sites_layer(project)
-        building_level_layer = ProjectUtils.get_building_levels_layer(project)
+        project_area_layer = self.get_project_area_layer()
+        development_site_layer = self.get_development_sites_layer()
+        building_level_layer = self.get_building_levels_layer()
         if not project_area_layer or not development_site_layer or not building_level_layer:
             return
 
@@ -108,7 +106,7 @@ class ProjectUtils:
             ("development_sites_to_building_levels", development_site_layer, building_level_layer, "development_site_pk"),
         ]
 
-        context = QgsRelationContext(project)
+        context = QgsRelationContext(self.project)
         for name, parent_layer, child_layer, foreign_key in relations:
             relation = QgsRelation(context)
             relation.setName(name)
@@ -120,17 +118,17 @@ class ProjectUtils:
             assert relation.isValid(), relation.validationError()
             relation_manager.addRelation(relation)
 
-    @staticmethod
-    def set_associated_database_path(project: QgsProject, path: str):
+    def set_associated_database_path(self, path: str):
         """
         Sets the database path which is associated with a project
         """
-        project.writeEntry('qcity', 'database_path', path)
+        self.project.writeEntry('qcity', 'database_path', path)
 
-    @staticmethod
-    def associated_database_path(project: QgsProject) -> str:
+    def associated_database_path(self) -> str:
         """
         Returns the database path associated with a project
         """
-        return project.readEntry('qcity', 'database_path')[0]
+        return self.project.readEntry('qcity', 'database_path')[0]
 
+
+PROJECT_CONTROLLER = ProjectController(QgsProject.instance())

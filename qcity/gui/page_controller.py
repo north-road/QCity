@@ -5,7 +5,7 @@ from qgis.PyQt.QtWidgets import QWidget, QSpinBox, QDoubleSpinBox, QListWidget, 
 
 from qgis.core import QgsFeature, NULL, QgsProject, QgsVectorLayer
 
-from ..core import LayerUtils, SETTINGS_MANAGER, LayerType, ProjectUtils
+from ..core import LayerUtils, LayerType, PROJECT_CONTROLLER
 
 
 class PageController(QObject):
@@ -64,7 +64,7 @@ class PageController(QObject):
         """
         Returns the layer associated with the page
         """
-        layer = ProjectUtils.get_layer(QgsProject.instance(), self.layer_type)
+        layer = PROJECT_CONTROLLER.get_layer(self.layer_type)
         return layer
 
     def get_feature_by_id(self, feature_id: int) -> QgsFeature:
@@ -86,8 +86,7 @@ class PageController(QObject):
         widget = self.sender()
         field_name = widget.objectName()
 
-        LayerUtils.store_value(QgsProject.instance(),
-                               self.layer_type,
+        LayerUtils.store_value(self.layer_type,
                                self.current_feature_id,
                                field_name, value
                                )

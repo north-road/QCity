@@ -43,7 +43,7 @@ from qgis.gui import (
     QgsSnapIndicator,
 )
 
-from ..core import SETTINGS_MANAGER, LayerType, ProjectUtils, DatabaseUtils
+from ..core import LayerType, PROJECT_CONTROLLER, DatabaseUtils
 from ..gui.qcity_dock import QCityDockWidget
 
 
@@ -178,14 +178,14 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             list_widget = self.dlg.listWidget_development_sites
         elif self._layer_type == LayerType.ProjectAreas:
             list_widget = self.dlg.listWidget_project_areas
-            site_layer = ProjectUtils.get_development_sites_layer(QgsProject.instance())
+            site_layer = PROJECT_CONTROLLER.get_development_sites_layer()
             sql_filter = "FALSE"
             site_layer.setSubsetString(sql_filter)
         elif self._layer_type == LayerType.BuildingLevels:
             list_widget = self.dlg.listWidget_building_levels
         else:
             raise Exception(f"Unknown tab name: {self._layer_type}")
-        layer = ProjectUtils.get_layer(QgsProject.instance(), self._layer_type)
+        layer = PROJECT_CONTROLLER.get_layer(self._layer_type)
 
         items = []
         for index in range(list_widget.count()):

@@ -35,7 +35,7 @@ from ..gui.gui_utils import GuiUtils
 from qcity.gui.widget_tab_development_sites import DevelopmentSitesPageController
 
 from qcity.gui.widget_tab_project_areas import ProjectAreasPageController
-from ..core import DatabaseUtils, ProjectUtils, LayerType
+from ..core import DatabaseUtils, PROJECT_CONTROLLER, LayerType
 
 
 class QCityDockWidget(QgsDockWidget):
@@ -94,7 +94,7 @@ class QCityDockWidget(QgsDockWidget):
         self.project.readProject.connect(self.restore_saved_database_path)
 
     def restore_saved_database_path(self) -> None:
-        path = ProjectUtils.associated_database_path(self.project)
+        path = PROJECT_CONTROLLER.associated_database_path()
         if path:
             self.load_project_database(path, add_layers=False)
 
@@ -141,9 +141,9 @@ class QCityDockWidget(QgsDockWidget):
 
         self.enable_widgets()
 
-        ProjectUtils.set_associated_database_path(self.project, gpkg_path)
-        ProjectUtils.add_database_layers_to_project(self.project, gpkg_path)
-        ProjectUtils.create_layer_relations(self.project)
+        PROJECT_CONTROLLER.set_associated_database_path(gpkg_path)
+        PROJECT_CONTROLLER.add_database_layers_to_project(self.project, gpkg_path)
+        PROJECT_CONTROLLER.create_layer_relations()
 
         self.iface.messageBar().pushMessage(
             self.tr("Success"),
@@ -170,11 +170,11 @@ class QCityDockWidget(QgsDockWidget):
         self.listWidget_project_areas.clear()
         SETTINGS_MANAGER.set_database_path(file_name)
 
-        ProjectUtils.set_associated_database_path(self.project, file_name)
+        PROJECT_CONTROLLER.set_associated_database_path(file_name)
         if add_layers:
-            ProjectUtils.add_database_layers_to_project(self.project, file_name)
+            PROJECT_CONTROLLER.add_database_layers_to_project(self.project, file_name)
 
-        area_layer = ProjectUtils.get_project_area_layer(self.project).clone()
+        area_layer = PROJECT_CONTROLLER.get_project_area_layer().clone()
         area_layer.setSubsetString('')
         feats = area_layer.getFeatures()
         for feat in feats:
@@ -200,7 +200,7 @@ class QCityDockWidget(QgsDockWidget):
 
         self.enable_widgets()
 
-        ProjectUtils.create_layer_relations(self.project)
+        PROJECT_CONTROLLER.create_layer_relations()
 
         self.iface.messageBar().pushMessage(
             self.tr("Success"),

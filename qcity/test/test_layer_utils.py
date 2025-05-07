@@ -8,7 +8,7 @@ from qgis.core import (
     QgsVectorLayerUtils
 )
 
-from qcity.core.project import ProjectUtils
+from qcity.core.project import PROJECT_CONTROLLER
 
 from qcity.core.database import DatabaseUtils
 from qcity.core import LayerType
@@ -30,10 +30,10 @@ class TestLayerUtils(unittest.TestCase):
                 gpkg_path
             )
 
-            p = QgsProject()
-            ProjectUtils.add_database_layers_to_project(p, gpkg_path)
+            p = QgsProject.instance()
+            PROJECT_CONTROLLER.add_database_layers_to_project(p, gpkg_path)
 
-            project_area_layer = ProjectUtils.get_project_area_layer(p)
+            project_area_layer = PROJECT_CONTROLLER.get_project_area_layer()
             # create an initial feature
             f = QgsVectorLayerUtils.createFeature(project_area_layer)
             f['car_parking_1_bedroom'] = 1
@@ -48,7 +48,7 @@ class TestLayerUtils(unittest.TestCase):
             f_id = f.id()
 
             self.assertTrue(
-                LayerUtils.store_value(p, LayerType.ProjectAreas, f_id, 'car_parking_3_bedroom', 33)
+                LayerUtils.store_value(LayerType.ProjectAreas, f_id, 'car_parking_3_bedroom', 33)
             )
 
             f_3 = project_area_layer.getFeature(f_id)

@@ -3,9 +3,8 @@ import csv
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 from qgis.PyQt.QtWidgets import QLabel
 from qgis.PyQt.QtCore import QObject
-from qgis.core import QgsVectorLayer, QgsFeatureRequest, QgsProject
-from qcity.core import SETTINGS_MANAGER
-from qcity.core.project import ProjectUtils
+from qgis.core import QgsVectorLayer, QgsFeatureRequest
+from qcity.core import SETTINGS_MANAGER, PROJECT_CONTROLLER
 
 
 class WidgetUtilsStatistics(QObject):
@@ -111,7 +110,7 @@ class WidgetUtilsStatistics(QObject):
         return feats
 
     def populate_export_combo_box(self) -> None:
-        area_layer = ProjectUtils.get_project_area_layer(QgsProject.instance())
+        area_layer = PROJECT_CONTROLLER.get_project_area_layer()
         old_subset_string = area_layer.subsetString()
         area_layer.setSubsetString("")
         names = {

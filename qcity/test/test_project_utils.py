@@ -2,19 +2,13 @@ import unittest
 import os
 import tempfile
 
-from qgis.PyQt.QtCore import QVariant
-
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
-    QgsCoordinateReferenceSystem,
 )
-from sphinx.project import Project
 
-from qcity.core.project import ProjectUtils
-from qcity.core.settings import SETTINGS_MANAGER
+from qcity.core.project import ProjectController
 
-from qcity.test.utilities import get_qgis_app
 from qcity.core.database import DatabaseUtils
 from qcity.core import LayerType
 
@@ -35,38 +29,40 @@ class TestProjectUtils(unittest.TestCase):
             )
 
             p = QgsProject()
-            self.assertIsNone(ProjectUtils.get_project_area_layer(p))
-            self.assertIsNone(ProjectUtils.get_development_sites_layer(p))
-            self.assertIsNone(ProjectUtils.get_building_levels_layer(p))
-            self.assertIsNone(ProjectUtils.get_layer(p, LayerType.ProjectAreas))
-            self.assertIsNone(ProjectUtils.get_layer(p, LayerType.BuildingLevels))
-            self.assertIsNone(ProjectUtils.get_layer(p, LayerType.DevelopmentSites))
+            controller = ProjectController(p)
+            self.assertIsNone(controller.get_project_area_layer())
+            self.assertIsNone(controller.get_development_sites_layer())
+            self.assertIsNone(controller.get_building_levels_layer())
+            self.assertIsNone(controller.get_layer(LayerType.ProjectAreas))
+            self.assertIsNone(controller.get_layer(LayerType.BuildingLevels))
+            self.assertIsNone(controller.get_layer(LayerType.DevelopmentSites))
 
-            ProjectUtils.add_database_layers_to_project(p, gpkg_path)
+            controller.add_database_layers_to_project(p, gpkg_path)
             self.assertEqual(len(p.mapLayers()), 3)
 
-            project_area_layer = ProjectUtils.get_project_area_layer(p)
+            project_area_layer = controller.get_project_area_layer()
             self.assertIsInstance(project_area_layer, QgsVectorLayer)
             self.assertTrue(project_area_layer.isValid())
             self.assertGreaterEqual(project_area_layer.fields().lookupField('dwelling_size_4_bedroom'), 0)
-            self.assertEqual(ProjectUtils.get_layer(p, LayerType.ProjectAreas), project_area_layer)
+            self.assertEqual(controller.get_layer( LayerType.ProjectAreas), project_area_layer)
 
-            development_sites_layer = ProjectUtils.get_development_sites_layer(p)
+            development_sites_layer = controller.get_development_sites_layer()
             self.assertIsInstance(development_sites_layer, QgsVectorLayer)
             self.assertGreaterEqual(development_sites_layer.fields().lookupField('site_owner'), 0)
-            self.assertEqual(ProjectUtils.get_layer(p, LayerType.DevelopmentSites), development_sites_layer)
+            self.assertEqual(controller.get_layer(LayerType.DevelopmentSites), development_sites_layer)
 
-            building_areas_layer = ProjectUtils.get_building_levels_layer(p)
+            building_areas_layer = controller.get_building_levels_layer()
             self.assertIsInstance(building_areas_layer, QgsVectorLayer)
             self.assertGreaterEqual(building_areas_layer.fields().lookupField('count_1_bedroom_dwellings'), 0)
-            self.assertEqual(ProjectUtils.get_layer(p, LayerType.BuildingLevels), building_areas_layer)
+            self.assertEqual(controller.get_layer(LayerType.BuildingLevels), building_areas_layer)
 
     def test_layer_relations(self):
         """
         Test creating layer relations
         """
         p = QgsProject()
-        ProjectUtils.create_layer_relations(p)
+        controller = ProjectController(p)
+        controller.create_layer_relations()
         self.assertEqual(len(p.relationManager().relations()), 0)
         with tempfile.TemporaryDirectory() as temp_dir:
             gpkg_path = os.path.join(temp_dir, "test_database.gpkg")
@@ -75,25 +71,27 @@ class TestProjectUtils(unittest.TestCase):
                 gpkg_path
             )
 
-            ProjectUtils.add_database_layers_to_project(p, gpkg_path)
-            ProjectUtils.create_layer_relations(p)
+            controller.add_database_layers_to_project(p, gpkg_path)
+            controller.create_layer_relations()
             self.assertEqual(len(p.relationManager().relations()), 2)
 
-            area_to_site = [p.relationManager().relation(r) for r in p.relationManager().relations() if p.relationManager().relation(r).referencedLayer() == ProjectUtils.get_project_area_layer(p)][0]
-            self.assertEqual(area_to_site.referencingLayer(), ProjectUtils.get_development_sites_layer(p))
-            site_to_level = [p.relationManager().relation(r) for r in p.relationManager().relations() if p.relationManager().relation(r).referencedLayer() == ProjectUtils.get_development_sites_layer(p)][0]
-            self.assertEqual(site_to_level.referencingLayer(), ProjectUtils.get_building_levels_layer(p))
+            area_to_site = [p.relationManager().relation(r) for r in p.relationManager().relations() if p.relationManager().relation(r).referencedLayer() == controller.get_project_area_layer()][0]
+            self.assertEqual(area_to_site.referencingLayer(), controller.get_development_sites_layer())
+            site_to_level = [p.relationManager().relation(r) for r in p.relationManager().relations() if p.relationManager().relation(r).referencedLayer() == controller.get_development_sites_layer()][0]
+            self.assertEqual(site_to_level.referencingLayer(), controller.get_building_levels_layer())
 
     def test_project_database_path(self):
         """
         Test associated database path
         """
         p = QgsProject()
-        self.assertFalse(ProjectUtils.associated_database_path(p))
+        controller = ProjectController(p)
+        self.assertFalse(controller.associated_database_path())
 
-        ProjectUtils.set_associated_database_path(p, 'xxx')
-        self.assertEqual(ProjectUtils.associated_database_path(p), 'xxx')
+        controller.set_associated_database_path('xxx')
+        self.assertEqual(controller.associated_database_path(), 'xxx')
 
         p2 = QgsProject()
-        self.assertEqual(ProjectUtils.associated_database_path(p), 'xxx')
-        self.assertFalse(ProjectUtils.associated_database_path(p2))
+        controller2 = ProjectController(p2)
+        self.assertEqual(controller.associated_database_path(), 'xxx')
+        self.assertFalse(controller2.associated_database_path())

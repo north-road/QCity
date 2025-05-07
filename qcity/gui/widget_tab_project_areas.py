@@ -14,8 +14,7 @@ from qgis.core import (
 )
 from qgis.gui import QgsNewNameDialog
 
-from qcity.core import SETTINGS_MANAGER, LayerType
-from qcity.core.project import ProjectUtils
+from qcity.core import SETTINGS_MANAGER, LayerType, PROJECT_CONTROLLER
 from .page_controller import PageController
 
 
@@ -98,8 +97,8 @@ class ProjectAreasPageController(PageController):
 
         super().set_feature(feature)
 
-        site_layer = ProjectUtils.get_development_sites_layer(QgsProject.instance())
-        level_layer = ProjectUtils.get_building_levels_layer(QgsProject.instance())
+        site_layer = PROJECT_CONTROLLER.get_development_sites_layer()
+        level_layer = PROJECT_CONTROLLER.get_building_levels_layer()
 
         self.og_widget.listWidget_development_sites.clear()
 
@@ -107,7 +106,7 @@ class ProjectAreasPageController(PageController):
         for feat in site_layer.getFeatures():
             item = QListWidgetItem(self.og_widget.listWidget_development_sites)
             item.setText(feat["name"])
-            item.setData(Qt.UserrRole, feat.id())
+            item.setData(Qt.UserRole, feat.id())
             self.og_widget.listWidget_development_sites.addItem(item)
 
         area_layer.setSubsetString(f"\"fid\" = '{feature.id()}'")
@@ -165,7 +164,7 @@ class ProjectAreasPageController(PageController):
 
         layer = QgsVectorLayer(file_path, "Loaded Layer", "ogr")
 
-        area_layer = ProjectUtils.get_project_area_layer(QgsProject.instance())
+        area_layer = PROJECT_CONTROLLER.get_project_area_layer()
 
         for feature in layer.getFeatures():
             items = []

@@ -9,8 +9,7 @@ from qgis.PyQt.QtWidgets import (
 from qgis.core import QgsVectorLayer, QgsProject
 from qgis.gui import QgsNewNameDialog
 
-from qcity.core import SETTINGS_MANAGER, LayerType
-from qcity.core.project import ProjectUtils
+from qcity.core import SETTINGS_MANAGER, LayerType, PROJECT_CONTROLLER
 from .page_controller import PageController
 
 
@@ -45,7 +44,7 @@ class BuildingLevelsPageController(PageController):
         self, item: QListWidgetItem
     ) -> None:
         """Updates the listwidget of the building levels to show only building levels within the active project level."""
-        level_layer = ProjectUtils.get_building_levels_layer(QgsProject.instance())
+        level_layer = PROJECT_CONTROLLER.get_building_levels_layer()
 
         level_layer.setSubsetString("")
 

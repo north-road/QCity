@@ -3,5 +3,5 @@ from .settings import SettingsManager as SettingsManager
 from .settings import SETTINGS_MANAGER as SETTINGS_MANAGER
 from .utils import Utils as Utils
 from .layer import LayerUtils
-from .project import ProjectUtils
+from .project import PROJECT_CONTROLLER
 from .database import DatabaseUtils

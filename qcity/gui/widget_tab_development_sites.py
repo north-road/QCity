@@ -8,11 +8,10 @@ from qgis.PyQt.QtWidgets import (
     QSpinBox,
     QDoubleSpinBox,
 )
-from qgis.core import QgsVectorLayer, QgsProject, QgsMapLayerType
+from qgis.core import QgsVectorLayer, QgsMapLayerType
 from qgis.gui import QgsNewNameDialog
 
-from qcity.core import SETTINGS_MANAGER, LayerType
-from qcity.core.project import ProjectUtils
+from qcity.core import SETTINGS_MANAGER, LayerType, PROJECT_CONTROLLER
 from .page_controller import PageController
 
 class DevelopmentSitesPageController(PageController):
@@ -109,7 +108,7 @@ class DevelopmentSitesPageController(PageController):
         self, item: QListWidgetItem
     ) -> None:
         """Sets the SubsetString for the development site layer"""
-        site_layer = ProjectUtils.get_development_sites_layer(QgsProject.instance())
+        site_layer = PROJECT_CONTROLLER.get_development_sites_layer()
         site_layer.setSubsetString(f"\"name\" = '{item.text()}'")
 
     def remove_selected_sites(self) -> None:
@@ -161,8 +160,8 @@ class DevelopmentSitesPageController(PageController):
         if not item:
             return
 
-        level_layer = ProjectUtils.get_building_levels_layer(QgsProject.instance())
-        site_layer = ProjectUtils.get_development_sites_layer(QgsProject.instance())
+        level_layer = PROJECT_CONTROLLER.get_building_levels_layer()
+        site_layer = PROJECT_CONTROLLER.get_development_sites_layer()
 
         self.og_widget.listWidget_building_levels.clear()
         site_layer.setSubsetString("")

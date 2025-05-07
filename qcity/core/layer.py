@@ -3,7 +3,7 @@ from qgis.core import (
     QgsProject
 )
 from .enums import LayerType
-from .project import ProjectUtils
+from .project import PROJECT_CONTROLLER
 
 
 class LayerUtils:
@@ -13,7 +13,6 @@ class LayerUtils:
 
     @staticmethod
     def store_value(
-            project: QgsProject,
             layer_type: LayerType,
             feature_id: int,
             field_name: str,
@@ -22,7 +21,7 @@ class LayerUtils:
         """
         Stores a value in a QCity database layer
         """
-        layer = ProjectUtils.get_layer(project, layer_type)
+        layer = PROJECT_CONTROLLER.get_layer(layer_type)
         if not layer:
             return False
 
