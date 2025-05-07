@@ -79,9 +79,9 @@ class QCityDockWidget(QgsDockWidget):
         )
 
         # Initialize tabs
-        ProjectAreasPageController(self, self.tab_project_areas)
-        DevelopmentSitesPageController(self, None)
-        BuildingLevelsPageController(self, self.tab_development_sites)
+        ProjectAreasPageController(self, self.tab_project_areas, self.listWidget_project_areas, self.label_current_project_area)
+        DevelopmentSitesPageController(self, None, self.listWidget_development_sites)
+        BuildingLevelsPageController(self, self.tab_development_sites, self.listWidget_building_levels)
         WidgetUtilsStatistics(self)
 
         # set associated database when plugin is started
@@ -173,7 +173,10 @@ class QCityDockWidget(QgsDockWidget):
         area_layer.setSubsetString('')
         feats = area_layer.getFeatures()
         for feat in feats:
-            self.listWidget_project_areas.addItem(feat["name"])
+            item = QListWidgetItem(self.listWidget_project_areas)
+            item.setText(feat["name"])
+            item.setData(Qt.UserRole, feat.id())
+            self.listWidget_project_areas.addItem(item)
 
         # Click on first project area item to initialize all other listwidgets
         for widget in [

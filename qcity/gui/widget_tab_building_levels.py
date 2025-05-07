@@ -18,8 +18,8 @@ class BuildingLevelsPageController(PageController):
     """
     Page controller for the building levels page
     """
-    def __init__(self, og_widget: 'QCityDockWidget', tab_widget):
-        super().__init__(LayerType.BuildingLevels, og_widget, tab_widget)
+    def __init__(self, og_widget: 'QCityDockWidget', tab_widget, list_widget):
+        super().__init__(LayerType.BuildingLevels, og_widget, tab_widget, list_widget)
 
         self.og_widget.toolButton_building_level_add.clicked.connect(
             lambda: self.og_widget.action_maptool_emit(

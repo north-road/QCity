@@ -3,15 +3,13 @@ from qgis.PyQt.QtWidgets import (
     QDoubleSpinBox,
     QListWidgetItem,
     QDialog,
-    QFileDialog,
-    QWidget
+    QFileDialog
 )
-from qgis.PyQt.QtCore import QObject, Qt
+from qgis.PyQt.QtCore import Qt
 from qgis.core import (
     QgsFeature,
     QgsVectorLayer,
     QgsProject,
-    QgsCoordinateTransform,
     QgsReferencedRectangle
 )
 from qgis.gui import QgsNewNameDialog
@@ -25,8 +23,8 @@ class ProjectAreasPageController(PageController):
     """
     Page controller for the project areas page
     """
-    def __init__(self, og_widget, tab_widget):
-        super().__init__(LayerType.ProjectAreas, og_widget, tab_widget)
+    def __init__(self, og_widget, tab_widget, list_widget, current_label):
+        super().__init__(LayerType.ProjectAreas, og_widget, tab_widget, list_widget, current_label)
         self.skip_fields_for_widgets = ("fid", "name")
 
         self.og_widget.toolButton_project_area_add.clicked.connect(
@@ -43,40 +41,22 @@ class ProjectAreasPageController(PageController):
             self.update_area_name_gpkg
         )
 
-        self.og_widget.listWidget_project_areas.itemClicked.connect(
-            lambda item: SETTINGS_MANAGER.set_current_project_area_feature_name(
-                item.text()
-            )
-        )
-
-        self.og_widget.listWidget_project_areas.itemClicked.connect(
-            lambda item: self.zoom_to_project_area(item)
-        )
-
         self.og_widget.pushButton_import_project_areas.clicked.connect(
             self.import_project_area_geometries
         )
 
-        self.og_widget.listWidget_project_areas.currentItemChanged.connect(
-            lambda item: self.update_project_area_parameters(item)
-        )
-
-        self.og_widget.listWidget_project_areas.itemClicked.connect(
-            lambda item: self.update_development_site_listwidget(item)
-        )
-
     def remove_selected_areas(self) -> None:
         """Removes selected area from QListwidget, map and geopackage."""
-        tbr_areas = self.og_widget.listWidget_project_areas.selectedItems()
+        tbr_areas = self.list_widget.selectedItems()
 
         if tbr_areas:
             rows = {
-                self.og_widget.listWidget_project_areas.row(item): item.text()
+                self.list_widget.row(item): item.text()
                 for item in tbr_areas
             }
 
             for key, table_name in rows.items():
-                self.og_widget.listWidget_project_areas.takeItem(key)
+                self.list_widget.takeItem(key)
 
                 layers = self.og_widget.project.mapLayersByName(table_name)
                 if layers:
@@ -103,47 +83,54 @@ class ProjectAreasPageController(PageController):
 
             self.og_widget.label_current_project_area.setText("Project Area")
 
-            if self.og_widget.listWidget_project_areas.count() < 1:
-                SETTINGS_MANAGER.set_current_project_area_feature_name(None)
+            if self.list_widget.count() < 1:
+                self.current_feature_id = None
                 for widget in self.og_widget.findChildren((QSpinBox, QDoubleSpinBox)):
                     widget.setValue(0)
                 self.og_widget.groupbox_car_parking.setEnabled(False)
                 self.og_widget.groupbox_bike_parking.setEnabled(False)
                 self.og_widget.groupbox_dwellings.setEnabled(False)
 
-    def update_development_site_listwidget(self, item: QListWidgetItem) -> None:
-        """Updates the development site listwidget to only contain sites within the current project area"""
-        area_layer = ProjectUtils.get_project_area_layer(QgsProject.instance())
+    def set_feature(self, feature: QgsFeature):
+        """
+        Updates the development site listwidget to only contain sites within the current project area
+        """
+        area_layer = self.get_layer()
+        area_layer.setSubsetString("")
+
+        super().set_feature(feature)
+
         site_layer = ProjectUtils.get_development_sites_layer(QgsProject.instance())
         level_layer = ProjectUtils.get_building_levels_layer(QgsProject.instance())
 
         self.og_widget.listWidget_development_sites.clear()
-        area_layer.setSubsetString("")
-        site_layer.setSubsetString("")
 
-        names = list()
-        pk = SETTINGS_MANAGER.get_pk(SETTINGS_MANAGER.development_site_prefix)
+        site_layer.setSubsetString(f'project_area_pk = {feature.id()}')
         for feat in site_layer.getFeatures():
-            if feat.id() == pk:
-                name = feat["name"]
-                self.og_widget.listWidget_development_sites.addItem(name)
-                names.append(name)
+            item = QListWidgetItem(self.og_widget.listWidget_development_sites)
+            item.setText(feat["name"])
+            item.setData(Qt.UserrRole, feat.id())
+            self.og_widget.listWidget_development_sites.addItem(item)
 
-        area_layer.setSubsetString(f"\"name\" = '{item.text()}'")
-        name_filter = ", ".join(f"'{name}'" for name in names)
-        site_layer.setSubsetString(f"name IN ({name_filter})")
-        level_layer.setSubsetString("FALSE")
+        area_layer.setSubsetString(f"\"fid\" = '{feature.id()}'")
+
+#        level_layer.setSubsetString("FALSE")
+
+        feature_bbox = QgsReferencedRectangle(feature.geometry().boundingBox(), area_layer.crs())
+
+        self.og_widget.iface.mapCanvas().setReferencedExtent(feature_bbox)
+        self.og_widget.iface.mapCanvas().refresh()
 
     def update_area_name_gpkg(self) -> None:
         """
         Updates the name of the table in the geopackage.
         """
-        widget = self.og_widget.listWidget_project_areas.selectedItems()[0]
+        widget = self.list_widget.selectedItems()[0]
         old_feat_name = widget.text()
 
         existing_names = [
-            self.og_widget.listWidget_project_areas.item(i).text()
-            for i in range(self.og_widget.listWidget_project_areas.count())
+            self.list_widget.item(i).text()
+            for i in range(self.list_widget.count())
         ]
 
         dialog = QgsNewNameDialog(
@@ -162,9 +149,8 @@ class ProjectAreasPageController(PageController):
 
         new_feat_name = dialog.name()
 
-        old_item_id = self.og_widget.listWidget_project_areas.row(widget)
-        self.og_widget.listWidget_project_areas.takeItem(old_item_id)
-        self.og_widget.listWidget_project_areas.addItem(new_feat_name)
+        old_item_id = self.list_widget.row(widget)
+        self.list_widget.addItem(new_feat_name)
 
         layer = QgsVectorLayer(
             f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.project_area_prefix}",
@@ -180,42 +166,12 @@ class ProjectAreasPageController(PageController):
             layer.commitChanges()
 
         # Set selection to changed item
-        item_to_select = self.og_widget.listWidget_project_areas.findItems(
+        item_to_select = self.list_widget.findItems(
             new_feat_name, Qt.MatchExactly
         )[0]
-        self.og_widget.listWidget_project_areas.setCurrentItem(item_to_select)
-        SETTINGS_MANAGER.set_current_project_area_feature_name(item_to_select.text())
+        self.list_widget.setCurrentItem(item_to_select)
 
         self.og_widget.label_current_project_area.setText(new_feat_name)
-
-    def zoom_to_project_area(self, item: QListWidgetItem) -> None:
-        """Sets the canvas extent to the clicked project area"""
-        area_layer = ProjectUtils.get_project_area_layer(QgsProject.instance())
-        area_layer.setSubsetString("")
-
-        feature = self.og_widget.get_feature_of_layer_by_name(area_layer, item)
-        feature_bbox = QgsReferencedRectangle(feature.geometry().boundingBox(), area_layer.crs())
-
-        self.og_widget.iface.mapCanvas().setReferencedExtent(feature_bbox)
-        self.og_widget.iface.mapCanvas().refresh()
-
-    def update_project_area_parameters(self, item: QListWidgetItem) -> None:
-        """
-        Updates the parameter-spin-boxes of the project area to the currently selected one.
-        """
-        if item:
-            feature_name = item.text()
-
-            SETTINGS_MANAGER.set_current_project_area_feature_name(feature_name)
-
-            gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.project_area_prefix}"
-
-            layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
-
-            feature = self.og_widget.get_feature_of_layer_by_name(layer, item)
-            self.set_feature(feature)
-
-            self.og_widget.label_current_project_area.setText(feature_name)
 
     def import_project_area_geometries(self):
         """Imports geometries as project areas from a file."""
@@ -232,8 +188,8 @@ class ProjectAreasPageController(PageController):
 
         for feature in layer.getFeatures():
             items = []
-            for index in range(self.og_widget.listWidget_project_areas.count()):
-                item = self.og_widget.listWidget_project_areas.item(index)
+            for index in range(self.list_widget.count()):
+                item = self.list_widget.item(index)
                 items.append(item.text())
 
             feature_name = str(feature.id())
@@ -263,13 +219,13 @@ class ProjectAreasPageController(PageController):
             area_layer.addFeature(new_feature)
             area_layer.commitChanges()
 
-            self.og_widget.listWidget_project_areas.addItem(feature_name)
+            self.list_widget.addItem(feature_name)
 
-        item = self.og_widget.listWidget_project_areas.findItems(
+        item = self.list_widget.findItems(
             feature_name, Qt.MatchExactly
         )[0]
-        row = self.og_widget.listWidget_project_areas.row(item)
-        self.og_widget.listWidget_project_areas.setCurrentRow(row)
+        row = self.list_widget.row(item)
+        self.list_widget.setCurrentRow(row)
 
-        if not self.og_widget.listWidget_project_areas.isEnabled():
-            self.og_widget.listWidget_project_areas.setEnabled(True)
+        if not self.list_widget.isEnabled():
+            self.list_widget.setEnabled(True)

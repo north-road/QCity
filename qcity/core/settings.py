@@ -27,10 +27,7 @@ class SettingsManager(QObject):
 
     database_path_changed = pyqtSignal(str)
     add_feature_clicked = pyqtSignal(bool)
-    current_project_area_parameter_name_changed = pyqtSignal(str)
     database_path_with_project_name_saved = pyqtSignal(dict)
-    current_development_site_parameter_name_changed = pyqtSignal(str)
-    current_building_level_parameter_name_changed = pyqtSignal(str)
 
     plugin_path = os.path.dirname(os.path.realpath(__file__))
     project_area_prefix = "project_areas"
@@ -42,7 +39,6 @@ class SettingsManager(QObject):
         super().__init__(parent)
         self._current_building_level_parameter_table_name: Optional[str] = None
         self._current_development_site_parameter_feature_name: Optional[str] = None
-        self._current_project_area_parameter_feature_name: Optional[str] = None
         self._database_path = None
 
         self.plugin_path = os.path.dirname(os.path.realpath(__file__))
@@ -133,26 +129,17 @@ class SettingsManager(QObject):
             else:
                 layer.rollBack()
 
-    def set_current_project_area_feature_name(self, name: str) -> None:
-        """
-        Sets the current project area parameter table name.
-        """
-        self._current_project_area_parameter_feature_name = name
-        self.current_project_area_parameter_name_changed.emit(name)
-
     def set_current_development_site_feature_name(self, name: str) -> None:
         """
         Sets the current project area parameter table name.
         """
         self._current_development_site_parameter_feature_name = name
-        self.current_development_site_parameter_name_changed.emit(name)
 
     def set_current_building_level_feature_name(self, name: str) -> None:
         """
         Sets the current project area parameter table name.
         """
         self._current_building_level_parameter_table_name = name
-        self.current_building_level_parameter_name_changed.emit(name)
 
     def get_attributes_from_json(self, kind: str) -> dict:
         """Gets the attributes of the default values from the json files"""
