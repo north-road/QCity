@@ -27,7 +27,6 @@ class SettingsManager(QObject):
 
     database_path_changed = pyqtSignal(str)
     add_feature_clicked = pyqtSignal(bool)
-    spinbox_changed = pyqtSignal(tuple)
     current_project_area_parameter_name_changed = pyqtSignal(str)
     database_path_with_project_name_saved = pyqtSignal(dict)
     current_development_site_parameter_name_changed = pyqtSignal(str)
@@ -133,8 +132,6 @@ class SettingsManager(QObject):
                 layer.commitChanges()
             else:
                 layer.rollBack()
-
-        self.spinbox_changed.emit((widget.objectName(), value))
 
     def set_current_project_area_feature_name(self, name: str) -> None:
         """
