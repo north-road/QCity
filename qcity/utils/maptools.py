@@ -218,8 +218,6 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         layer.dataProvider().addFeature(feature)
         layer.commitChanges()
 
-        #layer.setSubsetString(f"name='{feature_name}'")
-
         if not list_widget.isEnabled():
             list_widget.setEnabled(True)
 

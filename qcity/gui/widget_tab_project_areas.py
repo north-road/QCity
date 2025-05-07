@@ -36,7 +36,7 @@ class ProjectAreasPageController(PageController):
         )
 
         self.og_widget.toolButton_project_area_rename.clicked.connect(
-            self.update_area_name_gpkg
+            self.rename_area
         )
 
         self.og_widget.pushButton_import_project_areas.clicked.connect(
@@ -119,12 +119,12 @@ class ProjectAreasPageController(PageController):
         self.og_widget.iface.mapCanvas().setReferencedExtent(feature_bbox)
         self.og_widget.iface.mapCanvas().refresh()
 
-    def update_area_name_gpkg(self) -> None:
+    def rename_area(self) -> None:
         """
-        Updates the name of the table in the geopackage.
+        Renames the selected area
         """
-        widget = self.list_widget.selectedItems()[0]
-        old_feat_name = widget.text()
+        selected_item = self.list_widget.selectedItems()[0]
+        feature_id = selected_item.data(Qt.UserRole)
 
         existing_names = [
             self.list_widget.item(i).text()
@@ -138,38 +138,21 @@ class ProjectAreasPageController(PageController):
             parent=self.og_widget.iface.mainWindow(),
         )
 
-        dialog.setWindowTitle(self.tr("Rename"))
+        dialog.setWindowTitle(self.tr("Rename Project Area"))
         dialog.setAllowEmptyName(False)
-        dialog.setHintString(self.tr("Enter a name for the project area"))
+        dialog.setHintString(self.tr("Enter a new name for the project area"))
 
         if dialog.exec_() != QDialog.DialogCode.Accepted:
             return
 
         new_feat_name = dialog.name()
+        selected_item.setText(new_feat_name)
+        self.current_item_label.setText(new_feat_name)
 
-        old_item_id = self.list_widget.row(widget)
-        self.list_widget.addItem(new_feat_name)
-
-        layer = QgsVectorLayer(
-            f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.project_area_prefix}",
-            SETTINGS_MANAGER.project_area_prefix,
-            "ogr",
-        )
-        if layer:
-            layer.startEditing()
-            for feature in layer.getFeatures():
-                if feature["name"] == old_feat_name:
-                    feature["name"] = new_feat_name
-                    layer.updateFeature(feature)
-            layer.commitChanges()
-
-        # Set selection to changed item
-        item_to_select = self.list_widget.findItems(
-            new_feat_name, Qt.MatchExactly
-        )[0]
-        self.list_widget.setCurrentItem(item_to_select)
-
-        self.og_widget.label_current_project_area.setText(new_feat_name)
+        layer = self.get_layer()
+        layer.startEditing()
+        layer.changeAttributeValue(feature_id, layer.fields().lookupField("name"), new_feat_name)
+        layer.commitChanges()
 
     def import_project_area_geometries(self):
         """Imports geometries as project areas from a file."""
