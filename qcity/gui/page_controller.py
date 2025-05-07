@@ -16,6 +16,7 @@ class PageController(QObject):
         self.og_widget: 'QCityDockWidget' = og_widget
         self.tab_widget: QWidget = tab_widget
         self.skip_fields_for_widgets = []
+        self._block_feature_updates = False
 
         if self.tab_widget:
             for spin_box in self.tab_widget.findChildren(
@@ -27,6 +28,9 @@ class PageController(QObject):
         """
         Triggered when a widget value is changed by the user
         """
+        if self._block_feature_updates:
+            return
+
         widget = self.sender()
         SETTINGS_MANAGER.save_widget_value_to_layer(
             widget, value, SETTINGS_MANAGER.project_area_prefix
@@ -36,8 +40,10 @@ class PageController(QObject):
         """
         Sets the current feature to show in the page
         """
+        self._block_feature_updates = True
         attributes = feature.attributeMap()
         self.set_widget_values(attributes)
+        self._block_feature_updates = False
 
     def set_widget_values(self, widget_values: dict):
         """
