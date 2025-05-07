@@ -1,9 +1,9 @@
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QWidget, QSpinBox, QDoubleSpinBox
 
-from qgis.core import QgsFeature, NULL
+from qgis.core import QgsFeature, NULL, QgsProject
 
-from ..core.settings import SETTINGS_MANAGER
+from ..core import LayerUtils, SETTINGS_MANAGER, LayerType
 
 
 class PageController(QObject):
@@ -11,8 +11,9 @@ class PageController(QObject):
     Base QObject class for dock page controllers
     """
 
-    def __init__(self, og_widget: 'QCityDockWidget', tab_widget: QWidget):
+    def __init__(self, layer_type: LayerType, og_widget: 'QCityDockWidget', tab_widget: QWidget):
         super().__init__(og_widget)
+        self.layer_type = layer_type
         self.og_widget: 'QCityDockWidget' = og_widget
         self.tab_widget: QWidget = tab_widget
         self.skip_fields_for_widgets = []

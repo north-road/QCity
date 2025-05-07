@@ -16,7 +16,7 @@ from qgis.core import (
 )
 from qgis.gui import QgsNewNameDialog
 
-from qcity.core import SETTINGS_MANAGER
+from qcity.core import SETTINGS_MANAGER, LayerType
 from qcity.core.project import ProjectUtils
 from .page_controller import PageController
 
@@ -26,7 +26,7 @@ class ProjectAreasPageController(PageController):
     Page controller for the project areas page
     """
     def __init__(self, og_widget, tab_widget):
-        super().__init__(og_widget, tab_widget)
+        super().__init__(LayerType.ProjectAreas, og_widget, tab_widget)
         self.skip_fields_for_widgets = ("fid", "name")
 
         self.og_widget.toolButton_project_area_add.clicked.connect(
