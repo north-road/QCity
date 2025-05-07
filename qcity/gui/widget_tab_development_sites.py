@@ -103,13 +103,13 @@ class DevelopmentSitesPageController(PageController):
 
     def set_feature(self, feature: QgsFeature):
         site_layer = self.get_layer()
-        site_layer.setSubsetString("")
 
         super().set_feature(feature)
 
         # PROJECT_CONTROLLER.set_current_project_area(feature.id())
 
-        site_layer.setSubsetString(f"\"fid\" = '{feature.id()}'")
+        # TODO hide others from renderer only!
+        # site_layer.setSubsetString(f"\"fid\" = '{feature.id()}'")
 
         feature_bbox = QgsReferencedRectangle(feature.geometry().boundingBox(), site_layer.crs())
 
