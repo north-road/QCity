@@ -11,7 +11,7 @@ from qgis.PyQt.QtWidgets import (
     QListWidgetItem,
 )
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import QCoreApplication, Qt, QVariant
+from qgis.PyQt.QtCore import QCoreApplication, Qt, pyqtSignal
 from qgis.PyQt.QtGui import QColor
 from qgis.core import (
     QgsVectorFileWriter,
@@ -35,15 +35,15 @@ from ..gui.gui_utils import GuiUtils
 from qcity.gui.widget_tab_development_sites import DevelopmentSitesPageController
 
 from qcity.gui.widget_tab_project_areas import ProjectAreasPageController
-from ..utils.utils import get_qgis_type
-from ..core.database import DatabaseUtils
-from ..core.project import ProjectUtils
+from ..core import DatabaseUtils, ProjectUtils, LayerType
 
 
 class QCityDockWidget(QgsDockWidget):
     """
     Main dock widget.
     """
+
+    add_feature_clicked = pyqtSignal(LayerType, int)
 
     def __init__(self, project, iface) -> None:
         super(QCityDockWidget, self).__init__()
@@ -79,9 +79,14 @@ class QCityDockWidget(QgsDockWidget):
         )
 
         # Initialize tabs
-        ProjectAreasPageController(self, self.tab_project_areas, self.listWidget_project_areas, self.label_current_project_area)
-        DevelopmentSitesPageController(self, None, self.listWidget_development_sites)
-        BuildingLevelsPageController(self, self.tab_development_sites, self.listWidget_building_levels)
+        self.project_area_controller = ProjectAreasPageController(self, self.tab_project_areas, self.listWidget_project_areas, self.label_current_project_area)
+        self.project_area_controller.add_feature_clicked.connect(self.on_add_feature_clicked)
+        self.development_site_controller = DevelopmentSitesPageController(self, None, self.listWidget_development_sites)
+        self.development_site_controller.add_feature_clicked.connect(self.on_add_feature_clicked)
+
+        self.building_levels_controller = BuildingLevelsPageController(self, self.tab_development_sites, self.listWidget_building_levels)
+        self.building_levels_controller.add_feature_clicked.connect(self.on_add_feature_clicked)
+
         WidgetUtilsStatistics(self)
 
         # set associated database when plugin is started
@@ -274,7 +279,16 @@ class QCityDockWidget(QgsDockWidget):
 
         return next(iterator)
 
-    def action_maptool_emit(self, kind: str) -> None:
-        """Emitted when plus button is clicked."""
-        SETTINGS_MANAGER.current_digitisation_type = kind
-        SETTINGS_MANAGER.add_feature_clicked.emit(True)
+    def on_add_feature_clicked(self):
+        """
+        Triggered when add feature is clicked in a page
+        """
+        controller = self.sender()
+        layer_type = controller.layer_type
+        if layer_type == LayerType.ProjectAreas:
+            parent_pk = None
+        elif layer_type == LayerType.DevelopmentSites:
+            parent_pk = self.project_area_controller.current_feature_id
+        elif layer_type == LayerType.BuildingLevels:
+            parent_pk = self.development_site_controller.current_feature_id
+        self.add_feature_clicked.emit(layer_type, parent_pk)

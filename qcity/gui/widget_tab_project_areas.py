@@ -28,9 +28,7 @@ class ProjectAreasPageController(PageController):
         self.skip_fields_for_widgets = ("fid", "name")
 
         self.og_widget.toolButton_project_area_add.clicked.connect(
-            lambda: self.og_widget.action_maptool_emit(
-                SETTINGS_MANAGER.project_area_prefix
-            )
+            self.add_feature_clicked
         )
 
         self.og_widget.toolButton_project_area_remove.clicked.connect(

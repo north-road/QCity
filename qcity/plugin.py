@@ -12,7 +12,7 @@ from .gui.qcity_dock import (
 
 
 class QCityPlugin:
-    
+
     def __init__(self, iface):
         self.dlg_config = None
         self.iface = iface
@@ -51,7 +51,7 @@ class QCityPlugin:
         self.handler = MapToolHandler(self.map_tool, self.action_maptool)
         self.iface.registerMapToolHandler(self.handler)
 
-        SETTINGS_MANAGER.add_feature_clicked.connect(self.action_maptool.triggered)
+        self.widget.add_feature_clicked.connect(self.map_tool.add_feature)
 
         self.widget.show()
 

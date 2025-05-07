@@ -26,14 +26,12 @@ class SettingsManager(QObject):
     SETTINGS_KEY = "qcity"
 
     database_path_changed = pyqtSignal(str)
-    add_feature_clicked = pyqtSignal(bool)
     database_path_with_project_name_saved = pyqtSignal(dict)
 
     plugin_path = os.path.dirname(os.path.realpath(__file__))
     project_area_prefix = "project_areas"
     development_site_prefix = "development_sites"
     building_level_prefix = "building_levels"
-    current_digitisation_type: Optional[str] = None
 
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
@@ -173,22 +171,6 @@ class SettingsManager(QObject):
             checkbox.isChecked(),
             section=QgsSettings.Plugins,
         )
-
-    def get_pk(self, kind: str) -> int:
-        """Gets the primary key of the current parent feature."""
-        if kind == self.development_site_prefix:
-            gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={self.project_area_prefix}"
-            name = self._current_project_area_parameter_feature_name
-        elif kind == self.building_level_prefix:
-            name = self._current_development_site_parameter_feature_name
-            gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={self.development_site_prefix}"
-
-        layer = QgsVectorLayer(gpkg_path, "", "ogr")
-
-        request = QgsFeatureRequest().setFilterExpression(f"\"name\" = '{name}'")
-        feat = next(layer.getFeatures(request))
-
-        return feat.id()
 
 
 # Settings manager singleton instance

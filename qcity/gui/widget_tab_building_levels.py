@@ -22,9 +22,7 @@ class BuildingLevelsPageController(PageController):
         super().__init__(LayerType.BuildingLevels, og_widget, tab_widget, list_widget)
 
         self.og_widget.toolButton_building_level_add.clicked.connect(
-            lambda: self.og_widget.action_maptool_emit(
-                SETTINGS_MANAGER.building_level_prefix
-            )
+            self.add_feature_clicked
         )
 
         self.og_widget.toolButton_building_level_remove.clicked.connect(

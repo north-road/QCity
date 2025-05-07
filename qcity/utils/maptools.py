@@ -12,10 +12,11 @@ import os
 from typing import List, Union, Optional
 
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QInputDialog
+from qgis.PyQt.QtWidgets import QInputDialog, QListWidgetItem
 from qgis.PyQt.QtCore import Qt
 
 from qgis.core import (
+    NULL,
     QgsProject,
     QgsGeometry,
     QgsVectorLayer,
@@ -24,6 +25,7 @@ from qgis.core import (
     Qgis,
     QgsFeature,
     QgsWkbTypes,
+    QgsVectorLayerUtils
 )
 
 from qgis.gui import (
@@ -41,9 +43,9 @@ from qgis.gui import (
     QgsSnapIndicator,
 )
 
-from ..core import SETTINGS_MANAGER
+from ..core import SETTINGS_MANAGER, LayerType, ProjectUtils, DatabaseUtils
 from ..gui.qcity_dock import QCityDockWidget
-from ..core.project import ProjectUtils
+
 
 
 class DrawPolygonTool(QgsMapToolDigitizeFeature):
@@ -91,6 +93,13 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             geometryType=QgsWkbTypes.GeometryType.PolygonGeometry,
         )
         self.snap_indicator = QgsSnapIndicator(map_canvas)
+        self._layer_type = LayerType.ProjectAreas
+        self._parent_pk = NULL
+
+    def add_feature(self, layer_type: LayerType, parent_pk):
+        self._layer_type = layer_type
+        self._parent_pk = parent_pk
+        self.map_canvas.setMapTool(self)
 
     def activate(self):
         # skip QgsMapToolDigitizeFeature method -- it has odd logic
@@ -148,7 +157,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
                 self.cleanup()
                 return
 
-            table_name, ok = QInputDialog.getText(self.dlg, "Name", "Input Name:")
+            feature_name, ok = QInputDialog.getText(self.dlg, "Name", "Input Name:")
 
             if not ok:
                 self.cleanup()
@@ -157,34 +166,26 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             if self.rubber_band:
                 self.clearRubberBands()
 
-            self.add_layers_to_gpkg(
-                table_name, SETTINGS_MANAGER.current_digitisation_type
+            self.create_feature(
+                feature_name
             )
 
             self.cleanup()
 
-    def add_layers_to_gpkg(self, feature_name: str, kind: str) -> None:
+    def create_feature(self, feature_name: str) -> None:
         """ """
-        if kind == SETTINGS_MANAGER.development_site_prefix:
+        if self._layer_type == LayerType.DevelopmentSites:
             list_widget = self.dlg.listWidget_development_sites
-            SETTINGS_MANAGER.set_current_development_site_feature_name(feature_name)
-            layer = ProjectUtils.get_development_sites_layer(QgsProject.instance())
-        elif kind == SETTINGS_MANAGER.project_area_prefix:
+        elif self._layer_type == LayerType.ProjectAreas:
             list_widget = self.dlg.listWidget_project_areas
-            SETTINGS_MANAGER.set_current_project_area_feature_name(feature_name)
-            layer = ProjectUtils.get_project_area_layer(QgsProject.instance())
-
             site_layer = ProjectUtils.get_development_sites_layer(QgsProject.instance())
             sql_filter = "FALSE"
             site_layer.setSubsetString(sql_filter)
-        elif kind == SETTINGS_MANAGER.building_level_prefix:
+        elif self._layer_type == LayerType.BuildingLevels:
             list_widget = self.dlg.listWidget_building_levels
-            SETTINGS_MANAGER.set_current_building_level_feature_name(feature_name)
-            layer = ProjectUtils.get_building_levels_layer(QgsProject.instance())
-            SETTINGS_MANAGER.set_current_building_level_feature_name(feature_name)
-
         else:
-            raise Exception(f"Unknown tab name: {kind}")
+            raise Exception(f"Unknown tab name: {self._layer_type}")
+        layer = ProjectUtils.get_layer(QgsProject.instance(), self._layer_type)
 
         items = []
         for index in range(list_widget.count()):
@@ -203,36 +204,29 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         if not layer.isValid():
             raise Exception("Layer is not valid!")
 
-        feature = QgsFeature()
-        feature.setFields(layer.fields())
-
-        attributes = SETTINGS_MANAGER.get_attributes_from_json(kind)
-
-        feature.setAttribute("name", feature_name)
-
-        for key, value in attributes.items():
-            if key in layer.fields().names():
-                feature.setAttribute(key, value)
-
-        if not kind == SETTINGS_MANAGER.project_area_prefix:
-            feature.setAttribute("primary_key", SETTINGS_MANAGER.get_pk(kind))
-
         polygon = QgsGeometry.fromPolygonXY(
             [[QgsPointXY(x, y) for x, y in self.points]]
         )
-        feature.setGeometry(polygon)
+        feature = QgsVectorLayerUtils.createFeature(layer, polygon)
+        feature["name"] = feature_name
+
+        foreign_key = DatabaseUtils.foreign_key_for_layer(self._layer_type)
+        if foreign_key:
+            feature.setAttribute(foreign_key, self._parent_pk)
 
         layer.startEditing()
         layer.dataProvider().addFeature(feature)
         layer.commitChanges()
 
-        layer.setSubsetString(f"name='{feature_name}'")
+        #layer.setSubsetString(f"name='{feature_name}'")
 
         if not list_widget.isEnabled():
             list_widget.setEnabled(True)
 
-        list_widget.addItem(feature_name)
-        item = list_widget.findItems(feature_name, Qt.MatchExactly)[0]
+        item = QListWidgetItem(list_widget)
+        item.setText(feature_name)
+        item.setData(Qt.UserRole, feature.id())
+        list_widget.addItem(item)
         row = list_widget.row(item)
         list_widget.setCurrentRow(row)
 

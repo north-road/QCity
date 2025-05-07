@@ -1,6 +1,6 @@
 from typing import Optional
 
-from qgis.PyQt.QtCore import Qt, QObject
+from qgis.PyQt.QtCore import Qt, QObject, pyqtSignal
 from qgis.PyQt.QtWidgets import QWidget, QSpinBox, QDoubleSpinBox, QListWidget, QLabel
 
 from qgis.core import QgsFeature, NULL, QgsProject, QgsVectorLayer
@@ -12,6 +12,7 @@ class PageController(QObject):
     """
     Base QObject class for dock page controllers
     """
+    add_feature_clicked = pyqtSignal()
 
     def __init__(self,
                  layer_type: LayerType,

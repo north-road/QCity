@@ -1,4 +1,5 @@
 import json
+from typing import Optional
 
 from qgis.PyQt.QtCore import QVariant
 from qgis.core import (
@@ -11,12 +12,23 @@ from qgis.core import (
 )
 
 from .settings import SETTINGS_MANAGER
-
+from .enums import LayerType
 
 class DatabaseUtils:
     """
     Utilities for working with QCity databases
     """
+
+    @staticmethod
+    def foreign_key_for_layer(layer: LayerType) -> Optional[str]:
+        """
+        Returns the foreign key field name for the given layer
+        """
+        return {
+            LayerType.ProjectAreas: None,
+            LayerType.DevelopmentSites: 'project_area_pk',
+            LayerType.BuildingLevels: 'development_site_pk',
+        }[layer]
 
     @staticmethod
     def qvariant_type_from_string(key: str) -> QVariant.Type:
@@ -81,4 +93,5 @@ class DatabaseUtils:
 
         if not error == QgsVectorFileWriter.NoError:
             raise Exception(f"Error adding layer to GeoPackage {gpkg_path}: {error_message}")
+
 

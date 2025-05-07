@@ -1,6 +1,6 @@
 from enum import Enum, auto
 
-class LayerType:
+class LayerType(Enum):
     """
     QCity layer types
     """

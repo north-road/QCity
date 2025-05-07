@@ -23,9 +23,7 @@ class DevelopmentSitesPageController(PageController):
         super().__init__(LayerType.DevelopmentSites, og_widget, tab_widget, list_widget)
 
         self.og_widget.toolButton_development_site_add.clicked.connect(
-            lambda: self.og_widget.action_maptool_emit(
-                SETTINGS_MANAGER.development_site_prefix
-            )
+            self.add_feature_clicked
         )
 
         self.og_widget.toolButton_development_site_remove.clicked.connect(
