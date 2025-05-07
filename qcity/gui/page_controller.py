@@ -21,12 +21,16 @@ class PageController(QObject):
             for spin_box in self.tab_widget.findChildren(
                 (QSpinBox, QDoubleSpinBox)
             ):
-                spin_box.valueChanged.connect(
-                    lambda value,
-                    widget=spin_box: SETTINGS_MANAGER.save_widget_value_to_layer(
-                        widget, value, SETTINGS_MANAGER.project_area_prefix
-                    )
-                )
+                spin_box.valueChanged.connect(self.save_widget_value_to_feature)
+
+    def save_widget_value_to_feature(self, value):
+        """
+        Triggered when a widget value is changed by the user
+        """
+        widget = self.sender()
+        SETTINGS_MANAGER.save_widget_value_to_layer(
+            widget, value, SETTINGS_MANAGER.project_area_prefix
+        )
 
     def set_feature(self, feature: QgsFeature):
         """
