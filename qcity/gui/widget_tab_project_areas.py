@@ -27,6 +27,7 @@ class ProjectAreasPageController(PageController):
     """
     def __init__(self, og_widget):
         super().__init__(og_widget)
+        self.skip_fields_for_widgets = ("fid", "name")
 
         self.og_widget.toolButton_project_area_add.clicked.connect(
             lambda: self.og_widget.action_maptool_emit(
@@ -222,23 +223,7 @@ class ProjectAreasPageController(PageController):
             layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
 
             feature = self.og_widget.get_feature_of_layer_by_name(layer, item)
-
-            widget_values = feature.attributeMap()
-
-            for field_name, value in widget_values.items():
-                if field_name in ["fid", "name"]:
-                    continue
-
-                widget_name = field_name
-                widget = self.og_widget.findChild(
-                    (QWidget), widget_name
-                )
-                if isinstance(widget, QSpinBox):
-                    widget.setValue(int(value))
-                elif isinstance(widget, QDoubleSpinBox):
-                    widget.setValue(float(value))
-                else:
-                    assert False
+            self.set_feature(feature)
 
             self.og_widget.label_current_project_area.setText(feature_name)
 
