@@ -6,7 +6,7 @@ from qgis.core import (
     QgsRelationContext
 )
 from .settings import SETTINGS_MANAGER
-
+from .enums import LayerType
 
 class ProjectUtils:
     """
@@ -73,6 +73,19 @@ class ProjectUtils:
             if layer.customProperty('_qcity_role') == 'building_levels':
                 return layer
 
+        return None
+
+    @staticmethod
+    def get_layer(project: QgsProject, layer: LayerType) -> Optional[QgsVectorLayer]:
+        """
+        Retrieves the specified QCity layer from a project
+        """
+        if layer == LayerType.ProjectAreas:
+            return ProjectUtils.get_project_area_layer(project)
+        if layer == LayerType.DevelopmentSites:
+            return ProjectUtils.get_development_sites_layer(project)
+        if layer == LayerType.BuildingLevels:
+            return ProjectUtils.get_building_levels_layer(project)
         return None
 
     @staticmethod

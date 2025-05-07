@@ -16,6 +16,7 @@ from qcity.core.settings import SETTINGS_MANAGER
 
 from qcity.test.utilities import get_qgis_app
 from qcity.core.database import DatabaseUtils
+from qcity.core import LayerType
 
 test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
 
@@ -37,6 +38,9 @@ class TestProjectUtils(unittest.TestCase):
             self.assertIsNone(ProjectUtils.get_project_area_layer(p))
             self.assertIsNone(ProjectUtils.get_development_sites_layer(p))
             self.assertIsNone(ProjectUtils.get_building_levels_layer(p))
+            self.assertIsNone(ProjectUtils.get_layer(p, LayerType.ProjectAreas))
+            self.assertIsNone(ProjectUtils.get_layer(p, LayerType.BuildingLevels))
+            self.assertIsNone(ProjectUtils.get_layer(p, LayerType.DevelopmentSites))
 
             ProjectUtils.add_database_layers_to_project(p, gpkg_path)
             self.assertEqual(len(p.mapLayers()), 3)
@@ -45,14 +49,17 @@ class TestProjectUtils(unittest.TestCase):
             self.assertIsInstance(project_area_layer, QgsVectorLayer)
             self.assertTrue(project_area_layer.isValid())
             self.assertGreaterEqual(project_area_layer.fields().lookupField('dwelling_size_4_bedroom'), 0)
+            self.assertEqual(ProjectUtils.get_layer(p, LayerType.ProjectAreas), project_area_layer)
 
             development_sites_layer = ProjectUtils.get_development_sites_layer(p)
             self.assertIsInstance(development_sites_layer, QgsVectorLayer)
             self.assertGreaterEqual(development_sites_layer.fields().lookupField('site_owner'), 0)
+            self.assertEqual(ProjectUtils.get_layer(p, LayerType.DevelopmentSites), development_sites_layer)
 
             building_areas_layer = ProjectUtils.get_building_levels_layer(p)
             self.assertIsInstance(building_areas_layer, QgsVectorLayer)
             self.assertGreaterEqual(building_areas_layer.fields().lookupField('count_1_bedroom_dwellings'), 0)
+            self.assertEqual(ProjectUtils.get_layer(p, LayerType.BuildingLevels), building_areas_layer)
 
     def test_layer_relations(self):
         """
