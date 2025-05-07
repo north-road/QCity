@@ -1,7 +1,7 @@
 from typing import Optional
 
 from qgis.PyQt.QtCore import Qt, QObject, pyqtSignal
-from qgis.PyQt.QtWidgets import QWidget, QSpinBox, QDoubleSpinBox, QListWidget, QLabel
+from qgis.PyQt.QtWidgets import QWidget, QSpinBox, QDoubleSpinBox, QListWidget, QLabel, QLineEdit, QComboBox
 
 from qgis.core import QgsFeature, NULL, QgsProject, QgsVectorLayer
 
@@ -122,5 +122,13 @@ class PageController(QObject):
                     continue
 
                 widget.setValue(float(value))
+            elif isinstance(widget, QLineEdit):
+                if value == NULL:
+                    widget.clear()
+                else:
+                    widget.setText(str(value))
+            elif isinstance(widget, QComboBox):
+                #widget.setCurrentIndex(int(widget_values_dict[widget_name]))
+                pass
             else:
                 assert False

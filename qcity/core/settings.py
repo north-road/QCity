@@ -35,8 +35,6 @@ class SettingsManager(QObject):
 
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
-        self._current_building_level_parameter_table_name: Optional[str] = None
-        self._current_development_site_parameter_feature_name: Optional[str] = None
         self._database_path = None
 
         self.plugin_path = os.path.dirname(os.path.realpath(__file__))
@@ -96,48 +94,6 @@ class SettingsManager(QObject):
         Get the current database path.
         """
         return self._database_path
-
-    def save_widget_value_to_layer(
-        self, widget: QWidget, value: Union[float, int, str], kind: str
-    ):
-        """
-        Sets a spinbox value from the corresponding widget-value.
-        """
-        if kind == SETTINGS_MANAGER.project_area_prefix:
-            feature_name = self._current_project_area_parameter_feature_name
-        elif kind == SETTINGS_MANAGER.development_site_prefix:
-            feature_name = self._current_development_site_parameter_feature_name
-        elif kind == SETTINGS_MANAGER.building_level_prefix:
-            feature_name = self._current_building_level_parameter_table_name
-
-        if feature_name:
-            gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={kind}"
-            layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
-            request = QgsFeatureRequest().setFilterExpression(
-                f"\"name\" = '{feature_name}'"
-            )
-            iterator = layer.getFeatures(request)
-            feature = next(iterator)
-
-            layer.startEditing()
-            if feature:
-                feature[widget.objectName()] = value
-                layer.updateFeature(feature)
-                layer.commitChanges()
-            else:
-                layer.rollBack()
-
-    def set_current_development_site_feature_name(self, name: str) -> None:
-        """
-        Sets the current project area parameter table name.
-        """
-        self._current_development_site_parameter_feature_name = name
-
-    def set_current_building_level_feature_name(self, name: str) -> None:
-        """
-        Sets the current project area parameter table name.
-        """
-        self._current_building_level_parameter_table_name = name
 
     def get_attributes_from_json(self, kind: str) -> dict:
         """Gets the attributes of the default values from the json files"""

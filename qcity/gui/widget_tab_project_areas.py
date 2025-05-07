@@ -89,29 +89,14 @@ class ProjectAreasPageController(PageController):
                 self.og_widget.groupbox_dwellings.setEnabled(False)
 
     def set_feature(self, feature: QgsFeature):
-        """
-        Updates the development site listwidget to only contain sites within the current project area
-        """
         area_layer = self.get_layer()
         area_layer.setSubsetString("")
 
         super().set_feature(feature)
 
-        site_layer = PROJECT_CONTROLLER.get_development_sites_layer()
-        level_layer = PROJECT_CONTROLLER.get_building_levels_layer()
-
-        self.og_widget.listWidget_development_sites.clear()
-
-        site_layer.setSubsetString(f'project_area_pk = {feature.id()}')
-        for feat in site_layer.getFeatures():
-            item = QListWidgetItem(self.og_widget.listWidget_development_sites)
-            item.setText(feat["name"])
-            item.setData(Qt.UserRole, feat.id())
-            self.og_widget.listWidget_development_sites.addItem(item)
+        PROJECT_CONTROLLER.set_current_project_area(feature.id())
 
         area_layer.setSubsetString(f"\"fid\" = '{feature.id()}'")
-
-#        level_layer.setSubsetString("FALSE")
 
         feature_bbox = QgsReferencedRectangle(feature.geometry().boundingBox(), area_layer.crs())
 

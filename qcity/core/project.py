@@ -1,20 +1,28 @@
 from typing import Optional
+
+from qgis.PyQt.QtCore import QObject, pyqtSignal
+
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
     QgsRelation,
     QgsRelationContext
 )
+
 from .settings import SETTINGS_MANAGER
 from .enums import LayerType
 
-class ProjectController:
+class ProjectController(QObject):
     """
     Controller for working with QCity projects
     """
 
+    project_area_changed = pyqtSignal(int)
+
     def __init__(self, project: QgsProject):
+        super().__init__()
         self.project = project
+        self.current_project_area_fid: Optional[int] = None
 
     @staticmethod
     def add_database_layers_to_project(project: QgsProject, database_path: str) -> None:
@@ -129,6 +137,13 @@ class ProjectController:
         Returns the database path associated with a project
         """
         return self.project.readEntry('qcity', 'database_path')[0]
+
+    def set_current_project_area(self, project_area_fid: int):
+        """
+        Sets the feature ID for the current project area
+        """
+        self.current_project_area_fid = project_area_fid
+        self.project_area_changed.emit(self.current_project_area_fid)
 
 
 PROJECT_CONTROLLER = ProjectController(QgsProject.instance())

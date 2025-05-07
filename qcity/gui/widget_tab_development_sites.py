@@ -8,18 +8,21 @@ from qgis.PyQt.QtWidgets import (
     QSpinBox,
     QDoubleSpinBox,
 )
-from qgis.core import QgsVectorLayer, QgsMapLayerType
+from qgis.core import QgsVectorLayer, QgsMapLayerType, QgsFeature, QgsReferencedRectangle
 from qgis.gui import QgsNewNameDialog
 
-from qcity.core import SETTINGS_MANAGER, LayerType, PROJECT_CONTROLLER
+from qcity.core import SETTINGS_MANAGER, LayerType, PROJECT_CONTROLLER, DatabaseUtils
 from .page_controller import PageController
 
 class DevelopmentSitesPageController(PageController):
     """
     Page controller for the development sites page
     """
-    def __init__(self, og_widget, tab_widget, list_widget):
-        super().__init__(LayerType.DevelopmentSites, og_widget, tab_widget, list_widget)
+    def __init__(self, og_widget, tab_widget, list_widget, current_item_label):
+        super().__init__(LayerType.DevelopmentSites, og_widget, tab_widget, list_widget, current_item_label)
+        self.skip_fields_for_widgets = ['fid', 'name', 'project_area_pk']
+
+        PROJECT_CONTROLLER.project_area_changed.connect(self.on_project_area_changed)
 
         self.og_widget.toolButton_development_site_add.clicked.connect(
             self.add_feature_clicked
@@ -33,25 +36,8 @@ class DevelopmentSitesPageController(PageController):
             self.update_site_name_gpkg
         )
 
-        self.og_widget.listWidget_development_sites.currentItemChanged.connect(
-            lambda item: SETTINGS_MANAGER.set_current_development_site_feature_name(
-                item.text() if item else None
-            )
-        )
-
-        self.og_widget.address.textChanged.connect(
-            lambda value,
-            widget=self.og_widget.address: SETTINGS_MANAGER.save_widget_value_to_layer(
-                widget, value, SETTINGS_MANAGER.development_site_prefix
-            )
-        )
-
-        self.og_widget.site_owner.textChanged.connect(
-            lambda value,
-            widget=self.og_widget.site_owner: SETTINGS_MANAGER.save_widget_value_to_layer(
-                widget, value, SETTINGS_MANAGER.development_site_prefix
-            )
-        )
+        self.og_widget.address.textChanged.connect(self.save_widget_value_to_feature)
+        self.og_widget.site_owner.textChanged.connect(self.save_widget_value_to_feature)
 
         self.og_widget.date.textChanged.connect(
             lambda value,
@@ -67,17 +53,13 @@ class DevelopmentSitesPageController(PageController):
             )
         )
 
-        self.og_widget.listWidget_development_sites.currentItemChanged.connect(
-            lambda item: self.update_development_site_parameters(item)
-        )
+        #self.og_widget.listWidget_development_sites.currentItemChanged.connect(
+        #    lambda item: self.update_development_site_parameters(item)
+        #)
 
-        self.og_widget.listWidget_development_sites.itemClicked.connect(
-            lambda item: self.set_subset_string_for_development_site_layer(item)
-        )
-
-        self.og_widget.listWidget_development_sites.itemClicked.connect(
-            lambda item: self.update_building_level_listwidget(item)
-        )
+     #   self.og_widget.listWidget_development_sites.itemClicked.connect(
+     #       lambda item: self.update_building_level_listwidget(item)
+     #   )
 
         self.og_widget.site_elevation.valueChanged.connect(
             lambda value: SETTINGS_MANAGER.save_widget_value_to_layer(
@@ -98,18 +80,41 @@ class DevelopmentSitesPageController(PageController):
                 self.og_widget.listWidget_development_sites.currentItem(),
             )
         )
-        self.og_widget.listWidget_development_sites.currentItemChanged.connect(
-            lambda item: SETTINGS_MANAGER.restore_checkbox_state(
-                self.og_widget.checkBox_auto_elevation, item
-            )
-        )
+    #    self.og_widget.listWidget_development_sites.currentItemChanged.connect(
+     #       lambda item: SETTINGS_MANAGER.restore_checkbox_state(
+      #          self.og_widget.checkBox_auto_elevation, item
+     #       )
+     #   )
 
-    def set_subset_string_for_development_site_layer(
-        self, item: QListWidgetItem
-    ) -> None:
-        """Sets the SubsetString for the development site layer"""
-        site_layer = PROJECT_CONTROLLER.get_development_sites_layer()
-        site_layer.setSubsetString(f"\"name\" = '{item.text()}'")
+    def on_project_area_changed(self, project_area_fid: int):
+        """
+        Called when the current project area FID is changed
+        """
+        site_layer = self.get_layer()
+        self.list_widget.clear()
+        foreign_key = DatabaseUtils.foreign_key_for_layer(self.layer_type)
+        site_layer.setSubsetString(f'{foreign_key} = {project_area_fid}')
+
+        for feat in site_layer.getFeatures():
+            item = QListWidgetItem(self.list_widget)
+            item.setText(feat["name"])
+            item.setData(Qt.UserRole, feat.id())
+            self.list_widget.addItem(item)
+
+    def set_feature(self, feature: QgsFeature):
+        site_layer = self.get_layer()
+        site_layer.setSubsetString("")
+
+        super().set_feature(feature)
+
+        # PROJECT_CONTROLLER.set_current_project_area(feature.id())
+
+        site_layer.setSubsetString(f"\"fid\" = '{feature.id()}'")
+
+        feature_bbox = QgsReferencedRectangle(feature.geometry().boundingBox(), site_layer.crs())
+
+        self.og_widget.iface.mapCanvas().setReferencedExtent(feature_bbox)
+        self.og_widget.iface.mapCanvas().refresh()
 
     def remove_selected_sites(self) -> None:
         """Removes selected area from Qlistwidget, map and geopackage."""
@@ -236,38 +241,6 @@ class DevelopmentSitesPageController(PageController):
         )
 
         self.og_widget.label_current_development_site.setText(new_feat_name)
-
-    def update_development_site_parameters(self, item: QListWidgetItem) -> None:
-        """
-        Updates the line edits and combobox of the development sites tab to the currently selected site.
-        """
-        if item:
-            feature_name = item.text()
-            gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.development_site_prefix}"
-
-            layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
-
-            feature = self.og_widget.get_feature_of_layer_by_name(layer, item)
-
-            feature_dict = feature.attributes()
-            col_names = [field.name() for field in layer.fields()]
-            widget_values_dict = dict(zip(col_names, feature_dict))
-
-            for widget_name in widget_values_dict.keys():
-                if widget_name in ["fid", "name"]:
-                    pass
-                widget = self.og_widget.findChild(QWidget, widget_name)
-
-                if isinstance(widget, QLineEdit):
-                    widget.setText(widget_values_dict[widget_name])
-                elif isinstance(widget, QComboBox):
-                    widget.setCurrentIndex(int(widget_values_dict[widget_name]))
-                elif isinstance(widget, QSpinBox):
-                    widget.setValue(int(widget_values_dict[widget_name]))
-                elif isinstance(widget, QDoubleSpinBox):
-                    widget.setValue(widget_values_dict[widget_name])
-
-            self.og_widget.label_current_development_site.setText(feature_name)
 
     def get_elevation_from_dem(self, checked) -> None:
         """Gets the elevation for a centroid in a polygon feature and sets it as an attribute."""

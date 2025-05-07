@@ -81,7 +81,7 @@ class QCityDockWidget(QgsDockWidget):
         # Initialize tabs
         self.project_area_controller = ProjectAreasPageController(self, self.tab_project_areas, self.listWidget_project_areas, self.label_current_project_area)
         self.project_area_controller.add_feature_clicked.connect(self.on_add_feature_clicked)
-        self.development_site_controller = DevelopmentSitesPageController(self, None, self.listWidget_development_sites)
+        self.development_site_controller = DevelopmentSitesPageController(self, None, self.listWidget_development_sites,  self.label_current_development_site)
         self.development_site_controller.add_feature_clicked.connect(self.on_add_feature_clicked)
 
         self.building_levels_controller = BuildingLevelsPageController(self, self.tab_development_sites, self.listWidget_building_levels)
