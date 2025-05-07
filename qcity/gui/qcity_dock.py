@@ -79,9 +79,9 @@ class QCityDockWidget(QgsDockWidget):
         )
 
         # Initialize tabs
-        ProjectAreasPageController(self)
-        DevelopmentSitesPageController(self)
-        BuildingLevelsPageController(self)
+        ProjectAreasPageController(self, self.tab_project_areas)
+        DevelopmentSitesPageController(self, None)
+        BuildingLevelsPageController(self, self.tab_development_sites)
         WidgetUtilsStatistics(self)
 
         # set associated database when plugin is started

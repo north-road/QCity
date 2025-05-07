@@ -19,8 +19,8 @@ class DevelopmentSitesPageController(PageController):
     """
     Page controller for the development sites page
     """
-    def __init__(self, og_widget):
-        super().__init__(og_widget)
+    def __init__(self, og_widget, tab_widget):
+        super().__init__(og_widget, tab_widget)
 
         self.og_widget.toolButton_development_site_add.clicked.connect(
             lambda: self.og_widget.action_maptool_emit(

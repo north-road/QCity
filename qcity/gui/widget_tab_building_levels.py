@@ -18,8 +18,8 @@ class BuildingLevelsPageController(PageController):
     """
     Page controller for the building levels page
     """
-    def __init__(self, og_widget: 'QCityDockWidget'):
-        super().__init__(og_widget)
+    def __init__(self, og_widget: 'QCityDockWidget', tab_widget):
+        super().__init__(og_widget, tab_widget)
 
         self.og_widget.toolButton_building_level_add.clicked.connect(
             lambda: self.og_widget.action_maptool_emit(
@@ -42,16 +42,6 @@ class BuildingLevelsPageController(PageController):
         self.og_widget.listWidget_building_levels.itemClicked.connect(
             lambda item: self.set_subset_string_for_building_levels_layer(item)
         )
-
-        for spinBox in self.og_widget.tab_development_sites.findChildren(
-            (QSpinBox, QDoubleSpinBox)
-        ):
-            spinBox.valueChanged.connect(
-                lambda value,
-                widget=spinBox: SETTINGS_MANAGER.save_widget_value_to_layer(
-                    widget, value, SETTINGS_MANAGER.building_level_prefix
-                )
-            )
 
     def set_subset_string_for_building_levels_layer(
         self, item: QListWidgetItem

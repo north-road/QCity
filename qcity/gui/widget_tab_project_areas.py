@@ -25,8 +25,8 @@ class ProjectAreasPageController(PageController):
     """
     Page controller for the project areas page
     """
-    def __init__(self, og_widget):
-        super().__init__(og_widget)
+    def __init__(self, og_widget, tab_widget):
+        super().__init__(og_widget, tab_widget)
         self.skip_fields_for_widgets = ("fid", "name")
 
         self.og_widget.toolButton_project_area_add.clicked.connect(
@@ -56,16 +56,6 @@ class ProjectAreasPageController(PageController):
         self.og_widget.pushButton_import_project_areas.clicked.connect(
             self.import_project_area_geometries
         )
-
-        for spinBox in self.og_widget.tab_project_areas.findChildren(
-            (QSpinBox, QDoubleSpinBox)
-        ):
-            spinBox.valueChanged.connect(
-                lambda value,
-                widget=spinBox: SETTINGS_MANAGER.save_widget_value_to_layer(
-                    widget, value, SETTINGS_MANAGER.project_area_prefix
-                )
-            )
 
         self.og_widget.listWidget_project_areas.currentItemChanged.connect(
             lambda item: self.update_project_area_parameters(item)

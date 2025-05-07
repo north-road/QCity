@@ -3,16 +3,30 @@ from qgis.PyQt.QtWidgets import QWidget, QSpinBox, QDoubleSpinBox
 
 from qgis.core import QgsFeature, NULL
 
+from ..core.settings import SETTINGS_MANAGER
+
 
 class PageController(QObject):
     """
     Base QObject class for dock page controllers
     """
 
-    def __init__(self, og_widget: 'QCityDockWidget'):
+    def __init__(self, og_widget: 'QCityDockWidget', tab_widget: QWidget):
         super().__init__(og_widget)
         self.og_widget: 'QCityDockWidget' = og_widget
+        self.tab_widget: QWidget = tab_widget
         self.skip_fields_for_widgets = []
+
+        if self.tab_widget:
+            for spin_box in self.tab_widget.findChildren(
+                (QSpinBox, QDoubleSpinBox)
+            ):
+                spin_box.valueChanged.connect(
+                    lambda value,
+                    widget=spin_box: SETTINGS_MANAGER.save_widget_value_to_layer(
+                        widget, value, SETTINGS_MANAGER.project_area_prefix
+                    )
+                )
 
     def set_feature(self, feature: QgsFeature):
         """
