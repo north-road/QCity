@@ -11,7 +11,8 @@ from .gui.qcity_dock import (
 )
 
 
-class GradientDigitizerPlugin:
+class QCityPlugin:
+    
     def __init__(self, iface):
         self.dlg_config = None
         self.iface = iface
