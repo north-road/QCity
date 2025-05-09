@@ -19,6 +19,7 @@ class BuildingLevelsPageController(PageController):
     """
     def __init__(self, og_widget: 'QCityDockWidget', tab_widget, list_widget):
         super().__init__(LayerType.BuildingLevels, og_widget, tab_widget, list_widget)
+        self.skip_fields_for_widgets = ['fid', 'name', 'development_site_pk', 'level_height']
 
         PROJECT_CONTROLLER.development_site_changed.connect(self.on_development_site_changed)
 
@@ -32,10 +33,6 @@ class BuildingLevelsPageController(PageController):
 
         self.og_widget.toolButton_building_level_rename.clicked.connect(
             self.rename_current_selection
-        )
-
-        self.og_widget.listWidget_building_levels.currentItemChanged.connect(
-            lambda item: self.update_building_level_parameters(item)
         )
 
     def on_development_site_changed(self, development_site_fid: int):
@@ -94,31 +91,3 @@ class BuildingLevelsPageController(PageController):
                 for widget in self.og_widget.findChildren((QSpinBox, QDoubleSpinBox)):
                     widget.setValue(0)
                     # self.og_widget.tabWidget_project_level_parameters.setEnabled(False)
-
-    def update_building_level_parameters(self, item: QListWidgetItem) -> None:
-        """
-        Updates the line edits and combobox of the development sites tab to the currently selected site.
-        """
-        if item:
-            feature_name = item.text()
-
-            SETTINGS_MANAGER.set_current_building_level_feature_name(feature_name)
-            gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.building_level_prefix}"
-
-            layer = QgsVectorLayer(gpkg_path, feature_name, "ogr")
-
-            feature = self.og_widget.get_feature_of_layer_by_name(layer, item)
-
-            feature_dict = feature.attributes()
-            col_names = [field.name() for field in layer.fields()]
-            widget_values_dict = dict(zip(col_names, feature_dict))
-
-            for widget_name in widget_values_dict.keys():
-                if widget_name in ["fid", "name"]:
-                    pass
-                widget = self.og_widget.findChild(QWidget, widget_name)
-
-                if isinstance(widget, QSpinBox):
-                    widget.setValue(int(widget_values_dict[widget_name]))
-                elif isinstance(widget, QDoubleSpinBox):
-                    widget.setValue(widget_values_dict[widget_name])

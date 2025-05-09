@@ -650,7 +650,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="tab_building_levels">
        <attribute name="title">
         <string>Building Levels</string>
        </attribute>
