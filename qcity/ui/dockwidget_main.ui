@@ -466,14 +466,11 @@
                <layout class="QVBoxLayout" name="verticalLayout_2">
                 <item>
                  <widget class="QToolButton" name="toolButton_development_site_add">
-                  <property name="minimumSize">
-                   <size>
-                    <width>25</width>
-                    <height>25</height>
-                   </size>
+                  <property name="toolTip">
+                   <string>Create new development site</string>
                   </property>
                   <property name="text">
-                   <string>+</string>
+                   <string/>
                   </property>
                  </widget>
                 </item>
@@ -485,27 +482,21 @@
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>25</width>
-                    <height>25</height>
-                   </size>
+                  <property name="toolTip">
+                   <string>Remove selected development site</string>
                   </property>
                   <property name="text">
-                   <string>-</string>
+                   <string/>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QToolButton" name="toolButton_development_site_rename">
-                  <property name="minimumSize">
-                   <size>
-                    <width>25</width>
-                    <height>25</height>
-                   </size>
+                  <property name="toolTip">
+                   <string>Rename selected development site</string>
                   </property>
                   <property name="text">
-                   <string>...</string>
+                   <string/>
                   </property>
                  </widget>
                 </item>
@@ -695,14 +686,11 @@
                <layout class="QVBoxLayout" name="verticalLayout_4">
                 <item>
                  <widget class="QToolButton" name="toolButton_building_level_add">
-                  <property name="minimumSize">
-                   <size>
-                    <width>25</width>
-                    <height>25</height>
-                   </size>
+                  <property name="toolTip">
+                   <string>Create new building level</string>
                   </property>
                   <property name="text">
-                   <string>+</string>
+                   <string/>
                   </property>
                  </widget>
                 </item>
@@ -714,27 +702,21 @@
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>25</width>
-                    <height>25</height>
-                   </size>
+                  <property name="toolTip">
+                   <string>Remove selected building level</string>
                   </property>
                   <property name="text">
-                   <string>-</string>
+                   <string/>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QToolButton" name="toolButton_building_level_rename">
-                  <property name="minimumSize">
-                   <size>
-                    <width>25</width>
-                    <height>25</height>
-                   </size>
+                  <property name="toolTip">
+                   <string>Rename selected building level</string>
                   </property>
                   <property name="text">
-                   <string>...</string>
+                   <string/>
                   </property>
                  </widget>
                 </item>
@@ -1314,12 +1296,6 @@
   <customwidget>
    <class>QgsDockWidget</class>
    <extends>QDockWidget</extends>
-   <header>qgis.gui</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QGroupBox</class>
-   <extends>QGroupBox</extends>
    <header>qgis.gui</header>
    <container>1</container>
   </customwidget>
