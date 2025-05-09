@@ -249,4 +249,3 @@ class TestProjectUtils(unittest.TestCase):
             self.assertFalse(development_site_layer.isEditable())
             self.assertFalse([f.id() for f in building_level_layer.getFeatures()])
             self.assertFalse(building_level_layer.isEditable())
-    

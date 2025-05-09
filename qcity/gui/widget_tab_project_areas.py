@@ -64,14 +64,10 @@ class ProjectAreasPageController(PageController):
             return
 
         for feature_id, item in feature_ids.items():
-            self.list_widget.takeItem(self.list_widget.row(item))
-
-        layer = self.get_layer()
-        layer.startEditing()
-        layer.deleteFeatures(list(feature_ids.keys()))
-        layer.commitChanges()
-
-        # TODO -- also remove development sites, etc
+            if PROJECT_CONTROLLER.delete_project_area(feature_id):
+                self.list_widget.takeItem(self.list_widget.row(item))
+            else:
+                return
 
     def set_feature(self, feature: QgsFeature):
         area_layer = self.get_layer()
