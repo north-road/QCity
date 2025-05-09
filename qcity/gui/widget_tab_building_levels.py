@@ -31,7 +31,7 @@ class BuildingLevelsPageController(PageController):
         )
 
         self.og_widget.toolButton_building_level_rename.clicked.connect(
-            self.update_site_name_gpkg
+            self.rename_current_selection
         )
 
         self.og_widget.listWidget_building_levels.currentItemChanged.connect(
@@ -94,58 +94,6 @@ class BuildingLevelsPageController(PageController):
                 for widget in self.og_widget.findChildren((QSpinBox, QDoubleSpinBox)):
                     widget.setValue(0)
                     # self.og_widget.tabWidget_project_level_parameters.setEnabled(False)
-
-    def update_site_name_gpkg(self) -> None:
-        """
-        Updates the name of the table in the geopackage.
-        """
-        widget = self.og_widget.listWidget_building_levels.selectedItems()[0]
-        old_feat_name = widget.text()
-
-        existing_names = [
-            self.og_widget.listWidget_building_levels.item(i).text()
-            for i in range(self.og_widget.listWidget_building_levels.count())
-        ]
-
-        dialog = QgsNewNameDialog(
-            initial="",
-            existing=existing_names,
-            cs=Qt.CaseSensitivity.CaseSensitive,
-            parent=self.og_widget.iface.mainWindow(),
-        )
-
-        dialog.setWindowTitle(self.tr("Rename"))
-        dialog.setAllowEmptyName(False)
-        dialog.setHintString(self.tr("Enter a name for the development site"))
-
-        if dialog.exec_() != QDialog.DialogCode.Accepted:
-            return
-
-        new_feat_name = dialog.name()
-
-        old_item_id = self.og_widget.listWidget_building_levels.row(widget)
-        self.og_widget.listWidget_building_levels.takeItem(old_item_id)
-        self.og_widget.listWidget_building_levels.addItem(new_feat_name)
-
-        layer = QgsVectorLayer(
-            f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.building_level_prefix}",
-            SETTINGS_MANAGER.building_level_prefix,
-            "ogr",
-        )
-        if layer:
-            layer.startEditing()
-            for feature in layer.getFeatures():
-                if feature["name"] == old_feat_name:
-                    feature["name"] = new_feat_name
-                    layer.updateFeature(feature)
-            layer.commitChanges()
-
-        # Set selection to changed item
-        item_to_select = self.og_widget.listWidget_building_levels.findItems(
-            new_feat_name, Qt.MatchExactly
-        )[0]
-        self.og_widget.listWidget_building_levels.setCurrentItem(item_to_select)
-        SETTINGS_MANAGER.set_current_building_level_feature_name(item_to_select.text())
 
     def update_building_level_parameters(self, item: QListWidgetItem) -> None:
         """
