@@ -1,7 +1,7 @@
 from qgis.PyQt.QtWidgets import (
     QSpinBox,
     QDoubleSpinBox,
-    QListWidgetItem,
+    QMessageBox,
     QDialog,
     QFileDialog
 )
@@ -45,49 +45,33 @@ class ProjectAreasPageController(PageController):
 
     def remove_selected_areas(self) -> None:
         """Removes selected area from QListwidget, map and geopackage."""
-        tbr_areas = self.list_widget.selectedItems()
+        selected_items = self.list_widget.selectedItems()
+        if not selected_items:
+            return
 
-        if tbr_areas:
-            rows = {
-                self.list_widget.row(item): item.text()
-                for item in tbr_areas
-            }
+        feature_ids = {
+            item.data(Qt.UserRole): item for item in selected_items
+        }
+        if len(feature_ids) == 1:
+            item_text = next(iter(feature_ids.values())).text()
+        else:
+            item_text = ', '.join(t.text() for t in feature_ids.values())
+        if QMessageBox.warning(self.list_widget, self.tr('Remove Project Area'),
+                                self.tr('Are you sure you want to remove {}?. This will permanently delete the project area and all development sites from the database.').format(item_text),
+                                QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No,
+                                QMessageBox.StandardButton.No
+                                ) != QMessageBox.StandardButton.Yes:
+            return
 
-            for key, table_name in rows.items():
-                self.list_widget.takeItem(key)
+        for feature_id, item in feature_ids.items():
+            self.list_widget.takeItem(self.list_widget.row(item))
 
-                layers = self.og_widget.project.mapLayersByName(table_name)
-                if layers:
-                    self.og_widget.project.removeMapLayer(layers[0].id())
+        layer = self.get_layer()
+        layer.startEditing()
+        layer.deleteFeatures(list(feature_ids.keys()))
+        layer.commitChanges()
 
-                gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.project_area_prefix}"
-                layer = QgsVectorLayer(
-                    gpkg_path, SETTINGS_MANAGER.project_area_prefix, "ogr"
-                )
-                layer.startEditing()
-
-                feature_ids = [
-                    feat.id()
-                    for feat in layer.getFeatures()
-                    if feat["name"] == table_name
-                ]
-
-                if feature_ids:
-                    for fid in feature_ids:
-                        layer.deleteFeature(fid)
-                layer.commitChanges()
-
-                del layer
-
-            self.og_widget.label_current_project_area.setText("Project Area")
-
-            if self.list_widget.count() < 1:
-                self.current_feature_id = None
-                for widget in self.og_widget.findChildren((QSpinBox, QDoubleSpinBox)):
-                    widget.setValue(0)
-                self.og_widget.groupbox_car_parking.setEnabled(False)
-                self.og_widget.groupbox_bike_parking.setEnabled(False)
-                self.og_widget.groupbox_dwellings.setEnabled(False)
+        # TODO -- also remove development sites, etc
 
     def set_feature(self, feature: QgsFeature):
         area_layer = self.get_layer()
