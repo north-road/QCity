@@ -177,7 +177,7 @@ class PageController(QObject):
         """
         Centers the canvas on a feature
         """
-        feature_bbox = QgsReferencedRectangle(feature.geometry().boundingBox(), site_layer.crs())
+        feature_bbox = QgsReferencedRectangle(feature.geometry().boundingBox(), self.get_layer().crs())
 
         CanvasUtils.zoom_to_extent_if_not_visible(
             self.og_widget.iface.mapCanvas(),

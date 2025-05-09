@@ -21,11 +21,13 @@ class ProjectController(QObject):
     """
 
     project_area_changed = pyqtSignal(int)
+    development_site_changed = pyqtSignal(int)
 
     def __init__(self, project: QgsProject):
         super().__init__()
         self.project = project
         self.current_project_area_fid: Optional[int] = None
+        self.current_development_site_fid: Optional[int] = None
 
     @staticmethod
     def add_database_layers_to_project(project: QgsProject, database_path: str) -> None:
@@ -147,6 +149,13 @@ class ProjectController(QObject):
         """
         self.current_project_area_fid = project_area_fid
         self.project_area_changed.emit(self.current_project_area_fid)
+
+    def set_current_development_site(self, development_site_fid: int):
+        """
+        Sets the feature ID for the current development site
+        """
+        self.current_development_site_fid = development_site_fid
+        self.development_site_changed.emit(self.current_development_site_fid)
 
     def delete_project_area(self, project_area_fid: int) -> bool:
         """

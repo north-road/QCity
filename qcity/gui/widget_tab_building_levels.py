@@ -9,7 +9,7 @@ from qgis.PyQt.QtWidgets import (
 from qgis.core import QgsVectorLayer, QgsProject
 from qgis.gui import QgsNewNameDialog
 
-from qcity.core import SETTINGS_MANAGER, LayerType, PROJECT_CONTROLLER
+from qcity.core import SETTINGS_MANAGER, LayerType, PROJECT_CONTROLLER, DatabaseUtils
 from .page_controller import PageController
 
 
@@ -19,6 +19,8 @@ class BuildingLevelsPageController(PageController):
     """
     def __init__(self, og_widget: 'QCityDockWidget', tab_widget, list_widget):
         super().__init__(LayerType.BuildingLevels, og_widget, tab_widget, list_widget)
+
+        PROJECT_CONTROLLER.development_site_changed.connect(self.on_development_site_changed)
 
         self.og_widget.toolButton_building_level_add.clicked.connect(
             self.add_feature_clicked
@@ -36,23 +38,20 @@ class BuildingLevelsPageController(PageController):
             lambda item: self.update_building_level_parameters(item)
         )
 
-        self.og_widget.listWidget_building_levels.itemClicked.connect(
-            lambda item: self.set_subset_string_for_building_levels_layer(item)
-        )
+    def on_development_site_changed(self, development_site_fid: int):
+        """
+        Called when the current development site FID is changed
+        """
+        level_layer = self.get_layer()
+        self.list_widget.clear()
+        foreign_key = DatabaseUtils.foreign_key_for_layer(self.layer_type)
+        level_layer.setSubsetString(f'{foreign_key} = {development_site_fid}')
 
-    def set_subset_string_for_building_levels_layer(
-        self, item: QListWidgetItem
-    ) -> None:
-        """Updates the listwidget of the building levels to show only building levels within the active project level."""
-        level_layer = PROJECT_CONTROLLER.get_building_levels_layer()
-
-        level_layer.setSubsetString("")
-
-        filter_feature = self.og_widget.get_feature_of_layer_by_name(level_layer, item)
-
-        level_layer.setSubsetString(
-            f"\"name\" = '{item.text()}' and ST_Touches(geom, ST_GeomFromText('{filter_feature.geometry().asWkt()}', {level_layer.crs().postgisSrid()}))"
-        )
+        for feat in level_layer.getFeatures():
+            item = QListWidgetItem(self.list_widget)
+            item.setText(feat["name"])
+            item.setData(Qt.UserRole, feat.id())
+            self.list_widget.addItem(item)
 
     def remove_selected_sites(self) -> None:
         """Removes selected level from Qlistwidget, map and geopackage."""
