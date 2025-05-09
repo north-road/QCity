@@ -15,6 +15,7 @@ from qgis.core import (
 from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER, LayerType, PROJECT_CONTROLLER
+from .canvas_utils import CanvasUtils
 from .page_controller import PageController
 
 
@@ -100,8 +101,10 @@ class ProjectAreasPageController(PageController):
 
         feature_bbox = QgsReferencedRectangle(feature.geometry().boundingBox(), area_layer.crs())
 
-        self.og_widget.iface.mapCanvas().setReferencedExtent(feature_bbox)
-        self.og_widget.iface.mapCanvas().refresh()
+        CanvasUtils.zoom_to_extent_if_not_visible(
+            self.og_widget.iface.mapCanvas(),
+            feature_bbox,
+        )
 
     def rename_area(self) -> None:
         """

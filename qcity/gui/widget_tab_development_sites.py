@@ -13,6 +13,8 @@ from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER, LayerType, PROJECT_CONTROLLER, DatabaseUtils
 from .page_controller import PageController
+from .canvas_utils import CanvasUtils
+
 
 class DevelopmentSitesPageController(PageController):
     """
@@ -113,8 +115,10 @@ class DevelopmentSitesPageController(PageController):
 
         feature_bbox = QgsReferencedRectangle(feature.geometry().boundingBox(), site_layer.crs())
 
-        self.og_widget.iface.mapCanvas().setReferencedExtent(feature_bbox)
-        self.og_widget.iface.mapCanvas().refresh()
+        CanvasUtils.zoom_to_extent_if_not_visible(
+            self.og_widget.iface.mapCanvas(),
+            feature_bbox,
+        )
 
     def remove_selected_sites(self) -> None:
         """Removes selected area from Qlistwidget, map and geopackage."""
