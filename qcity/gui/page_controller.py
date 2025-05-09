@@ -1,9 +1,10 @@
 from typing import Optional
 
 from qgis.PyQt.QtCore import Qt, QObject, pyqtSignal
-from qgis.PyQt.QtWidgets import QWidget, QSpinBox, QDoubleSpinBox, QListWidget, QLabel, QLineEdit, QComboBox
+from qgis.PyQt.QtWidgets import QWidget, QSpinBox, QDoubleSpinBox, QListWidget, QLabel, QLineEdit, QComboBox, QDialog
 
 from qgis.core import QgsFeature, NULL, QgsProject, QgsVectorLayer
+from qgis.gui import QgsNewNameDialog
 
 from ..core import LayerUtils, LayerType, PROJECT_CONTROLLER
 
@@ -28,6 +29,7 @@ class PageController(QObject):
         self.current_item_label = current_item_label
         self.skip_fields_for_widgets = []
         self._block_feature_updates = False
+        self.name_field: str = "name"
 
         self.current_feature_id: Optional[int] = None
 
@@ -132,3 +134,39 @@ class PageController(QObject):
                 pass
             else:
                 assert False
+
+    def rename_current_selection(self):
+        """
+        Renames the selected object
+        """
+        selected_item = self.list_widget.selectedItems()[0]
+        feature_id = selected_item.data(Qt.UserRole)
+
+        existing_names = [
+            self.list_widget.item(i).text()
+            for i in range(self.list_widget.count())
+        ]
+
+        dialog = QgsNewNameDialog(
+            initial="",
+            existing=existing_names,
+            cs=Qt.CaseSensitivity.CaseSensitive,
+            parent=self.og_widget.iface.mainWindow(),
+        )
+
+        dialog.setWindowTitle(self.tr("Rename {}").format(self.layer_type.as_title_case(plural=False)))
+        dialog.setAllowEmptyName(False)
+        dialog.setHintString(self.tr("Enter a new name for the {}").format(self.layer_type.as_sentence_case(plural=False)))
+
+        if dialog.exec_() != QDialog.DialogCode.Accepted:
+            return
+
+        new_feat_name = dialog.name()
+        selected_item.setText(new_feat_name)
+        if self.current_item_label is not None:
+            self.current_item_label.setText(new_feat_name)
+
+        layer = self.get_layer()
+        layer.startEditing()
+        layer.changeAttributeValue(feature_id, layer.fields().lookupField(self.name_field), new_feat_name)
+        layer.commitChanges()

@@ -35,7 +35,7 @@ class DevelopmentSitesPageController(PageController):
         )
 
         self.og_widget.toolButton_development_site_rename.clicked.connect(
-            self.update_site_name_gpkg
+            self.rename_current_selection
         )
 
         self.og_widget.address.textChanged.connect(self.save_widget_value_to_feature)
@@ -189,62 +189,6 @@ class DevelopmentSitesPageController(PageController):
         level_layer.setSubsetString(
             f"name IN ({name_filter})"
         )
-
-    def update_site_name_gpkg(self) -> None:
-        """
-        Updates the name of the table in the geopackage.
-        """
-        widget = self.og_widget.listWidget_development_sites.selectedItems()[0]
-        old_feat_name = widget.text()
-
-        existing_names = [
-            self.og_widget.listWidget_development_sites.item(i).text()
-            for i in range(self.og_widget.listWidget_development_sites.count())
-        ]
-
-        dialog = QgsNewNameDialog(
-            initial="",
-            existing=existing_names,
-            cs=Qt.CaseSensitivity.CaseSensitive,
-            parent=self.og_widget.iface.mainWindow(),
-        )
-
-        dialog.setWindowTitle(self.tr("Rename"))
-        dialog.setAllowEmptyName(False)
-        dialog.setHintString(self.tr("Enter a name for the development site"))
-
-        if dialog.exec_() != QDialog.DialogCode.Accepted:
-            return
-
-        new_feat_name = dialog.name()
-
-        old_item_id = self.og_widget.listWidget_development_sites.row(widget)
-        self.og_widget.listWidget_development_sites.takeItem(old_item_id)
-        self.og_widget.listWidget_development_sites.addItem(new_feat_name)
-
-        layer = QgsVectorLayer(
-            f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.development_site_prefix}",
-            SETTINGS_MANAGER.development_site_prefix,
-            "ogr",
-        )
-        if layer:
-            layer.startEditing()
-            for feature in layer.getFeatures():
-                if feature["name"] == old_feat_name:
-                    feature["name"] = new_feat_name
-                    layer.updateFeature(feature)
-            layer.commitChanges()
-
-        # Set selection to changed item
-        item_to_select = self.og_widget.listWidget_development_sites.findItems(
-            new_feat_name, Qt.MatchExactly
-        )[0]
-        self.og_widget.listWidget_development_sites.setCurrentItem(item_to_select)
-        SETTINGS_MANAGER.set_current_development_site_feature_name(
-            item_to_select.text()
-        )
-
-        self.og_widget.label_current_development_site.setText(new_feat_name)
 
     def get_elevation_from_dem(self, checked) -> None:
         """Gets the elevation for a centroid in a polygon feature and sets it as an attribute."""

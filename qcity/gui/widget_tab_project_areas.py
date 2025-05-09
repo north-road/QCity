@@ -36,7 +36,7 @@ class ProjectAreasPageController(PageController):
         )
 
         self.og_widget.toolButton_project_area_rename.clicked.connect(
-            self.rename_area
+            self.rename_current_selection
         )
 
         self.og_widget.pushButton_import_project_areas.clicked.connect(
@@ -56,8 +56,11 @@ class ProjectAreasPageController(PageController):
             item_text = next(iter(feature_ids.values())).text()
         else:
             item_text = ', '.join(t.text() for t in feature_ids.values())
-        if QMessageBox.warning(self.list_widget, self.tr('Remove Project Area'),
-                                self.tr('Are you sure you want to remove {}?. This will permanently delete the project area and all development sites from the database.').format(item_text),
+        if QMessageBox.warning(self.list_widget, self.tr('Remove {}').format(self.layer_type.as_title_case(plural=False)),
+                                self.tr('Are you sure you want to remove {}?. This will permanently delete the {} and all related objects from the database.').format(
+                                    item_text,
+                                    self.layer_type.as_sentence_case(plural=False)
+                                ),
                                 QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No,
                                 QMessageBox.StandardButton.No
                                 ) != QMessageBox.StandardButton.Yes:
@@ -85,41 +88,6 @@ class ProjectAreasPageController(PageController):
             self.og_widget.iface.mapCanvas(),
             feature_bbox,
         )
-
-    def rename_area(self) -> None:
-        """
-        Renames the selected area
-        """
-        selected_item = self.list_widget.selectedItems()[0]
-        feature_id = selected_item.data(Qt.UserRole)
-
-        existing_names = [
-            self.list_widget.item(i).text()
-            for i in range(self.list_widget.count())
-        ]
-
-        dialog = QgsNewNameDialog(
-            initial="",
-            existing=existing_names,
-            cs=Qt.CaseSensitivity.CaseSensitive,
-            parent=self.og_widget.iface.mainWindow(),
-        )
-
-        dialog.setWindowTitle(self.tr("Rename Project Area"))
-        dialog.setAllowEmptyName(False)
-        dialog.setHintString(self.tr("Enter a new name for the project area"))
-
-        if dialog.exec_() != QDialog.DialogCode.Accepted:
-            return
-
-        new_feat_name = dialog.name()
-        selected_item.setText(new_feat_name)
-        self.current_item_label.setText(new_feat_name)
-
-        layer = self.get_layer()
-        layer.startEditing()
-        layer.changeAttributeValue(feature_id, layer.fields().lookupField("name"), new_feat_name)
-        layer.commitChanges()
 
     def import_project_area_geometries(self):
         """Imports geometries as project areas from a file."""
