@@ -6,11 +6,14 @@ from qgis.core import (
     QgsProject,
     QgsVectorLayer,
     QgsRelation,
-    QgsRelationContext
+    QgsRelationContext,
+    QgsFeatureRequest,
+    QgsExpression
 )
 
 from .settings import SETTINGS_MANAGER
 from .enums import LayerType
+from .database import DatabaseUtils
 
 class ProjectController(QObject):
     """
@@ -144,6 +147,63 @@ class ProjectController(QObject):
         """
         self.current_project_area_fid = project_area_fid
         self.project_area_changed.emit(self.current_project_area_fid)
+
+    def delete_project_area(self, project_area_fid: int) -> bool:
+        """
+        Deletes the specified project area, and all child objects
+        """
+        project_area_layer = self.get_project_area_layer()
+        if not project_area_layer:
+            return False
+
+        project_area_feature = project_area_layer.getFeature(project_area_fid)
+        if not project_area_feature.isValid():
+            return False
+
+        project_area_primary_key = project_area_feature[DatabaseUtils.primary_key_for_layer(LayerType.ProjectAreas)]
+
+        # find matching development sites
+        request = QgsFeatureRequest().setFilterExpression(
+            QgsExpression.createFieldEqualityExpression(DatabaseUtils.foreign_key_for_layer(LayerType.DevelopmentSites),
+                                                        project_area_primary_key)
+        )
+        development_site_layer = self.get_development_sites_layer()
+        development_site_features = [f for f in development_site_layer.getFeatures(request)]
+
+        # find matching building levels
+        development_site_primary_keys = [
+            f[DatabaseUtils.primary_key_for_layer(LayerType.DevelopmentSites)] for f in development_site_features
+        ]
+        building_levels_filter = '{} IN ({})'.format(
+            DatabaseUtils.foreign_key_for_layer(LayerType.BuildingLevels),
+            ','.join([str(k) for k in development_site_primary_keys])
+        )
+        request = QgsFeatureRequest().setFilterExpression(
+            building_levels_filter
+        )
+        building_level_layer = self.get_building_levels_layer()
+        building_level_features = [f for f in building_level_layer.getFeatures(request)]
+
+        if not building_level_layer.startEditing():
+            return False
+        if not building_level_layer.deleteFeatures([f.id() for f in building_level_features]):
+            return False
+
+        if not development_site_layer.startEditing():
+            return False
+        if not development_site_layer.deleteFeatures([f.id() for f in development_site_features]):
+            return False
+
+        if not project_area_layer.startEditing():
+            return False
+        if not project_area_layer.deleteFeature(project_area_fid):
+            return False
+
+        # only commit if ALL layer edits were successful
+        building_level_layer.commitChanges()
+        development_site_layer.commitChanges()
+        project_area_layer.commitChanges()
+        return True
 
 
 PROJECT_CONTROLLER = ProjectController(QgsProject.instance())

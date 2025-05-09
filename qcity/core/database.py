@@ -20,6 +20,17 @@ class DatabaseUtils:
     """
 
     @staticmethod
+    def primary_key_for_layer(layer: LayerType) -> str:
+        """
+        Returns the primary key field name for the given layer
+        """
+        return {
+            LayerType.ProjectAreas: "fid",
+            LayerType.DevelopmentSites: "fid",
+            LayerType.BuildingLevels: "fid",
+        }[layer]
+
+    @staticmethod
     def foreign_key_for_layer(layer: LayerType) -> Optional[str]:
         """
         Returns the foreign key field name for the given layer
