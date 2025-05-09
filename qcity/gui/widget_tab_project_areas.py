@@ -73,21 +73,12 @@ class ProjectAreasPageController(PageController):
                 return
 
     def set_feature(self, feature: QgsFeature):
-        area_layer = self.get_layer()
-
         super().set_feature(feature)
 
         PROJECT_CONTROLLER.set_current_project_area(feature.id())
 
         # todo hide others from RENDERER only!!
         # area_layer.setSubsetString(f"\"fid\" = '{feature.id()}'")
-
-        feature_bbox = QgsReferencedRectangle(feature.geometry().boundingBox(), area_layer.crs())
-
-        CanvasUtils.zoom_to_extent_if_not_visible(
-            self.og_widget.iface.mapCanvas(),
-            feature_bbox,
-        )
 
     def import_project_area_geometries(self):
         """Imports geometries as project areas from a file."""

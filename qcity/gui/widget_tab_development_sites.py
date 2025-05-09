@@ -83,21 +83,12 @@ class DevelopmentSitesPageController(PageController):
             self.list_widget.addItem(item)
 
     def set_feature(self, feature: QgsFeature):
-        site_layer = self.get_layer()
-
         super().set_feature(feature)
 
-        # PROJECT_CONTROLLER.set_current_project_area(feature.id())
+        PROJECT_CONTROLLER.set_current_development_site(feature.id())
 
         # TODO hide others from renderer only!
         # site_layer.setSubsetString(f"\"fid\" = '{feature.id()}'")
-
-        feature_bbox = QgsReferencedRectangle(feature.geometry().boundingBox(), site_layer.crs())
-
-        CanvasUtils.zoom_to_extent_if_not_visible(
-            self.og_widget.iface.mapCanvas(),
-            feature_bbox,
-        )
 
     def remove_selected_sites(self) -> None:
         """Removes selected area from Qlistwidget, map and geopackage."""

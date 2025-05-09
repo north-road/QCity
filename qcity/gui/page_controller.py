@@ -3,11 +3,11 @@ from typing import Optional
 from qgis.PyQt.QtCore import Qt, QObject, pyqtSignal
 from qgis.PyQt.QtWidgets import QWidget, QSpinBox, QDoubleSpinBox, QListWidget, QLabel, QLineEdit, QComboBox, QDialog
 
-from qgis.core import QgsFeature, NULL, QgsProject, QgsVectorLayer
+from qgis.core import QgsFeature, NULL, QgsReferencedRectangle, QgsVectorLayer
 from qgis.gui import QgsNewNameDialog
 
 from ..core import LayerUtils, LayerType, PROJECT_CONTROLLER
-
+from .canvas_utils import CanvasUtils
 
 class PageController(QObject):
     """
@@ -102,6 +102,8 @@ class PageController(QObject):
         self.set_widget_values(attributes)
         self._block_feature_updates = False
 
+        self.zoom_to_feature(feature)
+
     def set_widget_values(self, widget_values: dict):
         """
         Sets widget values from a dictionary
@@ -170,3 +172,14 @@ class PageController(QObject):
         layer.startEditing()
         layer.changeAttributeValue(feature_id, layer.fields().lookupField(self.name_field), new_feat_name)
         layer.commitChanges()
+
+    def zoom_to_feature(self, feature: QgsFeature):
+        """
+        Centers the canvas on a feature
+        """
+        feature_bbox = QgsReferencedRectangle(feature.geometry().boundingBox(), site_layer.crs())
+
+        CanvasUtils.zoom_to_extent_if_not_visible(
+            self.og_widget.iface.mapCanvas(),
+            feature_bbox,
+        )
