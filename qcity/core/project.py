@@ -214,5 +214,42 @@ class ProjectController(QObject):
         project_area_layer.commitChanges()
         return True
 
+    def delete_development_site(self, development_site_fid: int) -> bool:
+        """
+        Deletes the specified development site, and all child objects
+        """
+        development_site_layer = self.get_development_sites_layer()
+        if not development_site_layer:
+            return False
+
+        development_site_feature = development_site_layer.getFeature(development_site_fid)
+        if not development_site_feature.isValid():
+            return False
+
+        development_site_primary_key = development_site_feature[DatabaseUtils.primary_key_for_layer(LayerType.DevelopmentSites)]
+
+        # find matching building levels
+        request = QgsFeatureRequest().setFilterExpression(
+            QgsExpression.createFieldEqualityExpression(DatabaseUtils.foreign_key_for_layer(LayerType.BuildingLevels),
+                                                        development_site_primary_key)
+        )
+        building_level_layer = self.get_building_levels_layer()
+        building_level_features = [f for f in building_level_layer.getFeatures(request)]
+
+        if not building_level_layer.startEditing():
+            return False
+        if not building_level_layer.deleteFeatures([f.id() for f in building_level_features]):
+            return False
+
+        if not development_site_layer.startEditing():
+            return False
+        if not development_site_layer.deleteFeature(development_site_fid):
+            return False
+
+        # only commit if ALL layer edits were successful
+        building_level_layer.commitChanges()
+        development_site_layer.commitChanges()
+        return True
+
 
 PROJECT_CONTROLLER = ProjectController(QgsProject.instance())

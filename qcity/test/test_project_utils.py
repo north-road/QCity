@@ -249,3 +249,157 @@ class TestProjectUtils(unittest.TestCase):
             self.assertFalse(development_site_layer.isEditable())
             self.assertFalse([f.id() for f in building_level_layer.getFeatures()])
             self.assertFalse(building_level_layer.isEditable())
+
+    def test_delete_development_site(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            gpkg_path = os.path.join(temp_dir, "test_database.gpkg")
+
+            DatabaseUtils.create_base_tables(
+                gpkg_path
+            )
+
+            p = QgsProject.instance()
+            controller = ProjectController(p)
+            controller.add_database_layers_to_project(p, gpkg_path)
+
+            project_area_layer = controller.get_project_area_layer()
+            project_area_layer.startEditing()
+            # create some initial features
+            f = QgsVectorLayerUtils.createFeature(project_area_layer)
+            f['car_parking_1_bedroom'] = 1
+            f['car_parking_2_bedroom'] = 2
+            f['car_parking_3_bedroom'] = 3
+            f['car_parking_4_bedroom'] = 4
+            self.assertTrue(project_area_layer.addFeature(f))
+            f = QgsVectorLayerUtils.createFeature(project_area_layer)
+            f['car_parking_1_bedroom'] = 11
+            f['car_parking_2_bedroom'] = 12
+            f['car_parking_3_bedroom'] = 13
+            f['car_parking_4_bedroom'] = 14
+            self.assertTrue(project_area_layer.addFeature(f))
+            f = QgsVectorLayerUtils.createFeature(project_area_layer)
+            f['car_parking_1_bedroom'] = 21
+            f['car_parking_2_bedroom'] = 22
+            f['car_parking_3_bedroom'] = 23
+            f['car_parking_4_bedroom'] = 24
+            self.assertTrue(project_area_layer.addFeature(f))
+
+            self.assertTrue(project_area_layer.commitChanges())
+
+            f1 = None
+            f2 = None
+            f3 = None
+            for f in project_area_layer.getFeatures():
+                if f['car_parking_1_bedroom'] == 1:
+                    f1 = f
+                elif f['car_parking_1_bedroom'] == 11:
+                    f2 = f
+                elif f['car_parking_1_bedroom'] == 21:
+                    f3 = f
+
+            f1_pk = f1['fid']
+            f2_pk = f2['fid']
+
+            development_site_layer = controller.get_development_sites_layer()
+            development_site_layer.startEditing()
+            f = QgsVectorLayerUtils.createFeature(development_site_layer)
+            f['project_area_pk'] = f1_pk
+            f['address'] = 'a1'
+            self.assertTrue(development_site_layer.addFeature(f))
+            f = QgsVectorLayerUtils.createFeature(development_site_layer)
+            f['project_area_pk'] = f1_pk
+            f['address'] = 'a2'
+            self.assertTrue(development_site_layer.addFeature(f))
+            f = QgsVectorLayerUtils.createFeature(development_site_layer)
+            f['project_area_pk'] = f2_pk
+            f['address'] = 'b1'
+            self.assertTrue(development_site_layer.addFeature(f))
+            self.assertTrue(development_site_layer.commitChanges())
+
+            ds1 = None
+            ds2 = None
+            ds3 = None
+            for f in development_site_layer.getFeatures():
+                if f['address'] == 'a1':
+                    ds1 = f
+                elif f['address'] == 'a2':
+                    ds2 = f
+                elif f['address'] == 'b1':
+                    ds3 = f
+
+            ds1_pk = ds1['fid']
+            ds3_pk = ds3['fid']
+
+            # make some building levels
+
+            building_level_layer = controller.get_building_levels_layer()
+            building_level_layer.startEditing()
+            f = QgsVectorLayerUtils.createFeature(building_level_layer)
+            f['development_site_pk'] = ds1_pk
+            f['office_floorspace'] = 44
+            self.assertTrue(building_level_layer.addFeature(f))
+            f = QgsVectorLayerUtils.createFeature(building_level_layer)
+            f['development_site_pk'] = ds1_pk
+            f['office_floorspace'] = 45
+            self.assertTrue(building_level_layer.addFeature(f))
+            f = QgsVectorLayerUtils.createFeature(building_level_layer)
+            f['development_site_pk'] = ds3_pk
+            f['office_floorspace'] = 46
+            self.assertTrue(building_level_layer.addFeature(f))
+            self.assertTrue(building_level_layer.commitChanges())
+
+            bl1 = None
+            bl2 = None
+            bl3 = None
+            for f in building_level_layer.getFeatures():
+                if f['office_floorspace'] == 44:
+                    bl1 = f
+                elif f['office_floorspace'] == 45:
+                    bl2 = f
+                elif f['office_floorspace'] == 46:
+                    bl3 = f
+
+            # delete development site which doesn't exist
+            self.assertFalse(
+                controller.delete_development_site(1111)
+            )
+            # nothing should have changed
+            self.assertEqual(len(list(project_area_layer.getFeatures())), 3)
+            self.assertFalse(project_area_layer.isEditable())
+            self.assertEqual(len(list(development_site_layer.getFeatures())), 3)
+            self.assertFalse(development_site_layer.isEditable())
+            self.assertEqual(len(list(building_level_layer.getFeatures())), 3)
+            self.assertFalse(building_level_layer.isEditable())
+
+            # delete a valid development site
+            self.assertTrue(controller.delete_development_site(ds1.id()))
+            self.assertCountEqual([f.id() for f in project_area_layer.getFeatures()],
+                                  [f1.id(), f2.id(), f3.id()])
+            self.assertFalse(project_area_layer.isEditable())
+            self.assertCountEqual([f.id() for f in development_site_layer.getFeatures()],
+                                  [ds2.id(), ds3.id()])
+            self.assertFalse(development_site_layer.isEditable())
+            self.assertCountEqual([f.id() for f in building_level_layer.getFeatures()],
+                                  [bl3.id()])
+            self.assertFalse(building_level_layer.isEditable())
+
+            # nothing attached
+            self.assertTrue(controller.delete_development_site(ds2.id()))
+            self.assertCountEqual([f.id() for f in project_area_layer.getFeatures()],
+                                  [f1.id(), f2.id(), f3.id()])
+            self.assertFalse(project_area_layer.isEditable())
+            self.assertCountEqual([f.id() for f in development_site_layer.getFeatures()],
+                                  [ds3.id()])
+            self.assertFalse(development_site_layer.isEditable())
+            self.assertCountEqual([f.id() for f in building_level_layer.getFeatures()],
+                                  [bl3.id()])
+            self.assertFalse(building_level_layer.isEditable())
+
+            self.assertTrue(controller.delete_development_site(ds3.id()))
+            self.assertCountEqual([f.id() for f in project_area_layer.getFeatures()],
+                                  [f1.id(), f2.id(), f3.id()])
+            self.assertFalse(project_area_layer.isEditable())
+            self.assertFalse([f.id() for f in development_site_layer.getFeatures()])
+            self.assertFalse(development_site_layer.isEditable())
+            self.assertFalse([f.id() for f in building_level_layer.getFeatures()])
+            self.assertFalse(building_level_layer.isEditable())
