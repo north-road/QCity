@@ -1,21 +1,13 @@
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import (
-    QSpinBox,
-    QDoubleSpinBox,
-    QMessageBox,
-    QDialog,
     QFileDialog
 )
-from qgis.PyQt.QtCore import Qt
 from qgis.core import (
     QgsFeature,
-    QgsVectorLayer,
-    QgsProject,
-    QgsReferencedRectangle
+    QgsVectorLayer
 )
-from qgis.gui import QgsNewNameDialog
 
 from qcity.core import SETTINGS_MANAGER, LayerType, PROJECT_CONTROLLER
-from .canvas_utils import CanvasUtils
 from .page_controller import PageController
 
 
@@ -23,6 +15,7 @@ class ProjectAreasPageController(PageController):
     """
     Page controller for the project areas page
     """
+
     def __init__(self, og_widget, tab_widget, list_widget, current_label):
         super().__init__(LayerType.ProjectAreas, og_widget, tab_widget, list_widget, current_label)
         self.skip_fields_for_widgets = ("fid", "name")
@@ -32,7 +25,7 @@ class ProjectAreasPageController(PageController):
         )
 
         self.og_widget.toolButton_project_area_remove.clicked.connect(
-            self.remove_selected_areas
+            self.remove_current_selection
         )
 
         self.og_widget.toolButton_project_area_rename.clicked.connect(
@@ -43,34 +36,8 @@ class ProjectAreasPageController(PageController):
             self.import_project_area_geometries
         )
 
-    def remove_selected_areas(self) -> None:
-        """Removes selected area from QListwidget, map and geopackage."""
-        selected_items = self.list_widget.selectedItems()
-        if not selected_items:
-            return
-
-        feature_ids = {
-            item.data(Qt.UserRole): item for item in selected_items
-        }
-        if len(feature_ids) == 1:
-            item_text = next(iter(feature_ids.values())).text()
-        else:
-            item_text = ', '.join(t.text() for t in feature_ids.values())
-        if QMessageBox.warning(self.list_widget, self.tr('Remove {}').format(self.layer_type.as_title_case(plural=False)),
-                                self.tr('Are you sure you want to remove {}?. This will permanently delete the {} and all related objects from the database.').format(
-                                    item_text,
-                                    self.layer_type.as_sentence_case(plural=False)
-                                ),
-                                QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No,
-                                QMessageBox.StandardButton.No
-                                ) != QMessageBox.StandardButton.Yes:
-            return
-
-        for feature_id, item in feature_ids.items():
-            if PROJECT_CONTROLLER.delete_project_area(feature_id):
-                self.list_widget.takeItem(self.list_widget.row(item))
-            else:
-                return
+    def delete_feature_and_child_objects(self, feature_id: int) -> bool:
+        return PROJECT_CONTROLLER.delete_project_area(feature_id)
 
     def set_feature(self, feature: QgsFeature):
         super().set_feature(feature)

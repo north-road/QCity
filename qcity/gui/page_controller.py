@@ -75,6 +75,14 @@ class PageController(QObject):
         """
         return self.get_layer().getFeature(feature_id)
 
+    def delete_feature_and_child_objects(self, feature_id: int) -> bool:
+        """
+        Deletes a parent feature and all its child objects
+
+        Returns True if the deletion was successful
+        """
+        return False
+
     def save_widget_value_to_feature(self, value):
         """
         Triggered when a widget value is changed by the user
@@ -136,6 +144,38 @@ class PageController(QObject):
                 pass
             else:
                 assert False
+
+    def remove_current_selection(self) -> None:
+        """
+        Removes selected objects from the list widget, and deletes them
+        (and all child objects) from the database.
+        """
+        selected_items = self.list_widget.selectedItems()
+        if not selected_items:
+            return
+
+        feature_ids = {
+            item.data(Qt.UserRole): item for item in selected_items
+        }
+        if len(feature_ids) == 1:
+            item_text = next(iter(feature_ids.values())).text()
+        else:
+            item_text = ', '.join(t.text() for t in feature_ids.values())
+        if QMessageBox.warning(self.list_widget, self.tr('Remove {}').format(self.layer_type.as_title_case(plural=False)),
+                                self.tr('Are you sure you want to remove {}?. This will permanently delete the {} and all related objects from the database.').format(
+                                    item_text,
+                                    self.layer_type.as_sentence_case(plural=False)
+                                ),
+                                QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No,
+                                QMessageBox.StandardButton.No
+                                ) != QMessageBox.StandardButton.Yes:
+            return
+
+        for feature_id, item in feature_ids.items():
+            if self.delete_feature_and_child_objects(feature_id):
+                self.list_widget.takeItem(self.list_widget.row(item))
+            else:
+                return
 
     def rename_current_selection(self):
         """
