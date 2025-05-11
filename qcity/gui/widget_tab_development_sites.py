@@ -134,32 +134,6 @@ class DevelopmentSitesPageController(PageController):
                     widget.setValue(0)
                     # self.og_widget.tabWidget_project_area_parameters.setEnabled(False)
 
-    def update_building_level_listwidget(self, item: QListWidgetItem) -> None:
-        """Updates the building levels listwidget to only contain sites within the current development site"""
-        if not item:
-            return
-
-        level_layer = PROJECT_CONTROLLER.get_building_levels_layer()
-        site_layer = PROJECT_CONTROLLER.get_development_sites_layer()
-
-        self.og_widget.listWidget_building_levels.clear()
-        site_layer.setSubsetString("")
-        level_layer.setSubsetString("")
-
-        names = list()
-        pk = SETTINGS_MANAGER.get_pk(SETTINGS_MANAGER.building_level_prefix)
-        for feat in level_layer.getFeatures():
-            if feat.id() == pk:
-                name = feat["name"]
-                self.og_widget.listWidget_building_levels.addItem(name)
-                names.append(name)
-
-        site_layer.setSubsetString(f"\"name\" = '{item.text()}'")
-        name_filter = ", ".join(f"'{name}'" for name in names)
-        level_layer.setSubsetString(
-            f"name IN ({name_filter})"
-        )
-
     def get_elevation_from_dem(self, checked) -> None:
         """Gets the elevation for a centroid in a polygon feature and sets it as an attribute."""
         if checked:
