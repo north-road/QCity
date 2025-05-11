@@ -130,18 +130,16 @@ class QCityDockWidget(QgsDockWidget):
         if not file_name:
             return None
 
-        file_name = QgsFileUtils.addExtensionFromFilter(file_name, selected_filter)
-        SETTINGS_MANAGER.set_last_used_database_folder(os.path.split(file_name)[0])
+        gpkg_path = QgsFileUtils.addExtensionFromFilter(file_name, selected_filter)
+        SETTINGS_MANAGER.set_last_used_database_folder(os.path.split(gpkg_path)[0])
 
-        SETTINGS_MANAGER.set_database_path(file_name)
+        SETTINGS_MANAGER.set_database_path(gpkg_path)
 
         self.listWidget_project_areas.clear()
         self.label_current_project_area.setText("Project")
 
         self.listWidget_development_sites.clear()
         self.label_current_development_site.setText("Project")
-
-        gpkg_path = SETTINGS_MANAGER.get_database_path()
 
         DatabaseUtils.create_base_tables(
             gpkg_path
