@@ -17,7 +17,10 @@ class BuildingLevelsPageController(PageController):
         PROJECT_CONTROLLER.building_level_added.connect(
             self._on_building_level_added
         )
-
+        PROJECT_CONTROLLER.building_level_deleted.connect(
+            self._on_building_level_deleted
+        )
+        
         self.og_widget.toolButton_building_level_add.clicked.connect(
             self.add_feature_clicked
         )
@@ -40,6 +43,12 @@ class BuildingLevelsPageController(PageController):
             return
 
         self.add_feature_to_list(feature)
+
+    def _on_building_level_deleted(self, feature_id: int):
+        """
+        Called when a building level is deleted
+        """
+        self.remove_item_from_list(feature_id)
 
     def on_development_site_changed(self, development_site_fid: int):
         """

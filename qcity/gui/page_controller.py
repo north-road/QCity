@@ -191,9 +191,17 @@ class PageController(QObject):
             return
 
         for feature_id, item in feature_ids.items():
-            if self.delete_feature_and_child_objects(feature_id):
-                self.list_widget.takeItem(self.list_widget.row(item))
-            else:
+            if not self.delete_feature_and_child_objects(feature_id):
+                return
+
+    def remove_item_from_list(self, feature_id: int):
+        """
+        Removes the item with matching feature ID from the list widget
+        """
+        for row in range(self.list_widget.count()):
+            item = self.list_widget.item(row)
+            if item.data(Qt.UserRole) == feature_id:
+                self.list_widget.takeItem(row)
                 return
 
     def rename_current_selection(self):

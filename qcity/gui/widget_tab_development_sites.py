@@ -17,6 +17,9 @@ class DevelopmentSitesPageController(PageController):
         PROJECT_CONTROLLER.development_site_added.connect(
             self._on_development_site_added
         )
+        PROJECT_CONTROLLER.development_site_deleted.connect(
+            self._on_development_site_deleted
+        )
 
         self.og_widget.toolButton_development_site_add.clicked.connect(
             self.add_feature_clicked
@@ -70,6 +73,12 @@ class DevelopmentSitesPageController(PageController):
             return
 
         self.add_feature_to_list(feature)
+
+    def _on_development_site_deleted(self, feature_id: int):
+        """
+        Called when a development site is deleted
+        """
+        self.remove_item_from_list(feature_id)
 
     def on_project_area_changed(self, project_area_fid: int):
         """

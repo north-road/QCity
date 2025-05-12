@@ -20,6 +20,13 @@ class ProjectAreasPageController(PageController):
         super().__init__(LayerType.ProjectAreas, og_widget, tab_widget, list_widget, current_label)
         self.skip_fields_for_widgets = ("fid", "name")
 
+        PROJECT_CONTROLLER.project_area_added.connect(
+            self._on_project_area_added
+        )
+        PROJECT_CONTROLLER.project_area_deleted.connect(
+            self._on_project_area_deleted
+        )
+
         self.og_widget.toolButton_project_area_add.clicked.connect(
             self.add_feature_clicked
         )
@@ -35,15 +42,18 @@ class ProjectAreasPageController(PageController):
         self.og_widget.pushButton_import_project_areas.clicked.connect(
             self.import_project_area_geometries
         )
-        PROJECT_CONTROLLER.project_area_added.connect(
-            self._on_project_area_added
-        )
 
     def _on_project_area_added(self, feature: QgsFeature):
         """
         Called when a new project area is created
         """
         self.add_feature_to_list(feature)
+
+    def _on_project_area_deleted(self, feature_id: int):
+        """
+        Called when a project area is deleted
+        """
+        self.remove_item_from_list(feature_id)
 
     def delete_feature_and_child_objects(self, feature_id: int) -> bool:
         return PROJECT_CONTROLLER.delete_project_area(feature_id)

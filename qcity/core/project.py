@@ -23,9 +23,15 @@ class ProjectController(QObject):
 
     project_area_changed = pyqtSignal(int)
     development_site_changed = pyqtSignal(int)
+
     project_area_added = pyqtSignal(QgsFeature)
+    project_area_deleted = pyqtSignal(int)
+
     development_site_added = pyqtSignal(QgsFeature)
+    development_site_deleted = pyqtSignal(int)
+
     building_level_added = pyqtSignal(QgsFeature)
+    building_level_deleted = pyqtSignal(int)
 
     def __init__(self, project: QgsProject):
         super().__init__()
@@ -58,22 +64,28 @@ class ProjectController(QObject):
         if project_area_layer:
             if disconnect:
                 project_area_layer.featureAdded.disconnect(self._project_area_added)
+                project_area_layer.featureDeleted.disconnect(self._project_area_deleted)
             else:
                 project_area_layer.featureAdded.connect(self._project_area_added)
+                project_area_layer.featureDeleted.connect(self._project_area_deleted)
 
         development_site_layers = self.get_development_sites_layer()
         if development_site_layers:
             if disconnect:
                 development_site_layers.featureAdded.disconnect(self._development_site_added)
+                development_site_layers.featureDeleted.disconnect(self._development_site_deleted)
             else:
                 development_site_layers.featureAdded.connect(self._development_site_added)
+                development_site_layers.featureDeleted.connect(self._development_site_deleted)
 
         building_levels_layer = self.get_building_levels_layer()
         if building_levels_layer:
             if disconnect:
                 building_levels_layer.featureAdded.disconnect(self._building_level_added)
+                building_levels_layer.featureDeleted.disconnect(self._building_level_deleted)
             else:
                 building_levels_layer.featureAdded.connect(self._building_level_added)
+                building_levels_layer.featureDeleted.connect(self._building_level_deleted)
 
     def _project_area_added(self, project_area_fid: int):
         """
@@ -85,6 +97,18 @@ class ProjectController(QObject):
 
         self.project_area_added.emit(
             self.get_project_area_layer().getFeature(project_area_fid)
+        )
+
+    def _project_area_deleted(self, project_area_fid: int):
+        """
+        Called when a project area is deleted
+        """
+        if project_area_fid < 0:
+            # ignore uncommitted features
+            return
+
+        self.project_area_deleted.emit(
+            project_area_fid
         )
 
     def _development_site_added(self, development_site_fid: int):
@@ -99,6 +123,18 @@ class ProjectController(QObject):
             self.get_development_sites_layer().getFeature(development_site_fid)
         )
 
+    def _development_site_deleted(self, development_site_fid: int):
+        """
+        Called when a development site is deleted
+        """
+        if development_site_fid < 0:
+            # ignore uncommitted features
+            return
+
+        self.development_site_deleted.emit(
+            development_site_fid
+        )
+
     def _building_level_added(self, building_level_fid: int):
         """
         Called when a new building level is added to the layer
@@ -109,6 +145,18 @@ class ProjectController(QObject):
 
         self.building_level_added.emit(
             self.get_building_levels_layer().getFeature(building_level_fid)
+        )
+
+    def _building_level_deleted(self, building_level_fid: int):
+        """
+        Called when a building level is deleted
+        """
+        if building_level_fid < 0:
+            # ignore uncommitted features
+            return
+
+        self.building_level_deleted.emit(
+            building_level_fid
         )
 
     @staticmethod
