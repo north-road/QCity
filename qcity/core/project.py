@@ -100,6 +100,16 @@ class ProjectController(QObject):
             return self.get_building_levels_layer()
         return None
 
+    def get_unique_names(self, layer: LayerType) -> List[str]:
+        """
+        Gets a list of all existing unique names for the specified layer type,
+        sorted alphabetically.
+        """
+        map_layer = self.get_layer(layer)
+        return sorted(map_layer.uniqueValues(map_layer.fields().lookupField(
+            DatabaseUtils.name_field_for_layer(layer)
+        )), key=str.casefold)
+
     def create_layer_relations(self):
         """Adds relations between layers to the QGIS project."""
         relation_manager = self.project.relationManager()

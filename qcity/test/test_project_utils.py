@@ -403,3 +403,70 @@ class TestProjectUtils(unittest.TestCase):
             self.assertFalse(development_site_layer.isEditable())
             self.assertFalse([f.id() for f in building_level_layer.getFeatures()])
             self.assertFalse(building_level_layer.isEditable())
+
+    def test_names(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            gpkg_path = os.path.join(temp_dir, "test_database.gpkg")
+
+            DatabaseUtils.create_base_tables(
+                gpkg_path
+            )
+
+            p = QgsProject.instance()
+            controller = ProjectController(p)
+            controller.add_database_layers_to_project(p, gpkg_path)
+
+            project_area_layer = controller.get_project_area_layer()
+            project_area_layer.startEditing()
+            # create some initial features
+            f = QgsVectorLayerUtils.createFeature(project_area_layer)
+            f['name'] = 'Feature 1 Name'
+            self.assertTrue(project_area_layer.addFeature(f))
+            f = QgsVectorLayerUtils.createFeature(project_area_layer)
+            f['name'] = "feature 2"
+            self.assertTrue(project_area_layer.addFeature(f))
+            f = QgsVectorLayerUtils.createFeature(project_area_layer)
+            f['name'] = "a3"
+            self.assertTrue(project_area_layer.addFeature(f))
+            self.assertTrue(project_area_layer.commitChanges())
+
+            development_site_layer = controller.get_development_sites_layer()
+            development_site_layer.startEditing()
+            f = QgsVectorLayerUtils.createFeature(development_site_layer)
+            f['name'] = "dev site 1"
+            self.assertTrue(development_site_layer.addFeature(f))
+            f = QgsVectorLayerUtils.createFeature(development_site_layer)
+            f['name'] = "Development site 2"
+            self.assertTrue(development_site_layer.addFeature(f))
+            f = QgsVectorLayerUtils.createFeature(development_site_layer)
+            f['name'] = "Aaa 3"
+            self.assertTrue(development_site_layer.addFeature(f))
+            self.assertTrue(development_site_layer.commitChanges())
+
+            # make some building levels
+            building_level_layer = controller.get_building_levels_layer()
+            building_level_layer.startEditing()
+            f = QgsVectorLayerUtils.createFeature(building_level_layer)
+            f['name'] = "Floor 3"
+            self.assertTrue(building_level_layer.addFeature(f))
+            f = QgsVectorLayerUtils.createFeature(building_level_layer)
+            f['name'] = "Floor 4"
+            self.assertTrue(building_level_layer.addFeature(f))
+            f = QgsVectorLayerUtils.createFeature(building_level_layer)
+            f['name'] = "floor 1"
+            self.assertTrue(building_level_layer.addFeature(f))
+            self.assertTrue(building_level_layer.commitChanges())
+
+            self.assertEqual(
+                controller.get_unique_names(LayerType.ProjectAreas),
+                ['a3', 'Feature 1 Name', 'feature 2']
+            )
+
+            self.assertEqual(
+                controller.get_unique_names(LayerType.DevelopmentSites),
+                ['Aaa 3', 'dev site 1', 'Development site 2']
+            )
+            self.assertEqual(
+                controller.get_unique_names(LayerType.BuildingLevels),
+                ['floor 1', 'Floor 3', 'Floor 4']
+            )

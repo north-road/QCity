@@ -180,9 +180,6 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             list_widget = self.dlg.listWidget_development_sites
         elif self._layer_type == LayerType.ProjectAreas:
             list_widget = self.dlg.listWidget_project_areas
-            site_layer = PROJECT_CONTROLLER.get_development_sites_layer()
-            sql_filter = "FALSE"
-            site_layer.setSubsetString(sql_filter)
         elif self._layer_type == LayerType.BuildingLevels:
             list_widget = self.dlg.listWidget_building_levels
         else:
