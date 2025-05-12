@@ -4,21 +4,21 @@
     },
     "address": {
         "type": "string",
-        "widget": "lineedit"
+        "default" : ""
     },
     "site_status": {
         "type": "int",
-        "widget": "combo"
+        "default": 0
     },
     "date": {
-        "type": "date",
-        "widget": "dateedit"
+        "type": "date"
     },
     "site_owner": {
         "type": "string",
-        "widget": "lineedit"
+        "default": ""
     },
     "site_elevation": {
-        "type": "double"
+        "type": "double",
+        "default": 0
     }
 }

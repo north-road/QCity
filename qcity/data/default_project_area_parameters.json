@@ -1,82 +1,82 @@
 {
     "dwelling_size_1_bedroom": {
         "type": "double",
-        "widget": "spinbox"
+        "default": 30
     },
     "dwelling_size_2_bedroom": {
         "type": "double",
-        "widget": "spinbox"
+        "default": 40
     },
     "dwelling_size_3_bedroom": {
         "type": "double",
-        "widget": "spinbox"
+        "default": 50
     },
     "dwelling_size_4_bedroom": {
         "type": "double",
-        "widget": "spinbox"
+        "default": 60
     },
     "car_parking_1_bedroom": {
         "type": "int",
-        "widget": "spinbox"
+        "default": 1
     },
     "car_parking_2_bedroom": {
         "type": "int",
-        "widget": "spinbox"
+        "default": 1
     },
     "car_parking_3_bedroom": {
         "type": "int",
-        "widget": "spinbox"
+        "default": 2
     },
     "car_parking_4_bedroom":  {
         "type": "int",
-        "widget": "spinbox"
+        "default": 3
     },
     "car_parking_commercial_bays_count": {
         "type": "int",
-        "widget": "spinbox"
+        "default": 5
     },
     "car_parking_commercial_bays_area": {
         "type": "double",
-        "widget": "spinbox"
+        "default": 100
     },
     "car_parking_office_bays_count": {
         "type": "int",
-        "widget": "spinbox"
+        "default": 5
     },
     "car_parking_office_bays_area": {
         "type": "double",
-        "widget": "spinbox"
+        "default": 100
     },
     "bicycle_parking_1_bedroom": {
         "type": "int",
-        "widget": "spinbox"
+        "default": 1
     },
     "bicycle_parking_2_bedroom": {
         "type": "int",
-        "widget": "spinbox"
+        "default": 1
     },
     "bicycler_parking_3_bedroom": {
         "type": "int",
-        "widget": "spinbox"
+        "default": 1
     },
     "bicycle_parking_4_bedroom":  {
         "type": "int",
-        "widget": "spinbox"
+        "default": 2
     },
     "bicycle_parking_commercial_bays_count": {
         "type": "int",
-        "widget": "spinbox"
+        "default": 1
     },
     "bicycle_parking_commercial_bays_area": {
         "type": "double",
-        "widget": "spinbox"
+        "default": 100
     },
     "bicycle_parking_office_bays_count": {
         "type": "int",
-        "widget": "spinbox"
+        "default": 1
     },
     "bicycle_parking_office_bays_area": {
         "type": "double",
-        "widget": "spinbox"
+        "default": 100
     }
 }

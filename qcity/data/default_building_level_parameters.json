@@ -4,58 +4,58 @@
     },
     "commercial_floorspace": {
         "type": "double",
-        "widget": "spinbox"
+        "default": 0
     },
     "office_floorspace": {
         "type": "double",
-        "widget": "spinbox"
+        "default": 0
     },
     "residential_floorspace": {
         "type": "double",
-        "widget": "spinbox"
+        "default": 0
     },
     "count_1_bedroom_dwellings": {
         "type": "int",
-        "widget": "spinbox"
+        "default": 0
     },
     "count_2_bedroom_dwellings": {
         "type": "int",
-        "widget": "spinbox"
+        "default": 0
     },
     "count_3_bedroom_dwellings": {
         "type": "int",
-        "widget": "spinbox"
+        "default": 0
     },
     "count_4_bedroom_dwellings": {
         "type": "int",
-        "widget": "spinbox"
+        "default": 0
     },
     "commercial_car_bays": {
         "type": "int",
-        "widget": "spinbox"
+        "default": 0
     },
     "office_car_bays": {
         "type": "int",
-        "widget": "spinbox"
+        "default": 0
     },
     "residential_car_bays": {
         "type": "int",
-        "widget": "spinbox"
+        "default": 0
     },
     "commercial_bicycle_bays": {
         "type": "int",
-        "widget": "spinbox"
+        "default": 0
     },
     "office_bicycle_bays": {
         "type": "int",
-        "widget": "spinbox"
+        "default": 0
     },
     "residential_bicycle_bays": {
         "type": "int",
-        "widget": "spinbox"
+        "default": 0
     },
     "level_height": {
         "type": "double",
-        "widget": "spinbox"
+        "default": 6
     }
 }
