@@ -26,5 +26,69 @@
     "site_elevation": {
         "type": "double",
         "default": 0
+    },
+    "auto_calculate_floorspace": {
+        "type": "bool",
+        "default": true
+    },
+    "commercial_floorspace": {
+        "type": "double",
+        "default": 0
+    },
+    "office_floorspace": {
+        "type": "double",
+        "default": 0
+    },
+    "residential_floorspace": {
+        "type": "double",
+        "default": 0
+    },
+    "count_1_bedroom_dwellings": {
+        "type": "int",
+        "default": 0
+    },
+    "count_2_bedroom_dwellings": {
+        "type": "int",
+        "default": 0
+    },
+    "count_3_bedroom_dwellings": {
+        "type": "int",
+        "default": 0
+    },
+    "count_4_bedroom_dwellings": {
+        "type": "int",
+        "default": 0
+    },
+    "auto_calculate_car_parking": {
+        "type": "bool",
+        "default": true
+    },
+    "commercial_car_bays": {
+        "type": "int",
+        "default": 0
+    },
+    "office_car_bays": {
+        "type": "int",
+        "default": 0
+    },
+    "residential_car_bays": {
+        "type": "int",
+        "default": 0
+    },
+    "auto_calculate_bicycle_parking": {
+        "type": "bool",
+        "default": true
+    },
+    "commercial_bicycle_bays": {
+        "type": "int",
+        "default": 0
+    },
+    "office_bicycle_bays": {
+        "type": "int",
+        "default": 0
+    },
+    "residential_bicycle_bays": {
+        "type": "int",
+        "default": 0
     }
 }

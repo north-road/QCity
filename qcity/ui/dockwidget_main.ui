@@ -909,62 +909,6 @@
                <string>Level Composition</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_11" columnstretch="0,1,2,0">
-               <item row="2" column="2">
-                <widget class="QgsDoubleSpinBox" name="residential_floorspace">
-                 <property name="maximum">
-                  <double>100.000000000000000</double>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="3">
-                <widget class="QLabel" name="label_65">
-                 <property name="text">
-                  <string>%</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="3">
-                <widget class="QLabel" name="label_67">
-                 <property name="text">
-                  <string>%</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="2">
-                <widget class="QgsDoubleSpinBox" name="office_floorspace">
-                 <property name="maximum">
-                  <double>100.000000000000000</double>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="3">
-                <widget class="QLabel" name="label_64">
-                 <property name="text">
-                  <string>%</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="5" column="3">
-                <widget class="QLabel" name="label_68">
-                 <property name="text">
-                  <string>%</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="2">
-                <widget class="QgsDoubleSpinBox" name="commercial_floorspace">
-                 <property name="maximum">
-                  <double>100.000000000000000</double>
-                 </property>
-                </widget>
-               </item>
-               <item row="5" column="2">
-                <widget class="QgsDoubleSpinBox" name="count_3_bedroom_dwellings">
-                 <property name="maximum">
-                  <double>100.000000000000000</double>
-                 </property>
-                </widget>
-               </item>
                <item row="6" column="3">
                 <widget class="QLabel" name="label_69">
                  <property name="text">
@@ -972,38 +916,10 @@
                  </property>
                 </widget>
                </item>
-               <item row="5" column="1">
-                <widget class="QLabel" name="label_27">
-                 <property name="text">
-                  <string>3 bedroom dwellings</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="1">
-                <widget class="QLabel" name="label_26">
-                 <property name="text">
-                  <string>2 bedroom dwellings</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="2">
-                <widget class="QgsDoubleSpinBox" name="count_1_bedroom_dwellings">
-                 <property name="maximum">
-                  <double>100.000000000000000</double>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="3">
-                <widget class="QLabel" name="label_63">
+               <item row="3" column="3">
+                <widget class="QLabel" name="label_66">
                  <property name="text">
                   <string>%</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="6" column="1">
-                <widget class="QLabel" name="label_28">
-                 <property name="text">
-                  <string>4+ bedroom dwellings</string>
                  </property>
                 </widget>
                </item>
@@ -1014,24 +930,31 @@
                  </property>
                 </widget>
                </item>
-               <item row="6" column="2">
-                <widget class="QgsDoubleSpinBox" name="count_4_bedroom_dwellings">
-                 <property name="maximum">
-                  <double>100.000000000000000</double>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="1">
-                <widget class="QLabel" name="label_25">
-                 <property name="text">
-                  <string>1 bedroom dwellings</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="3">
-                <widget class="QLabel" name="label_66">
+               <item row="5" column="3">
+                <widget class="QLabel" name="label_68">
                  <property name="text">
                   <string>%</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QLabel" name="label_26">
+                 <property name="text">
+                  <string>2 bedroom dwellings</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="3">
+                <widget class="QLabel" name="label_67">
+                 <property name="text">
+                  <string>%</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="2">
+                <widget class="QgsDoubleSpinBox" name="count_3_bedroom_dwellings">
+                 <property name="maximum">
+                  <double>100.000000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -1058,6 +981,48 @@
                  </property>
                 </widget>
                </item>
+               <item row="0" column="2">
+                <widget class="QgsDoubleSpinBox" name="commercial_floorspace">
+                 <property name="maximum">
+                  <double>100.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QLabel" name="label_25">
+                 <property name="text">
+                  <string>1 bedroom dwellings</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="1">
+                <widget class="QLabel" name="label_27">
+                 <property name="text">
+                  <string>3 bedroom dwellings</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="3">
+                <widget class="QLabel" name="label_65">
+                 <property name="text">
+                  <string>%</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="2">
+                <widget class="QgsDoubleSpinBox" name="count_4_bedroom_dwellings">
+                 <property name="maximum">
+                  <double>100.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="2">
+                <widget class="QgsDoubleSpinBox" name="count_1_bedroom_dwellings">
+                 <property name="maximum">
+                  <double>100.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
                <item row="1" column="0" colspan="2">
                 <widget class="QLabel" name="label_23">
                  <property name="text">
@@ -1065,10 +1030,66 @@
                  </property>
                 </widget>
                </item>
+               <item row="6" column="1">
+                <widget class="QLabel" name="label_28">
+                 <property name="text">
+                  <string>4+ bedroom dwellings</string>
+                 </property>
+                </widget>
+               </item>
                <item row="0" column="0" colspan="2">
                 <widget class="QLabel" name="label_22">
                  <property name="text">
                   <string>Commercial floorspace</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="2">
+                <widget class="QgsDoubleSpinBox" name="residential_floorspace">
+                 <property name="maximum">
+                  <double>100.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="3">
+                <widget class="QLabel" name="label_64">
+                 <property name="text">
+                  <string>%</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="3">
+                <widget class="QLabel" name="label_63">
+                 <property name="text">
+                  <string>%</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2">
+                <widget class="QgsDoubleSpinBox" name="office_floorspace">
+                 <property name="maximum">
+                  <double>100.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="7" column="0" colspan="2">
+                <widget class="QLabel" name="label_70">
+                 <property name="text">
+                  <string>Floor height</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="7" column="2">
+                <widget class="QgsDoubleSpinBox" name="level_height">
+                 <property name="maximum">
+                  <double>100.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="7" column="3">
+                <widget class="QLabel" name="label_71">
+                 <property name="text">
+                  <string>m</string>
                  </property>
                 </widget>
                </item>
