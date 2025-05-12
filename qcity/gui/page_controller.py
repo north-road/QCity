@@ -1,13 +1,14 @@
 from typing import Optional
 
 from qgis.PyQt.QtCore import Qt, QObject, pyqtSignal
-from qgis.PyQt.QtWidgets import QWidget, QSpinBox, QDoubleSpinBox, QListWidget, QLabel, QLineEdit, QComboBox, QDialog
-
+from qgis.PyQt.QtWidgets import QWidget, QSpinBox, QDoubleSpinBox, QListWidget, QLabel, QLineEdit, QComboBox, QDialog, \
+    QMessageBox
 from qgis.core import QgsFeature, NULL, QgsReferencedRectangle, QgsVectorLayer
 from qgis.gui import QgsNewNameDialog
 
-from ..core import LayerUtils, LayerType, PROJECT_CONTROLLER
 from .canvas_utils import CanvasUtils
+from ..core import LayerUtils, LayerType, PROJECT_CONTROLLER
+
 
 class PageController(QObject):
     """
@@ -35,7 +36,7 @@ class PageController(QObject):
 
         if self.tab_widget is not None:
             for spin_box in self.tab_widget.findChildren(
-                (QSpinBox, QDoubleSpinBox)
+                    (QSpinBox, QDoubleSpinBox)
             ):
                 spin_box.valueChanged.connect(self.save_widget_value_to_feature)
 
@@ -140,7 +141,7 @@ class PageController(QObject):
                 else:
                     widget.setText(str(value))
             elif isinstance(widget, QComboBox):
-                #widget.setCurrentIndex(int(widget_values_dict[widget_name]))
+                # widget.setCurrentIndex(int(widget_values_dict[widget_name]))
                 pass
             else:
                 assert False
@@ -161,14 +162,16 @@ class PageController(QObject):
             item_text = next(iter(feature_ids.values())).text()
         else:
             item_text = ', '.join(t.text() for t in feature_ids.values())
-        if QMessageBox.warning(self.list_widget, self.tr('Remove {}').format(self.layer_type.as_title_case(plural=False)),
-                                self.tr('Are you sure you want to remove {}?. This will permanently delete the {} and all related objects from the database.').format(
-                                    item_text,
-                                    self.layer_type.as_sentence_case(plural=False)
-                                ),
-                                QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No,
-                                QMessageBox.StandardButton.No
-                                ) != QMessageBox.StandardButton.Yes:
+        if QMessageBox.warning(self.list_widget,
+                               self.tr('Remove {}').format(self.layer_type.as_title_case(plural=False)),
+                               self.tr(
+                                   'Are you sure you want to remove {}?. This will permanently delete the {} and all related objects from the database.').format(
+                                   item_text,
+                                   self.layer_type.as_sentence_case(plural=False)
+                               ),
+                               QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                               QMessageBox.StandardButton.No
+                               ) != QMessageBox.StandardButton.Yes:
             return
 
         for feature_id, item in feature_ids.items():
@@ -198,7 +201,8 @@ class PageController(QObject):
 
         dialog.setWindowTitle(self.tr("Rename {}").format(self.layer_type.as_title_case(plural=False)))
         dialog.setAllowEmptyName(False)
-        dialog.setHintString(self.tr("Enter a new name for the {}").format(self.layer_type.as_sentence_case(plural=False)))
+        dialog.setHintString(
+            self.tr("Enter a new name for the {}").format(self.layer_type.as_sentence_case(plural=False)))
 
         if dialog.exec_() != QDialog.DialogCode.Accepted:
             return
