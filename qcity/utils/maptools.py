@@ -157,7 +157,9 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
                 self.cleanup()
                 return
 
-            feature_name, ok = QInputDialog.getText(self.dlg, "Name", "Input Name:")
+            feature_name, ok = QInputDialog.getText(
+                self.canvas(), self.tr("Create {}").format(self._layer_type.as_title_case(plural=False)),
+                    self.tr("Input {} name").format(self._layer_type.as_sentence_case(plural=False)))
 
             if not ok:
                 self.cleanup()
