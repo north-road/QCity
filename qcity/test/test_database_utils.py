@@ -8,7 +8,7 @@ from qgis.core import (
     QgsVectorLayer
 )
 
-from qcity.core.database import DatabaseUtils
+from qcity.core import DatabaseUtils, LayerType
 
 test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
 
@@ -56,3 +56,21 @@ class TestDatabaseUtils(unittest.TestCase):
             office_floorspace_idx = fields.lookupField('office_floorspace')
             field = fields[office_floorspace_idx]
             self.assertEqual(field.type(), QVariant.Double)
+
+    def test_field_default(self):
+        self.assertIsNone(
+            DatabaseUtils.get_field_default(LayerType.ProjectAreas, "xxxx")
+        )
+
+        self.assertEqual(
+            DatabaseUtils.get_field_default(LayerType.ProjectAreas, "dwelling_size_3_bedroom"),
+             50
+        )
+        self.assertEqual(
+            DatabaseUtils.get_field_default(LayerType.DevelopmentSites, "site_elevation"),
+             0
+        )
+        self.assertEqual(
+            DatabaseUtils.get_field_default(LayerType.BuildingLevels, "level_height"),
+             6
+        )

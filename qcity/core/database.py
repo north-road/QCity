@@ -87,6 +87,28 @@ class DatabaseUtils:
         )
 
     @staticmethod
+    def get_field_default(layer: LayerType, field_name: str):
+        """
+        Returns the default value for the given field
+        """
+        if layer == LayerType.ProjectAreas:
+            config_path = SETTINGS_MANAGER._default_project_area_parameters_path
+        elif layer == LayerType.DevelopmentSites:
+            config_path = SETTINGS_MANAGER._default_project_development_site_path
+        elif layer == LayerType.BuildingLevels:
+            config_path = SETTINGS_MANAGER._default_project_building_level_path
+        else:
+            assert False
+
+        with open(config_path, "r") as file:
+            data = json.load(file)
+
+        if not field_name in data:
+            return None
+
+        return data[field_name].get("default")
+
+    @staticmethod
     def create_base_table(gpkg_path: str,
                           table_name: str,
                           json_config_path: str,

@@ -9,7 +9,9 @@ from qgis.core import (
     QgsRelationContext,
     QgsFeature,
     QgsFeatureRequest,
-    QgsExpression
+    QgsExpression,
+    QgsVectorLayerUtils,
+    QgsGeometry
 )
 
 from .settings import SETTINGS_MANAGER
@@ -239,6 +241,27 @@ class ProjectController(QObject):
         return sorted(map_layer.uniqueValues(map_layer.fields().lookupField(
             DatabaseUtils.name_field_for_layer(layer)
         )), key=str.casefold)
+
+    def create_feature(self, layer: LayerType, name: str, geometry: QgsGeometry) -> QgsFeature:
+        """
+        Creates a new feature, initialized with defaults, for the given layer
+        """
+        map_layer = self.get_layer(layer)
+        if not map_layer:
+            return QgsFeature()
+
+        initial_attributes = {}
+
+        for field_index, field in enumerate(map_layer.fields()):
+            if field.name() == DatabaseUtils.name_field_for_layer(layer):
+                initial_attributes[field_index] = name
+            else:
+                default_value = DatabaseUtils.get_field_default(layer, field.name())
+                if default_value is not None:
+                    initial_attributes[field_index] = default_value
+
+        feature = QgsVectorLayerUtils.createFeature(map_layer, geometry, initial_attributes)
+        return feature
 
     def create_layer_relations(self):
         """Adds relations between layers to the QGIS project."""

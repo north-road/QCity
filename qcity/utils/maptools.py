@@ -192,8 +192,9 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         polygon = QgsGeometry.fromPolygonXY(
             [[QgsPointXY(x, y) for x, y in self.points]]
         )
-        feature = QgsVectorLayerUtils.createFeature(layer, polygon)
-        feature["name"] = feature_name
+        feature = PROJECT_CONTROLLER.create_feature(self._layer_type,
+                                                    feature_name,
+                                                    polygon)
 
         foreign_key = DatabaseUtils.foreign_key_for_layer(self._layer_type)
         if foreign_key:
