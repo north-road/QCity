@@ -1,8 +1,6 @@
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import (
-    QListWidgetItem,
-    QSpinBox,
-    QDoubleSpinBox,
+    QListWidgetItem
 )
 from qgis.core import QgsVectorLayer, QgsMapLayerType, QgsFeature
 

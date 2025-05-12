@@ -1,13 +1,10 @@
-from qgis.PyQt.QtCore import QObject, Qt
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import (
     QListWidgetItem,
-    QWidget,
-    QDialog,
     QSpinBox,
     QDoubleSpinBox,
 )
-from qgis.core import QgsVectorLayer, QgsProject
-from qgis.gui import QgsNewNameDialog
+from qgis.core import QgsVectorLayer
 
 from qcity.core import SETTINGS_MANAGER, LayerType, PROJECT_CONTROLLER, DatabaseUtils
 from .page_controller import PageController
@@ -17,6 +14,7 @@ class BuildingLevelsPageController(PageController):
     """
     Page controller for the building levels page
     """
+
     def __init__(self, og_widget: 'QCityDockWidget', tab_widget, list_widget):
         super().__init__(LayerType.BuildingLevels, og_widget, tab_widget, list_widget)
         self.skip_fields_for_widgets = ['fid', 'name', 'development_site_pk', 'level_height']
