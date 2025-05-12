@@ -4,7 +4,7 @@ from qgis.PyQt.QtCore import Qt, QObject, pyqtSignal
 from qgis.PyQt.QtWidgets import QWidget, QSpinBox, QDoubleSpinBox, QListWidget, QLabel, QLineEdit, QComboBox, QDialog, \
     QMessageBox, QListWidgetItem
 from qgis.core import QgsFeature, NULL, QgsReferencedRectangle, QgsVectorLayer
-from qgis.gui import QgsNewNameDialog
+from qgis.gui import QgsNewNameDialog, QgsSpinBox, QgsDoubleSpinBox
 
 from .canvas_utils import CanvasUtils
 from ..core import LayerUtils, LayerType, PROJECT_CONTROLLER, DatabaseUtils
@@ -38,6 +38,11 @@ class PageController(QObject):
                     (QSpinBox, QDoubleSpinBox)
             ):
                 spin_box.valueChanged.connect(self.save_widget_value_to_feature)
+
+            for spin_box in self.tab_widget.findChildren(
+                    (QgsSpinBox, QgsDoubleSpinBox)
+            ):
+                spin_box.setShowClearButton(False)
 
         if self.list_widget is not None:
             self.list_widget.currentRowChanged.connect(
