@@ -1,8 +1,8 @@
 from typing import Optional
 
-from qgis.PyQt.QtCore import Qt, QObject, pyqtSignal, QDate
+from qgis.PyQt.QtCore import Qt, QObject, pyqtSignal
 from qgis.PyQt.QtWidgets import QWidget, QSpinBox, QDoubleSpinBox, QListWidget, QLabel, QLineEdit, QComboBox, QDialog, \
-    QMessageBox, QListWidgetItem
+    QMessageBox, QListWidgetItem, QCheckBox
 from qgis.core import QgsFeature, NULL, QgsReferencedRectangle, QgsVectorLayer
 from qgis.gui import QgsNewNameDialog, QgsSpinBox, QgsDoubleSpinBox
 
@@ -48,6 +48,11 @@ class PageController(QObject):
                     QLineEdit
             ):
                 line_edit.textChanged.connect(self.save_widget_value_to_feature)
+
+            for checkbox in self.tab_widget.findChildren(
+                    QCheckBox
+            ):
+                checkbox.toggled.connect(self.save_widget_value_to_feature)
 
             for combo in self.tab_widget.findChildren(
                     QComboBox
@@ -134,6 +139,8 @@ class PageController(QObject):
         field_name = widget.objectName()
         if isinstance(widget, QComboBox):
             value = widget.currentData()
+        elif isinstance(widget, QCheckBox):
+            value = widget.isChecked()
 
         LayerUtils.store_value(self.layer_type,
                                self.current_feature_id,
@@ -178,6 +185,8 @@ class PageController(QObject):
                     widget.clear()
                 else:
                     widget.setText(str(value))
+            elif isinstance(widget, QCheckBox):
+                widget.setChecked(bool(value))
             elif isinstance(widget, QComboBox):
                 match_index = widget.findData(value)
                 if match_index >= 0:

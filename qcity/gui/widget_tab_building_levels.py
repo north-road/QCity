@@ -11,7 +11,7 @@ class BuildingLevelsPageController(PageController):
 
     def __init__(self, og_widget: 'QCityDockWidget', tab_widget, list_widget):
         super().__init__(LayerType.BuildingLevels, og_widget, tab_widget, list_widget)
-        self.skip_fields_for_widgets = ['fid', 'name', 'development_site_pk', 'level_height']
+        self.skip_fields_for_widgets = ['fid', 'name', 'development_site_pk']
 
         PROJECT_CONTROLLER.development_site_changed.connect(self.on_development_site_changed)
         PROJECT_CONTROLLER.building_level_added.connect(
