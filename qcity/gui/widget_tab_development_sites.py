@@ -94,11 +94,7 @@ class DevelopmentSitesPageController(PageController):
 
     def set_feature(self, feature: QgsFeature):
         super().set_feature(feature)
-
         PROJECT_CONTROLLER.set_current_development_site(feature.id())
-
-        # TODO hide others from renderer only!
-        # site_layer.setSubsetString(f"\"fid\" = '{feature.id()}'")
 
     def get_elevation_from_dem(self, checked) -> None:
         """Gets the elevation for a centroid in a polygon feature and sets it as an attribute."""

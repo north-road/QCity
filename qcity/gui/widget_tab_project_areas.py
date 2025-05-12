@@ -60,11 +60,7 @@ class ProjectAreasPageController(PageController):
 
     def set_feature(self, feature: QgsFeature):
         super().set_feature(feature)
-
         PROJECT_CONTROLLER.set_current_project_area(feature.id())
-
-        # todo hide others from RENDERER only!!
-        # area_layer.setSubsetString(f"\"fid\" = '{feature.id()}'")
 
     def import_project_area_geometries(self):
         """Imports geometries as project areas from a file."""

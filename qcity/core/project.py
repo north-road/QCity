@@ -18,6 +18,7 @@ from .settings import SETTINGS_MANAGER
 from .enums import LayerType
 from .database import DatabaseUtils
 
+
 class ProjectController(QObject):
     """
     Controller for working with QCity projects
@@ -313,12 +314,42 @@ class ProjectController(QObject):
         self.current_project_area_fid = project_area_fid
         self.project_area_changed.emit(self.current_project_area_fid)
 
+        project_area_layer = self.get_project_area_layer()
+        project_area_feature = project_area_layer.getFeature(project_area_fid)
+        if not project_area_feature.isValid():
+            return
+
+        project_area_primary_key = project_area_feature[DatabaseUtils.primary_key_for_layer(LayerType.ProjectAreas)]
+
+        from .layer import LayerUtils
+
+        LayerUtils.set_renderer_filter(
+            project_area_layer,
+            QgsExpression.createFieldEqualityExpression(DatabaseUtils.primary_key_for_layer(LayerType.ProjectAreas),
+                                                        project_area_primary_key)
+        )
+
     def set_current_development_site(self, development_site_fid: int):
         """
         Sets the feature ID for the current development site
         """
         self.current_development_site_fid = development_site_fid
         self.development_site_changed.emit(self.current_development_site_fid)
+
+        development_site_layer = self.get_development_sites_layer()
+        development_site_feature = development_site_layer.getFeature(development_site_fid)
+        if not development_site_feature.isValid():
+            return
+
+        development_site_primary_key = development_site_feature[DatabaseUtils.primary_key_for_layer(LayerType.DevelopmentSites)]
+
+        from .layer import LayerUtils
+
+        LayerUtils.set_renderer_filter(
+            development_site_layer,
+            QgsExpression.createFieldEqualityExpression(DatabaseUtils.primary_key_for_layer(LayerType.DevelopmentSites),
+                                                        development_site_primary_key)
+        )
 
     def delete_project_area(self, project_area_fid: int) -> bool:
         """
