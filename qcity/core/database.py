@@ -1,5 +1,5 @@
 import json
-from typing import Optional
+from typing import Optional, Dict
 
 from qgis.PyQt.QtCore import QVariant, QDate
 from qgis.core import (
@@ -62,6 +62,7 @@ class DatabaseUtils:
             "double": QVariant.Double,
             "string": QVariant.String,
             "date": QVariant.Date,
+            "value_map": QVariant.String
         }[key]
 
     @staticmethod
@@ -87,14 +88,10 @@ class DatabaseUtils:
         )
 
     @staticmethod
-    def get_field_default(layer: LayerType, field_name: str):
+    def get_field_config(layer: LayerType, field_name: str) -> Optional[Dict]:
         """
-        Returns the default value for the given field
+        Returns the field config for the given field
         """
-        # special handling!
-        if field_name == "date":
-            return QDate.currentDate().year()
-
         if layer == LayerType.ProjectAreas:
             config_path = SETTINGS_MANAGER._default_project_area_parameters_path
         elif layer == LayerType.DevelopmentSites:
@@ -107,10 +104,22 @@ class DatabaseUtils:
         with open(config_path, "r") as file:
             data = json.load(file)
 
-        if not field_name in data:
+        return data.get(field_name)
+
+    @staticmethod
+    def get_field_default(layer: LayerType, field_name: str):
+        """
+        Returns the default value for the given field
+        """
+        # special handling!
+        if field_name == "date":
+            return QDate.currentDate().year()
+
+        config = DatabaseUtils.get_field_config(layer, field_name)
+        if config is None:
             return None
 
-        return data[field_name].get("default")
+        return config.get("default")
 
     @staticmethod
     def create_base_table(gpkg_path: str,

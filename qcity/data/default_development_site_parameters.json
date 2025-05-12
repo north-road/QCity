@@ -7,8 +7,13 @@
         "default" : ""
     },
     "site_status": {
-        "type": "int",
-        "default": 0
+        "type": "value_map",
+        "map": {
+          "P": "Proposed",
+          "M" : "Modelled",
+          "C": "Constructed"
+        },
+        "default": "P"
     },
     "year": {
         "type": "int",

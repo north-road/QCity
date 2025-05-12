@@ -44,6 +44,19 @@ class PageController(QObject):
             ):
                 spin_box.setShowClearButton(False)
 
+            for line_edit in self.tab_widget.findChildren(
+                    QLineEdit
+            ):
+                line_edit.textChanged.connect(self.save_widget_value_to_feature)
+
+            for combo in self.tab_widget.findChildren(
+                    QComboBox
+            ):
+                field_config = DatabaseUtils.get_field_config(self.layer_type, combo.objectName())
+                if field_config is not None and "map" in field_config:
+                    for code, value in field_config["map"].items():
+                        combo.addItem(value, code)
+
         if self.list_widget is not None:
             self.list_widget.currentRowChanged.connect(
                 self.set_current_feature_from_list

@@ -580,23 +580,7 @@
                 </widget>
                </item>
                <item row="2" column="1">
-                <widget class="QComboBox" name="site_status">
-                 <item>
-                  <property name="text">
-                   <string>Constructed</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Proposed</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Modelled</string>
-                  </property>
-                 </item>
-                </widget>
+                <widget class="QComboBox" name="site_status"/>
                </item>
                <item row="3" column="0">
                 <widget class="QLabel" name="label_development_site_year">
