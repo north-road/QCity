@@ -29,8 +29,10 @@ class LayerUtils:
             return False
 
         field_index = layer.fields().lookupField(field_name)
+        if field_index < 0:
+            return False
 
-        if not layer.startEditing():
+        if not layer.isEditable() and not layer.startEditing():
             return False
         if not layer.changeAttributeValue(feature_id, field_index, value):
             return False
