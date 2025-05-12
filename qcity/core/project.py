@@ -3,6 +3,7 @@ from typing import List, Optional
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 
 from qgis.core import (
+    Qgis,
     QgsProject,
     QgsVectorLayer,
     QgsRelation,
@@ -11,7 +12,8 @@ from qgis.core import (
     QgsFeatureRequest,
     QgsExpression,
     QgsVectorLayerUtils,
-    QgsGeometry
+    QgsGeometry,
+    QgsDistanceArea
 )
 
 from .settings import SETTINGS_MANAGER
@@ -32,6 +34,7 @@ class ProjectController(QObject):
 
     development_site_added = pyqtSignal(QgsFeature)
     development_site_deleted = pyqtSignal(int)
+    development_site_attribute_changed = pyqtSignal(int, str, object)
 
     building_level_added = pyqtSignal(QgsFeature)
     building_level_deleted = pyqtSignal(int)
@@ -77,9 +80,11 @@ class ProjectController(QObject):
             if disconnect:
                 development_site_layers.featureAdded.disconnect(self._development_site_added)
                 development_site_layers.featureDeleted.disconnect(self._development_site_deleted)
+                development_site_layers.attributeValueChanged.disconnect(self._development_site_attribute_changed)
             else:
                 development_site_layers.featureAdded.connect(self._development_site_added)
                 development_site_layers.featureDeleted.connect(self._development_site_deleted)
+                development_site_layers.attributeValueChanged.connect(self._development_site_attribute_changed)
 
         building_levels_layer = self.get_building_levels_layer()
         if building_levels_layer:
@@ -136,6 +141,21 @@ class ProjectController(QObject):
 
         self.development_site_deleted.emit(
             development_site_fid
+        )
+
+    def _development_site_attribute_changed(self, feature_id: int, field_index: int, value):
+        """
+        Called when a development site attribute is changed
+        """
+        if feature_id < 0:
+            # ignore uncommitted features
+            return
+
+        layer = self.get_development_sites_layer()
+        field_name = layer.fields()[field_index].name()
+
+        self.development_site_attribute_changed.emit(
+            feature_id, field_name, value
         )
 
     def _building_level_added(self, building_level_fid: int):

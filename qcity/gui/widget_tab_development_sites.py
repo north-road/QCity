@@ -20,6 +20,9 @@ class DevelopmentSitesPageController(PageController):
         PROJECT_CONTROLLER.development_site_deleted.connect(
             self._on_development_site_deleted
         )
+        PROJECT_CONTROLLER.development_site_attribute_changed.connect(
+            self._on_development_site_attribute_changed
+        )
 
         self.og_widget.toolButton_development_site_add.clicked.connect(
             self.add_feature_clicked
@@ -75,6 +78,19 @@ class DevelopmentSitesPageController(PageController):
         Called when a development site is deleted
         """
         self.remove_item_from_list(feature_id)
+
+    def _on_development_site_attribute_changed(self, feature_id: int, field_name: str, value):
+        """
+        Called when an attribute is changed for a development site
+        """
+        if feature_id != self.current_feature_id:
+            return
+
+        self._block_feature_updates = True
+        self.set_widget_values({
+            field_name: value
+        })
+        self._block_feature_updates = False
 
     def on_project_area_changed(self, project_area_fid: int):
         """
