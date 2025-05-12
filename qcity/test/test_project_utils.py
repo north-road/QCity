@@ -15,6 +15,9 @@ from qcity.core import LayerType
 
 test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
 
+from .utilities import get_qgis_app
+
+QGIS_APP = get_qgis_app()
 
 class TestProjectUtils(unittest.TestCase):
 
@@ -56,6 +59,7 @@ class TestProjectUtils(unittest.TestCase):
             self.assertIsInstance(building_areas_layer, QgsVectorLayer)
             self.assertGreaterEqual(building_areas_layer.fields().lookupField('count_1_bedroom_dwellings'), 0)
             self.assertEqual(controller.get_layer(LayerType.BuildingLevels), building_areas_layer)
+            controller.cleanup()
 
     def test_layer_relations(self):
         """
@@ -80,6 +84,7 @@ class TestProjectUtils(unittest.TestCase):
             self.assertEqual(area_to_site.referencingLayer(), controller.get_development_sites_layer())
             site_to_level = [p.relationManager().relation(r) for r in p.relationManager().relations() if p.relationManager().relation(r).referencedLayer() == controller.get_development_sites_layer()][0]
             self.assertEqual(site_to_level.referencingLayer(), controller.get_building_levels_layer())
+            controller.cleanup()
 
     def test_project_database_path(self):
         """
@@ -96,6 +101,8 @@ class TestProjectUtils(unittest.TestCase):
         controller2 = ProjectController(p2)
         self.assertEqual(controller.associated_database_path(), 'xxx')
         self.assertFalse(controller2.associated_database_path())
+        controller.cleanup()
+        controller2.cleanup()
 
     def test_delete_project_area(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -249,6 +256,7 @@ class TestProjectUtils(unittest.TestCase):
             self.assertFalse(development_site_layer.isEditable())
             self.assertFalse([f.id() for f in building_level_layer.getFeatures()])
             self.assertFalse(building_level_layer.isEditable())
+            controller.cleanup()
 
     def test_delete_development_site(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -403,6 +411,7 @@ class TestProjectUtils(unittest.TestCase):
             self.assertFalse(development_site_layer.isEditable())
             self.assertFalse([f.id() for f in building_level_layer.getFeatures()])
             self.assertFalse(building_level_layer.isEditable())
+            controller.cleanup()
 
     def test_names(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -470,3 +479,4 @@ class TestProjectUtils(unittest.TestCase):
                 controller.get_unique_names(LayerType.BuildingLevels),
                 ['floor 1', 'Floor 3', 'Floor 4']
             )
+            controller.cleanup()

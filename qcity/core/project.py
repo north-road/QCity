@@ -42,7 +42,7 @@ class ProjectController(QObject):
         """
         Cleanups the controller, ready for deletion
         """
-        self.disconnect()
+        self.connect_layers(False)
 
     def _update_project_layers(self):
         """
