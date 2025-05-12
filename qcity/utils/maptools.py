@@ -186,12 +186,8 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             raise Exception(f"Unknown tab name: {self._layer_type}")
         layer = PROJECT_CONTROLLER.get_layer(self._layer_type)
 
-        items = []
-        for index in range(list_widget.count()):
-            item = list_widget.item(index)
-            items.append(item.text())
-
-        feature_name_exists = True if feature_name in items else False
+        existing_names = PROJECT_CONTROLLER.get_unique_names(self._layer_type)
+        feature_name_exists = feature_name in existing_names
 
         if not feature_name or feature_name_exists:
             if feature_name_exists:

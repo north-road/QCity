@@ -186,10 +186,7 @@ class PageController(QObject):
         selected_item = self.list_widget.selectedItems()[0]
         feature_id = selected_item.data(Qt.UserRole)
 
-        existing_names = [
-            self.list_widget.item(i).text()
-            for i in range(self.list_widget.count())
-        ]
+        existing_names = PROJECT_CONTROLLER.get_unique_names(self.layer_type)
 
         dialog = QgsNewNameDialog(
             initial="",
