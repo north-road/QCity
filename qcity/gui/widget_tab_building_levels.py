@@ -4,7 +4,7 @@ from qgis.PyQt.QtWidgets import (
     QSpinBox,
     QDoubleSpinBox,
 )
-from qgis.core import QgsVectorLayer
+from qgis.core import QgsVectorLayer, QgsExpression
 
 from qcity.core import SETTINGS_MANAGER, LayerType, PROJECT_CONTROLLER, DatabaseUtils
 from .page_controller import PageController
@@ -40,11 +40,12 @@ class BuildingLevelsPageController(PageController):
         level_layer = self.get_layer()
         self.list_widget.clear()
         foreign_key = DatabaseUtils.foreign_key_for_layer(self.layer_type)
-        level_layer.setSubsetString(f'{foreign_key} = {development_site_fid}')
-
+        name_field = DatabaseUtils.name_field_for_layer(self.layer_type)
+        level_layer.setSubsetString(
+            QgsExpression.createFieldEqualityExpression(foreign_key, development_site_fid))
         for feat in level_layer.getFeatures():
             item = QListWidgetItem(self.list_widget)
-            item.setText(feat["name"])
+            item.setText(feat[name_field])
             item.setData(Qt.UserRole, feat.id())
             self.list_widget.addItem(item)
 

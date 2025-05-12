@@ -42,6 +42,17 @@ class DatabaseUtils:
         }[layer]
 
     @staticmethod
+    def name_field_for_layer(layer: LayerType) -> Optional[str]:
+        """
+        Returns the "name" field for the given layer
+        """
+        return {
+            LayerType.ProjectAreas: "name",
+            LayerType.DevelopmentSites: 'name',
+            LayerType.BuildingLevels: 'name',
+        }[layer]
+
+    @staticmethod
     def qvariant_type_from_string(key: str) -> QVariant.Type:
         """
         Returns the QVariant.Type corresponding to a config string value

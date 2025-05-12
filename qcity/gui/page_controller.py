@@ -7,7 +7,7 @@ from qgis.core import QgsFeature, NULL, QgsReferencedRectangle, QgsVectorLayer
 from qgis.gui import QgsNewNameDialog
 
 from .canvas_utils import CanvasUtils
-from ..core import LayerUtils, LayerType, PROJECT_CONTROLLER
+from ..core import LayerUtils, LayerType, PROJECT_CONTROLLER, DatabaseUtils
 
 
 class PageController(QObject):
@@ -30,7 +30,6 @@ class PageController(QObject):
         self.current_item_label = current_item_label
         self.skip_fields_for_widgets = []
         self._block_feature_updates = False
-        self.name_field: str = "name"
 
         self.current_feature_id: Optional[int] = None
 
@@ -214,7 +213,8 @@ class PageController(QObject):
 
         layer = self.get_layer()
         layer.startEditing()
-        layer.changeAttributeValue(feature_id, layer.fields().lookupField(self.name_field), new_feat_name)
+        layer.changeAttributeValue(feature_id, layer.fields().lookupField(
+            DatabaseUtils.name_field_for_layer(self.layer_type)), new_feat_name)
         layer.commitChanges()
 
     def zoom_to_feature(self, feature: QgsFeature):

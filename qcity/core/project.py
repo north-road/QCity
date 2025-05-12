@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 
