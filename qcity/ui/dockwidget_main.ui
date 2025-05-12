@@ -756,7 +756,7 @@
                <item row="1" column="2">
                 <widget class="QgsDoubleSpinBox" name="commercial_floorspace">
                  <property name="maximum">
-                  <double>100.000000000000000</double>
+                  <double>999999999999.000000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -797,7 +797,7 @@
                <item row="3" column="2">
                 <widget class="QgsDoubleSpinBox" name="residential_floorspace">
                  <property name="maximum">
-                  <double>100.000000000000000</double>
+                  <double>999999999999.000000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -807,7 +807,7 @@
                <item row="2" column="2">
                 <widget class="QgsDoubleSpinBox" name="office_floorspace">
                  <property name="maximum">
-                  <double>100.000000000000000</double>
+                  <double>999999999999.000000000000000</double>
                  </property>
                 </widget>
                </item>
