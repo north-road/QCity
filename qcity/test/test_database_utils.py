@@ -2,7 +2,7 @@ import unittest
 import os
 import tempfile
 
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QVariant, QDate
 
 from qgis.core import (
     QgsVectorLayer
@@ -60,6 +60,11 @@ class TestDatabaseUtils(unittest.TestCase):
     def test_field_default(self):
         self.assertIsNone(
             DatabaseUtils.get_field_default(LayerType.ProjectAreas, "xxxx")
+        )
+
+        self.assertEqual(
+            DatabaseUtils.get_field_default(LayerType.ProjectAreas, "date"),
+             QDate.currentDate().year()
         )
 
         self.assertEqual(

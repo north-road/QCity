@@ -1,6 +1,6 @@
 from typing import Optional
 
-from qgis.PyQt.QtCore import Qt, QObject, pyqtSignal
+from qgis.PyQt.QtCore import Qt, QObject, pyqtSignal, QDate
 from qgis.PyQt.QtWidgets import QWidget, QSpinBox, QDoubleSpinBox, QListWidget, QLabel, QLineEdit, QComboBox, QDialog, \
     QMessageBox, QListWidgetItem
 from qgis.core import QgsFeature, NULL, QgsReferencedRectangle, QgsVectorLayer

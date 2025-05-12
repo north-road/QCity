@@ -1,7 +1,7 @@
 import json
 from typing import Optional
 
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QVariant, QDate
 from qgis.core import (
     QgsFields,
     QgsField,
@@ -91,6 +91,10 @@ class DatabaseUtils:
         """
         Returns the default value for the given field
         """
+        # special handling!
+        if field_name == "date":
+            return QDate.currentDate().year()
+
         if layer == LayerType.ProjectAreas:
             config_path = SETTINGS_MANAGER._default_project_area_parameters_path
         elif layer == LayerType.DevelopmentSites:

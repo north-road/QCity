@@ -35,7 +35,6 @@ class DevelopmentSitesPageController(PageController):
 
         self.og_widget.address.textChanged.connect(self.save_widget_value_to_feature)
         self.og_widget.site_owner.textChanged.connect(self.save_widget_value_to_feature)
-        self.og_widget.date.textChanged.connect(self.save_widget_value_to_feature)
 
         self.og_widget.site_elevation.valueChanged.connect(
             lambda value: SETTINGS_MANAGER.save_widget_value_to_layer(
