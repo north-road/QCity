@@ -343,5 +343,24 @@ class ProjectController(QObject):
         development_site_layer.commitChanges()
         return True
 
+    def delete_building_level(self, building_level_fid: int) -> bool:
+        """
+        Deletes the specified building level
+        """
+        building_level_layer = self.get_building_levels_layer()
+        if not building_level_layer:
+            return False
+
+        building_level_feature = building_level_layer.getFeature(building_level_fid)
+        if not building_level_feature.isValid():
+            return False
+
+        if not building_level_layer.startEditing():
+            return False
+        if not building_level_layer.deleteFeature(building_level_fid):
+            return False
+        building_level_layer.commitChanges()
+        return True
+
 
 PROJECT_CONTROLLER = ProjectController(QgsProject.instance())

@@ -53,3 +53,6 @@ class BuildingLevelsPageController(PageController):
 
         for feat in level_layer.getFeatures():
             self.add_feature_to_list(feat, set_current=False)
+
+    def delete_feature_and_child_objects(self, feature_id: int) -> bool:
+        return PROJECT_CONTROLLER.delete_building_level(feature_id)
