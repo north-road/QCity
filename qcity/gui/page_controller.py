@@ -47,7 +47,15 @@ class PageController(QObject):
             for line_edit in self.tab_widget.findChildren(
                     QLineEdit
             ):
-                line_edit.textChanged.connect(self.save_widget_value_to_feature)
+                p = line_edit.parent()
+                is_child_of_spinbox = False
+                while p:
+                    if isinstance(p, (QSpinBox, QDoubleSpinBox)):
+                        is_child_of_spinbox = True
+                        break
+                    p = p.parent()
+                if not is_child_of_spinbox:
+                    line_edit.textChanged.connect(self.save_widget_value_to_feature)
 
             for checkbox in self.tab_widget.findChildren(
                     QCheckBox
