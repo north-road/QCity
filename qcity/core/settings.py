@@ -85,7 +85,7 @@ class SettingsManager(QObject):
         """
         Sets the current database path.
         """
-        if database_path != self.get_database_path():
+        if database_path != self._database_path:
             self._database_path = database_path
             self.database_path_changed.emit(database_path)
 
