@@ -57,6 +57,8 @@ class PageController(QObject):
                     for code, value in field_config["map"].items():
                         combo.addItem(value, code)
 
+                combo.currentIndexChanged.connect(self.save_widget_value_to_feature)
+
         if self.list_widget is not None:
             self.list_widget.currentRowChanged.connect(
                 self.set_current_feature_from_list
@@ -130,6 +132,8 @@ class PageController(QObject):
 
         widget = self.sender()
         field_name = widget.objectName()
+        if isinstance(widget, QComboBox):
+            value = widget.currentData()
 
         LayerUtils.store_value(self.layer_type,
                                self.current_feature_id,
@@ -175,8 +179,11 @@ class PageController(QObject):
                 else:
                     widget.setText(str(value))
             elif isinstance(widget, QComboBox):
-                # widget.setCurrentIndex(int(widget_values_dict[widget_name]))
-                pass
+                match_index = widget.findData(value)
+                if match_index >= 0:
+                    widget.setCurrentIndex(match_index)
+                else:
+                    widget.setCurrentIndex(-1)
             else:
                 assert False
 
