@@ -181,6 +181,9 @@ class QCityDockWidget(QgsDockWidget):
             PROJECT_CONTROLLER.add_database_layers_to_project(self.project, file_name)
 
         area_layer = PROJECT_CONTROLLER.get_project_area_layer()
+        if not area_layer:
+            return
+
         feats = area_layer.getFeatures()
         for feat in feats:
             item = QListWidgetItem(self.listWidget_project_areas)

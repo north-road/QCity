@@ -189,7 +189,7 @@ class ProjectController(QObject):
         assert building_level_layer.isValid()
         building_level_layer.setCustomProperty('_qcity_role', 'building_levels')
 
-        project.addMapLayers([area_layer, development_site_layer, building_level_layer])
+        project.addMapLayers([building_level_layer, development_site_layer, area_layer])
 
     def get_project_area_layer(self) -> Optional[QgsVectorLayer]:
         """

@@ -62,7 +62,8 @@ class DatabaseUtils:
             "double": QVariant.Double,
             "string": QVariant.String,
             "date": QVariant.Date,
-            "value_map": QVariant.String
+            "value_map": QVariant.String,
+            "bool": QVariant.Bool,
         }[key]
 
     @staticmethod
