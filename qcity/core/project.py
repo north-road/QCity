@@ -484,5 +484,55 @@ class ProjectController(QObject):
         building_level_layer.commitChanges()
         return True
 
+    def auto_calculate_development_site_floorspace(self, development_site_fid: int) -> bool:
+        """
+        Auto calculates the development site floor space
+        """
+        development_site_layer = self.get_development_sites_layer()
+        if not development_site_layer:
+            return False
+
+        development_site_feature = development_site_layer.getFeature(development_site_fid)
+        if not development_site_feature.isValid():
+            return False
+
+        development_site_primary_key = development_site_feature[
+            DatabaseUtils.primary_key_for_layer(LayerType.DevelopmentSites)]
+
+        # find matching building levels
+        request = QgsFeatureRequest().setFilterExpression(
+            QgsExpression.createFieldEqualityExpression(DatabaseUtils.foreign_key_for_layer(LayerType.BuildingLevels),
+                                                        development_site_primary_key)
+        )
+        building_level_layer = self.get_building_levels_layer()
+        building_level_features = [f for f in building_level_layer.getFeatures(request)]
+
+        total_commercial = 0
+        total_office = 0
+        total_residential = 0
+
+        da = QgsDistanceArea()
+        da.setEllipsoid(self.project.ellipsoid())
+        da.setSourceCrs(building_level_layer.crs(), self.project.transformContext())
+
+        for level in building_level_features:
+            floor_area_m2 = da.convertAreaMeasurement(
+                da.measureArea(level.geometry()), Qgis.AreaUnit.SquareMeters
+            )
+            total_commercial += level['percent_commercial_floorspace'] * floor_area_m2
+            total_office += level['percent_office_floorspace'] * floor_area_m2
+            total_residential += level['percent_residential_floorspace'] * floor_area_m2
+
+        development_site_layer.startEditing()
+        development_site_layer.changeAttributeValues(
+            development_site_fid, {
+                development_site_layer.fields().lookupField('commercial_floorspace'): total_commercial,
+                development_site_layer.fields().lookupField('office_floorspace'): total_office,
+                development_site_layer.fields().lookupField('residential_floorspace'): total_residential,
+
+            }
+        )
+        development_site_layer.commitChanges()
+
 
 PROJECT_CONTROLLER = ProjectController(QgsProject.instance())
