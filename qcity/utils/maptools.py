@@ -11,10 +11,9 @@
 import os
 from typing import List, Union, Optional
 
-from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QInputDialog, QListWidgetItem
 from qgis.PyQt.QtCore import Qt
-
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import QInputDialog
 from qgis.core import (
     NULL,
     QgsProject,
@@ -23,11 +22,9 @@ from qgis.core import (
     QgsPointXY,
     QgsRasterLayer,
     Qgis,
-    QgsFeature,
     QgsWkbTypes,
     QgsVectorLayerUtils
 )
-
 from qgis.gui import (
     QgsMapToolDigitizeFeature,
     QgsMapCanvas,
@@ -47,19 +44,18 @@ from ..core import LayerType, PROJECT_CONTROLLER, DatabaseUtils
 from ..gui.qcity_dock import QCityDockWidget
 
 
-
 class DrawPolygonTool(QgsMapToolDigitizeFeature):
     """
     A map tool for drawing polygons
     """
 
     def __init__(
-        self,
-        map_canvas: QgsMapCanvas,
-        cad_dock_widget: QgsAdvancedDigitizingDockWidget,
-        message_bar: QgsMessageBar,
-        dlg: QCityDockWidget,
-        iface: QgisInterface,
+            self,
+            map_canvas: QgsMapCanvas,
+            cad_dock_widget: QgsAdvancedDigitizingDockWidget,
+            message_bar: QgsMessageBar,
+            dlg: QCityDockWidget,
+            iface: QgisInterface,
     ) -> None:
         super().__init__(map_canvas, cad_dock_widget, QgsMapToolCapture.CaptureLine)
         self.default_color: QColor = QColor(255, 0, 0, 100)
@@ -159,7 +155,7 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
 
             feature_name, ok = QInputDialog.getText(
                 self.canvas(), self.tr("Create {}").format(self._layer_type.as_title_case(plural=False)),
-                    self.tr("Input {} name").format(self._layer_type.as_sentence_case(plural=False)))
+                self.tr("Input {} name").format(self._layer_type.as_sentence_case(plural=False)))
 
             if not ok:
                 self.cleanup()
@@ -175,15 +171,9 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             self.cleanup()
 
     def create_feature(self, feature_name: str) -> None:
-        """ """
-        if self._layer_type == LayerType.DevelopmentSites:
-            list_widget = self.dlg.listWidget_development_sites
-        elif self._layer_type == LayerType.ProjectAreas:
-            list_widget = self.dlg.listWidget_project_areas
-        elif self._layer_type == LayerType.BuildingLevels:
-            list_widget = self.dlg.listWidget_building_levels
-        else:
-            raise Exception(f"Unknown tab name: {self._layer_type}")
+        """
+        Called when the new feature should be created
+        """
         layer = PROJECT_CONTROLLER.get_layer(self._layer_type)
 
         existing_names = PROJECT_CONTROLLER.get_unique_names(self._layer_type)
@@ -210,18 +200,8 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
             feature.setAttribute(foreign_key, self._parent_pk)
 
         layer.startEditing()
-        layer.dataProvider().addFeature(feature)
+        layer.addFeature(feature)
         layer.commitChanges()
-
-        if not list_widget.isEnabled():
-            list_widget.setEnabled(True)
-
-        item = QListWidgetItem(list_widget)
-        item.setText(feature_name)
-        item.setData(Qt.UserRole, feature.id())
-        list_widget.addItem(item)
-        row = list_widget.row(item)
-        list_widget.setCurrentRow(row)
 
     def cleanup(self):
         """Run after digitization is finished, cleans up the maptool"""
@@ -246,11 +226,11 @@ class MapToolHandler(QgsAbstractMapToolHandler):
         super().__init__(tool, action)
 
     def isCompatibleWithLayer(
-        self, layer: Union[QgsVectorLayer, QgsRasterLayer], context
+            self, layer: Union[QgsVectorLayer, QgsRasterLayer], context
     ) -> None:
         # this tool can only be activated when an editable vector layer is selected
         return (
-            isinstance(layer, QgsVectorLayer)
-            and layer.isEditable()
-            and layer.geometryType() == Qgis.GeometryType.Polygon
+                isinstance(layer, QgsVectorLayer)
+                and layer.isEditable()
+                and layer.geometryType() == Qgis.GeometryType.Polygon
         )

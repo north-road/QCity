@@ -2,7 +2,7 @@ from typing import Optional
 
 from qgis.PyQt.QtCore import Qt, QObject, pyqtSignal
 from qgis.PyQt.QtWidgets import QWidget, QSpinBox, QDoubleSpinBox, QListWidget, QLabel, QLineEdit, QComboBox, QDialog, \
-    QMessageBox
+    QMessageBox, QListWidgetItem
 from qgis.core import QgsFeature, NULL, QgsReferencedRectangle, QgsVectorLayer
 from qgis.gui import QgsNewNameDialog
 
@@ -43,6 +43,23 @@ class PageController(QObject):
             self.list_widget.currentRowChanged.connect(
                 self.set_current_feature_from_list
             )
+
+    def add_feature_to_list(self, feature: QgsFeature, set_current: bool = True):
+        """
+        Adds a new feature to the list widget
+        """
+        self.list_widget.setEnabled(True)
+
+        item = QListWidgetItem(self.list_widget)
+        item.setText(feature[
+                         DatabaseUtils.name_field_for_layer(self.layer_type)
+                     ])
+        item.setData(Qt.UserRole, feature.id())
+
+        self.list_widget.addItem(item)
+        if set_current:
+            row = self.list_widget.row(item)
+            self.list_widget.setCurrentRow(row)
 
     def set_current_feature_from_list(self, row):
         """
@@ -164,7 +181,7 @@ class PageController(QObject):
         if QMessageBox.warning(self.list_widget,
                                self.tr('Remove {}').format(self.layer_type.as_title_case(plural=False)),
                                self.tr(
-                                   'Are you sure you want to remove {}?. This will permanently delete the {} and all related objects from the database.').format(
+                                   'Are you sure you want to remove {}? This will permanently delete the {} and all related objects from the database.').format(
                                    item_text,
                                    self.layer_type.as_sentence_case(plural=False)
                                ),

@@ -1,7 +1,3 @@
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import (
-    QListWidgetItem
-)
 from qgis.core import QgsVectorLayer, QgsMapLayerType, QgsFeature, QgsExpression
 
 from qcity.core import SETTINGS_MANAGER, LayerType, PROJECT_CONTROLLER, DatabaseUtils
@@ -18,6 +14,9 @@ class DevelopmentSitesPageController(PageController):
         self.skip_fields_for_widgets = ['fid', 'name', 'project_area_pk']
 
         PROJECT_CONTROLLER.project_area_changed.connect(self.on_project_area_changed)
+        PROJECT_CONTROLLER.development_site_added.connect(
+            self._on_development_site_added
+        )
 
         self.og_widget.toolButton_development_site_add.clicked.connect(
             self.add_feature_clicked
@@ -61,6 +60,17 @@ class DevelopmentSitesPageController(PageController):
     #       )
     #   )
 
+    def _on_development_site_added(self, feature: QgsFeature):
+        """
+        Called when a new development site is created
+        """
+        if feature[
+            DatabaseUtils.foreign_key_for_layer(self.layer_type)
+        ] != PROJECT_CONTROLLER.current_project_area_fid:
+            return
+
+        self.add_feature_to_list(feature)
+
     def on_project_area_changed(self, project_area_fid: int):
         """
         Called when the current project area FID is changed
@@ -68,15 +78,11 @@ class DevelopmentSitesPageController(PageController):
         site_layer = self.get_layer()
         self.list_widget.clear()
         foreign_key = DatabaseUtils.foreign_key_for_layer(self.layer_type)
-        name_field = DatabaseUtils.name_field_for_layer(self.layer_type)
         site_layer.setSubsetString(
             QgsExpression.createFieldEqualityExpression(foreign_key, project_area_fid))
 
         for feat in site_layer.getFeatures():
-            item = QListWidgetItem(self.list_widget)
-            item.setText(feat[name_field])
-            item.setData(Qt.UserRole, feat.id())
-            self.list_widget.addItem(item)
+            self.add_feature_to_list(feat, set_current=False)
 
     def delete_feature_and_child_objects(self, feature_id: int) -> bool:
         return PROJECT_CONTROLLER.delete_development_site(feature_id)

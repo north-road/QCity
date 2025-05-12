@@ -7,6 +7,7 @@ from qgis.core import (
     QgsVectorLayer,
     QgsRelation,
     QgsRelationContext,
+    QgsFeature,
     QgsFeatureRequest,
     QgsExpression
 )
@@ -22,12 +23,93 @@ class ProjectController(QObject):
 
     project_area_changed = pyqtSignal(int)
     development_site_changed = pyqtSignal(int)
+    project_area_added = pyqtSignal(QgsFeature)
+    development_site_added = pyqtSignal(QgsFeature)
+    building_level_added = pyqtSignal(QgsFeature)
 
     def __init__(self, project: QgsProject):
         super().__init__()
         self.project = project
         self.current_project_area_fid: Optional[int] = None
         self.current_development_site_fid: Optional[int] = None
+
+        self.connect_layers()
+
+        self.project.layersAdded.connect(self._update_project_layers)
+        self.project.layersRemoved.connect(self._update_project_layers)
+
+    def cleanup(self):
+        """
+        Cleanups the controller, ready for deletion
+        """
+        self.disconnect()
+
+    def _update_project_layers(self):
+        """
+        Called when project layers are changed
+        """
+        self.connect_layers()
+
+    def connect_layers(self, disconnect: bool = False):
+        """
+        Connects/disconnects from current project layers
+        """
+        project_area_layer = self.get_project_area_layer()
+        if project_area_layer:
+            if disconnect:
+                project_area_layer.featureAdded.disconnect(self._project_area_added)
+            else:
+                project_area_layer.featureAdded.connect(self._project_area_added)
+
+        development_site_layers = self.get_development_sites_layer()
+        if development_site_layers:
+            if disconnect:
+                development_site_layers.featureAdded.disconnect(self._development_site_added)
+            else:
+                development_site_layers.featureAdded.connect(self._development_site_added)
+
+        building_levels_layer = self.get_building_levels_layer()
+        if building_levels_layer:
+            if disconnect:
+                building_levels_layer.featureAdded.disconnect(self._building_level_added)
+            else:
+                building_levels_layer.featureAdded.connect(self._building_level_added)
+
+    def _project_area_added(self, project_area_fid: int):
+        """
+        Called when a new project area is added to the layer
+        """
+        if project_area_fid < 0:
+            # ignore uncommitted features
+            return
+
+        self.project_area_added.emit(
+            self.get_project_area_layer().getFeature(project_area_fid)
+        )
+
+    def _development_site_added(self, development_site_fid: int):
+        """
+        Called when a new development site is added to the layer
+        """
+        if development_site_fid < 0:
+            # ignore uncommitted features
+            return
+
+        self.development_site_added.emit(
+            self.get_development_sites_layer().getFeature(development_site_fid)
+        )
+
+    def _building_level_added(self, building_level_fid: int):
+        """
+        Called when a new building level is added to the layer
+        """
+        if building_level_fid < 0:
+            # ignore uncommitted features
+            return
+
+        self.building_level_added.emit(
+            self.get_building_levels_layer().getFeature(building_level_fid)
+        )
 
     @staticmethod
     def add_database_layers_to_project(project: QgsProject, database_path: str) -> None:
