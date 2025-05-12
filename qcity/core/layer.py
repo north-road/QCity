@@ -1,6 +1,9 @@
-from typing import Union
+from typing import Optional, Union
+
 from qgis.core import (
-    QgsProject
+    QgsVectorLayer,
+    QgsRuleBasedRenderer,
+    QgsSingleSymbolRenderer
 )
 from .enums import LayerType
 from .project import PROJECT_CONTROLLER
@@ -35,3 +38,44 @@ class LayerUtils:
             return False
 
         return True
+
+    @staticmethod
+    def set_renderer_filter(layer: QgsVectorLayer, filter_string: Optional[str]) -> bool:
+        """
+        Morphs a layer's renderer to respect the specified filter string
+        """
+        current_renderer = layer.renderer()
+        if isinstance(current_renderer, QgsRuleBasedRenderer):
+            # current renderer is rule based. Either update the rule filter,
+            # or downgrade to single symbol renderer
+            rule_count = len(current_renderer.rootRule().children())
+            if rule_count > 1:
+                return False
+
+            if filter_string:
+                new_renderer = current_renderer.clone()
+                new_renderer.rootRule().children()[0].setFilterExpression(filter_string)
+                layer.setRenderer(new_renderer)
+            else:
+                # remove rule based renderer
+                only_rule = current_renderer.rootRule().children()[0]
+                symbol = only_rule.symbol().clone()
+                layer.setRenderer(QgsSingleSymbolRenderer(symbol))
+            layer.triggerRepaint()
+            return True
+        elif isinstance(current_renderer, QgsSingleSymbolRenderer):
+            if not filter_string:
+                # nothing to do
+                return True
+
+            # current renderer is NOT rule based, upgrade to rule based
+            root_rule = QgsRuleBasedRenderer.Rule(None)
+            new_rule = QgsRuleBasedRenderer.Rule(current_renderer.symbol().clone(),
+                                                 filterExp = filter_string)
+            root_rule.appendChild(new_rule)
+            rule_based = QgsRuleBasedRenderer(root_rule)
+            layer.setRenderer(rule_based)
+            layer.triggerRepaint()
+            return True
+
+        return False
