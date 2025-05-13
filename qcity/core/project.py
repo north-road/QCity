@@ -218,6 +218,26 @@ class ProjectController(QObject):
             )
             layer.commitChanges()
 
+        if not self._block_ds_auto_updates and original_feature['auto_calculate_car_parking'] and field_name in (
+                'commercial_car_bays', 'residential_car_bays', 'office_car_bays'):
+            layer.startEditing()
+            layer.changeAttributeValues(
+                feature_id, {
+                    layer.fields().lookupField('auto_calculate_car_parking'): False
+                }
+            )
+            layer.commitChanges()
+
+        if not self._block_ds_auto_updates and original_feature['auto_calculate_bicycle_parking'] and field_name in (
+                'commercial_bicycle_bays', 'office_bicycle_bays', 'residential_bicycle_bays'):
+            layer.startEditing()
+            layer.changeAttributeValues(
+                feature_id, {
+                    layer.fields().lookupField('auto_calculate_bicycle_parking'): False
+                }
+            )
+            layer.commitChanges()
+
     def _building_level_attribute_changed(self, feature_id: int, field_index: int, value):
         """
         Called when a building level attribute is changed
