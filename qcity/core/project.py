@@ -1,7 +1,7 @@
+import math
 from typing import List, Optional
 
 from qgis.PyQt.QtCore import QObject, pyqtSignal
-
 from qgis.core import (
     Qgis,
     QgsProject,
@@ -16,9 +16,9 @@ from qgis.core import (
     QgsDistanceArea
 )
 
-from .settings import SETTINGS_MANAGER
-from .enums import LayerType
 from .database import DatabaseUtils
+from .enums import LayerType
+from .settings import SETTINGS_MANAGER
 
 
 class ProjectController(QObject):
@@ -53,6 +53,8 @@ class ProjectController(QObject):
 
         self.project.layersAdded.connect(self._update_project_layers)
         self.project.layersRemoved.connect(self._update_project_layers)
+
+        self._block_ds_auto_updates = False
 
     def cleanup(self):
         """
@@ -142,6 +144,26 @@ class ProjectController(QObject):
             feature_id, field_name, value
         )
 
+        if field_name in ('dwelling_size_1_bedroom',
+                          'dwelling_size_2_bedroom',
+                          'dwelling_size_3_bedroom',
+                          'dwelling_size_4_bedroom'):
+            project_area_feature = layer.getFeature(feature_id)
+            if not project_area_feature.isValid():
+                return
+
+            project_area_primary_key = project_area_feature[DatabaseUtils.primary_key_for_layer(LayerType.ProjectAreas)]
+
+            # find matching development sites
+            request = QgsFeatureRequest().setFilterExpression(
+                QgsExpression.createFieldEqualityExpression(
+                    DatabaseUtils.foreign_key_for_layer(LayerType.DevelopmentSites),
+                    project_area_primary_key)
+            )
+            development_site_layer = self.get_development_sites_layer()
+            for f in development_site_layer.getFeatures(request):
+                self.auto_calculate_development_site_floorspace(f.id())
+
     def _development_site_added(self, development_site_fid: int):
         """
         Called when a new development site is added to the layer
@@ -184,6 +206,18 @@ class ProjectController(QObject):
             feature_id, field_name, value, project_area_key
         )
 
+        if not self._block_ds_auto_updates and original_feature['auto_calculate_floorspace'] and field_name in (
+                'commercial_floorspace', 'office_floorspace', 'residential_floorspace',
+                'count_1_bedroom_dwellings', 'count_2_bedroom_dwellings',
+                'count_3_bedroom_dwellings', 'count_4_bedroom_dwellings'):
+            layer.startEditing()
+            layer.changeAttributeValues(
+                feature_id, {
+                    layer.fields().lookupField('auto_calculate_floorspace'): False
+                }
+            )
+            layer.commitChanges()
+
     def _building_level_attribute_changed(self, feature_id: int, field_index: int, value):
         """
         Called when a building level attribute is changed
@@ -211,7 +245,14 @@ class ProjectController(QObject):
             feature_id, field_name, value, project_area_key, development_site_key
         )
 
-        self.auto_calculate_development_site_floorspace(development_site_feature.id())
+        if field_name in ('percent_commercial_floorspace',
+                          'percent_office_floorspace',
+                          'percent_residential_floorspace',
+                          'percent_1_bedroom_floorspace',
+                          'percent_2_bedroom_floorspace',
+                          'percent_3_bedroom_floorspace',
+                          'percent_4_bedroom_floorspace'):
+            self.auto_calculate_development_site_floorspace(development_site_feature.id())
 
     def _building_level_added(self, building_level_fid: int):
         """
@@ -355,7 +396,8 @@ class ProjectController(QObject):
 
         relations = [
             ("project_area_to_development_sites", project_area_layer, development_site_layer, "project_area_pk"),
-            ("development_sites_to_building_levels", development_site_layer, building_level_layer, "development_site_pk"),
+            ("development_sites_to_building_levels", development_site_layer, building_level_layer,
+             "development_site_pk"),
         ]
 
         context = QgsRelationContext(self.project)
@@ -416,7 +458,8 @@ class ProjectController(QObject):
         if not development_site_feature.isValid():
             return
 
-        development_site_primary_key = development_site_feature[DatabaseUtils.primary_key_for_layer(LayerType.DevelopmentSites)]
+        development_site_primary_key = development_site_feature[
+            DatabaseUtils.primary_key_for_layer(LayerType.DevelopmentSites)]
 
         from .layer import LayerUtils
 
@@ -495,7 +538,8 @@ class ProjectController(QObject):
         if not development_site_feature.isValid():
             return False
 
-        development_site_primary_key = development_site_feature[DatabaseUtils.primary_key_for_layer(LayerType.DevelopmentSites)]
+        development_site_primary_key = development_site_feature[
+            DatabaseUtils.primary_key_for_layer(LayerType.DevelopmentSites)]
 
         # find matching building levels
         request = QgsFeatureRequest().setFilterExpression(
@@ -557,6 +601,20 @@ class ProjectController(QObject):
         development_site_primary_key = development_site_feature[
             DatabaseUtils.primary_key_for_layer(LayerType.DevelopmentSites)]
 
+        # find project area
+        project_area_layer = self.get_project_area_layer()
+        project_area_key = development_site_feature[DatabaseUtils.foreign_key_for_layer(LayerType.DevelopmentSites)]
+        request = QgsFeatureRequest().setFilterExpression(
+            QgsExpression.createFieldEqualityExpression(
+                DatabaseUtils.primary_key_for_layer(LayerType.ProjectAreas),
+                project_area_key)
+        )
+        project_area_feature = next(project_area_layer.getFeatures(request))
+        dwelling_size_1_bedroom = project_area_feature['dwelling_size_1_bedroom']
+        dwelling_size_2_bedroom = project_area_feature['dwelling_size_2_bedroom']
+        dwelling_size_3_bedroom = project_area_feature['dwelling_size_3_bedroom']
+        dwelling_size_4_bedroom = project_area_feature['dwelling_size_4_bedroom']
+
         # find matching building levels
         request = QgsFeatureRequest().setFilterExpression(
             QgsExpression.createFieldEqualityExpression(DatabaseUtils.foreign_key_for_layer(LayerType.BuildingLevels),
@@ -568,6 +626,10 @@ class ProjectController(QObject):
         total_commercial = 0
         total_office = 0
         total_residential = 0
+        count_1_bedroom = 0
+        count_2_bedroom = 0
+        count_3_bedroom = 0
+        count_4_bedroom = 0
 
         da = QgsDistanceArea()
         da.setEllipsoid(self.project.ellipsoid())
@@ -578,19 +640,36 @@ class ProjectController(QObject):
                 da.measureArea(level.geometry()), Qgis.AreaUnit.SquareMeters
             )
             total_commercial += level['percent_commercial_floorspace'] / 100 * floor_area_m2
-            total_office += level['percent_office_floorspace']  / 100 * floor_area_m2
-            total_residential += level['percent_residential_floorspace'] / 100 * floor_area_m2
+            total_office += level['percent_office_floorspace'] / 100 * floor_area_m2
+            residential_area_m2 = level['percent_residential_floorspace'] / 100 * floor_area_m2
+            total_residential += residential_area_m2
 
+            floor_1_bedroom = level['percent_1_bedroom_floorspace'] / 100 * residential_area_m2
+            floor_2_bedroom = level['percent_2_bedroom_floorspace'] / 100 * residential_area_m2
+            floor_3_bedroom = level['percent_3_bedroom_floorspace'] / 100 * residential_area_m2
+            floor_4_bedroom = level['percent_4_bedroom_floorspace'] / 100 * residential_area_m2
+
+            count_1_bedroom += math.floor(floor_1_bedroom / dwelling_size_1_bedroom)
+            count_2_bedroom += math.floor(floor_2_bedroom / dwelling_size_2_bedroom)
+            count_3_bedroom += math.floor(floor_3_bedroom / dwelling_size_3_bedroom)
+            count_4_bedroom += math.floor(floor_4_bedroom / dwelling_size_4_bedroom)
+
+        self._block_ds_auto_updates = True
         development_site_layer.startEditing()
         development_site_layer.changeAttributeValues(
             development_site_fid, {
                 development_site_layer.fields().lookupField('commercial_floorspace'): total_commercial,
                 development_site_layer.fields().lookupField('office_floorspace'): total_office,
                 development_site_layer.fields().lookupField('residential_floorspace'): total_residential,
-
+                development_site_layer.fields().lookupField('count_1_bedroom_dwellings'): count_1_bedroom,
+                development_site_layer.fields().lookupField('count_2_bedroom_dwellings'): count_2_bedroom,
+                development_site_layer.fields().lookupField('count_3_bedroom_dwellings'): count_3_bedroom,
+                development_site_layer.fields().lookupField('count_4_bedroom_dwellings'): count_4_bedroom,
             }
         )
         development_site_layer.commitChanges()
+        self._block_ds_auto_updates = False
+        return True
 
 
 PROJECT_CONTROLLER = ProjectController(QgsProject.instance())
