@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QFileDialog, QMessageBox
 from qgis.PyQt.QtWidgets import QLabel
 from qgis.PyQt.QtCore import QObject
 from qgis.core import QgsVectorLayer, QgsFeatureRequest
-from qcity.core import SETTINGS_MANAGER, PROJECT_CONTROLLER
+from qcity.core import SETTINGS_MANAGER, PROJECT_CONTROLLER, LayerType
 
 
 class WidgetUtilsStatistics(QObject):
@@ -13,19 +13,18 @@ class WidgetUtilsStatistics(QObject):
         self.totals = dict()
         self.og_widget = og_widget
 
-        self.og_widget.listWidget_project_areas.currentItemChanged.connect(
-            self.populate_export_combo_box
+        PROJECT_CONTROLLER.project_area_added.connect(
+            self.populate_project_area_combo_box
         )
-        self.og_widget.listWidget_project_areas.model().rowsInserted.connect(
-            self.populate_export_combo_box
-        )
-        self.og_widget.listWidget_project_areas.model().rowsRemoved.connect(
-            self.populate_export_combo_box
+        PROJECT_CONTROLLER.project_area_deleted.connect(
+            self.populate_project_area_combo_box
         )
 
         self.og_widget.comboBox_statistics_projects.activated.connect(
             self.update_development_statistics
         )
+
+        self.populate_project_area_combo_box()
 
         self.og_widget.pushButton_csv_export.clicked.connect(self.export_statistics_csv)
 
@@ -109,13 +108,16 @@ class WidgetUtilsStatistics(QObject):
 
         return feats
 
-    def populate_export_combo_box(self) -> None:
+    def populate_project_area_combo_box(self) -> None:
+        """
+        Populates the project area combo box
+        """
         area_layer = PROJECT_CONTROLLER.get_project_area_layer()
-        old_subset_string = area_layer.subsetString()
-        area_layer.setSubsetString("")
-        names = {
-            feature["name"] for feature in area_layer.getFeatures() if feature["name"]
+        name_to_id = {
+            feature["name"]: feature.id() for feature in area_layer.getFeatures()
         }
-        area_layer.setSubsetString(old_subset_string)
+        names_sorted = sorted(list(name_to_id.keys()), key=str.casefold)
         self.og_widget.comboBox_statistics_projects.clear()
-        self.og_widget.comboBox_statistics_projects.addItems(names)
+        for name in names_sorted:
+            self.og_widget.comboBox_statistics_projects.addItem(name, name_to_id[name])
+
