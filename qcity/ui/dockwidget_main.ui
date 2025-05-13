@@ -760,7 +760,11 @@
                 </widget>
                </item>
                <item row="7" column="2">
-                <widget class="QgsSpinBox" name="count_4_bedroom_dwellings"/>
+                <widget class="QgsSpinBox" name="count_4_bedroom_dwellings">
+                 <property name="maximum">
+                  <number>9999</number>
+                 </property>
+                </widget>
                </item>
                <item row="1" column="3">
                 <widget class="QLabel" name="label_85">
@@ -770,7 +774,11 @@
                 </widget>
                </item>
                <item row="6" column="2">
-                <widget class="QgsSpinBox" name="count_3_bedroom_dwellings"/>
+                <widget class="QgsSpinBox" name="count_3_bedroom_dwellings">
+                 <property name="maximum">
+                  <number>9999</number>
+                 </property>
+                </widget>
                </item>
                <item row="4" column="1">
                 <widget class="QLabel" name="label_78">
@@ -794,7 +802,11 @@
                 </widget>
                </item>
                <item row="5" column="2">
-                <widget class="QgsSpinBox" name="count_2_bedroom_dwellings"/>
+                <widget class="QgsSpinBox" name="count_2_bedroom_dwellings">
+                 <property name="maximum">
+                  <number>9999</number>
+                 </property>
+                </widget>
                </item>
                <item row="2" column="2">
                 <widget class="QgsDoubleSpinBox" name="office_floorspace">
@@ -841,7 +853,11 @@
                 </widget>
                </item>
                <item row="4" column="2">
-                <widget class="QgsSpinBox" name="count_1_bedroom_dwellings"/>
+                <widget class="QgsSpinBox" name="count_1_bedroom_dwellings">
+                 <property name="maximum">
+                  <number>9999</number>
+                 </property>
+                </widget>
                </item>
                <item row="0" column="0" colspan="4">
                 <widget class="QCheckBox" name="auto_calculate_floorspace">
@@ -870,7 +886,11 @@
                 </widget>
                </item>
                <item row="2" column="1">
-                <widget class="QgsSpinBox" name="office_car_bays"/>
+                <widget class="QgsSpinBox" name="office_car_bays">
+                 <property name="maximum">
+                  <number>9999</number>
+                 </property>
+                </widget>
                </item>
                <item row="3" column="0">
                 <widget class="QLabel" name="label_60">
@@ -880,10 +900,18 @@
                 </widget>
                </item>
                <item row="3" column="1">
-                <widget class="QgsSpinBox" name="residential_car_bays"/>
+                <widget class="QgsSpinBox" name="residential_car_bays">
+                 <property name="maximum">
+                  <number>9999</number>
+                 </property>
+                </widget>
                </item>
                <item row="1" column="1">
-                <widget class="QgsSpinBox" name="commercial_car_bays"/>
+                <widget class="QgsSpinBox" name="commercial_car_bays">
+                 <property name="maximum">
+                  <number>9999</number>
+                 </property>
+                </widget>
                </item>
                <item row="2" column="0">
                 <widget class="QLabel" name="label_59">
@@ -912,7 +940,11 @@
               </property>
               <layout class="QGridLayout" name="gridLayout_7" columnstretch="1,2">
                <item row="2" column="1">
-                <widget class="QgsSpinBox" name="office_bicycle_bays"/>
+                <widget class="QgsSpinBox" name="office_bicycle_bays">
+                 <property name="maximum">
+                  <number>9999</number>
+                 </property>
+                </widget>
                </item>
                <item row="3" column="0">
                 <widget class="QLabel" name="label_57">
@@ -929,10 +961,18 @@
                 </widget>
                </item>
                <item row="1" column="1">
-                <widget class="QgsSpinBox" name="commercial_bicycle_bays"/>
+                <widget class="QgsSpinBox" name="commercial_bicycle_bays">
+                 <property name="maximum">
+                  <number>9999</number>
+                 </property>
+                </widget>
                </item>
                <item row="3" column="1">
-                <widget class="QgsSpinBox" name="residential_bicycle_bays"/>
+                <widget class="QgsSpinBox" name="residential_bicycle_bays">
+                 <property name="maximum">
+                  <number>9999</number>
+                 </property>
+                </widget>
                </item>
                <item row="2" column="0">
                 <widget class="QLabel" name="label_56">
