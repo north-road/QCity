@@ -1,10 +1,10 @@
 import csv
-from collections import defaultdict
 
-from qgis.PyQt.QtWidgets import QLabel, QFileDialog, QMessageBox
-from qgis.PyQt.QtCore import QObject
-from qgis.core import QgsVectorLayer, QgsFeatureRequest
-from qcity.core import SETTINGS_MANAGER, PROJECT_CONTROLLER, LayerType
+from qgis.PyQt.QtCore import QObject, QDir
+from qgis.PyQt.QtWidgets import QLabel, QFileDialog
+from qgis.core import QgsFileUtils
+
+from qcity.core import PROJECT_CONTROLLER
 
 
 class WidgetUtilsStatistics(QObject):
@@ -59,26 +59,28 @@ class WidgetUtilsStatistics(QObject):
         for stat, widget_name in stats_mapping.items():
             label = self.og_widget.findChild(QLabel, widget_name)
             if label:
-                label.setText(str(round(totals[stat],2)))
+                label.setText(str(round(totals[stat], 2)))
 
     def export_statistics_csv(self) -> None:
         """Exports the statistics tab to a CSV file."""
         csv_filename, _ = QFileDialog.getSaveFileName(
-            self.og_widget, self.tr("Choose CSV Path"), "*.csv"
+            self.og_widget, self.tr("Export to CSV"), QDir.homePath(), "CSV Files (*.csv)"
+        )
+        if not csv_filename:
+            return
+
+        csv_filename = QgsFileUtils.addExtensionFromFilter(csv_filename, '*.csv')
+
+        totals = PROJECT_CONTROLLER.calculate_project_area_stats(
+            self.og_widget.comboBox_statistics_projects.currentData()
         )
 
-        if csv_filename and csv_filename.endswith(".csv"):
-            with open(csv_filename, "w", newline="") as csvfile:
-                writer = csv.writer(csvfile)
-                writer.writerow(["Statistic", "Value"])
+        with open(csv_filename, "w", newline="") as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(["Statistic", "Value"])
 
-                for key, value in self.totals.items():
-                    clean_key = key.replace("label_statistics_", "")
-                    writer.writerow([clean_key, value])
-        else:
-            QMessageBox.warning(
-                self.og_widget, "Could not save csv file!", "Wrong filename specified."
-            )
+            for key, value in totals.items():
+                writer.writerow([key, value])
 
     def populate_project_area_combo_box(self) -> None:
         """
