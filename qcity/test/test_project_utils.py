@@ -3,6 +3,7 @@ import os
 import tempfile
 
 from qgis.PyQt.QtCore import QCoreApplication
+from qgis.PyQt.QtTest import QSignalSpy
 
 from qgis.core import (
     QgsProject,
@@ -133,6 +134,13 @@ class TestProjectUtils(unittest.TestCase):
             controller = ProjectController(p)
             controller.add_database_layers_to_project(p, gpkg_path)
 
+            project_area_added_spy = QSignalSpy(controller.project_area_added)
+            development_site_added_spy = QSignalSpy(controller.development_site_added)
+            building_level_added_spy = QSignalSpy(controller.building_level_added)
+            project_area_deleted_spy = QSignalSpy(controller.project_area_deleted)
+            development_site_deleted_spy = QSignalSpy(controller.development_site_deleted)
+            building_level_deleted_spy = QSignalSpy(controller.building_level_deleted)
+
             project_area_layer = controller.get_project_area_layer()
             project_area_layer.startEditing()
             # create some initial features
@@ -154,8 +162,18 @@ class TestProjectUtils(unittest.TestCase):
             f['car_parking_3_bedroom'] = 23
             f['car_parking_4_bedroom'] = 24
             self.assertTrue(project_area_layer.addFeature(f))
+            # no signals for uncommitted features
+            self.assertEqual(len(project_area_added_spy), 0)
+            self.assertEqual(len(development_site_added_spy), 0)
+            self.assertEqual(len(building_level_added_spy), 0)
 
             self.assertTrue(project_area_layer.commitChanges())
+            self.assertEqual(len(project_area_added_spy), 3)
+            self.assertEqual(len(development_site_added_spy), 0)
+            self.assertEqual(len(building_level_added_spy), 0)
+            self.assertEqual(len(project_area_deleted_spy), 0)
+            self.assertEqual(len(development_site_deleted_spy), 0)
+            self.assertEqual(len(building_level_deleted_spy), 0)
 
             f1 = None
             f2 = None
@@ -185,7 +203,16 @@ class TestProjectUtils(unittest.TestCase):
             f['project_area_pk'] = f2_pk
             f['address'] = 'b1'
             self.assertTrue(development_site_layer.addFeature(f))
+
+            # no signals for uncommitted features
+            self.assertEqual(len(project_area_added_spy), 3)
+            self.assertEqual(len(development_site_added_spy), 0)
+            self.assertEqual(len(building_level_added_spy), 0)
+
             self.assertTrue(development_site_layer.commitChanges())
+            self.assertEqual(len(project_area_added_spy), 3)
+            self.assertEqual(len(development_site_added_spy), 3)
+            self.assertEqual(len(building_level_added_spy), 0)
 
             ds1 = None
             ds2 = None
@@ -217,7 +244,14 @@ class TestProjectUtils(unittest.TestCase):
             f['development_site_pk'] = ds3_pk
             f['percent_office_floorspace'] = 46
             self.assertTrue(building_level_layer.addFeature(f))
+            # no signals for uncommitted features
+            self.assertEqual(len(project_area_added_spy), 3)
+            self.assertEqual(len(development_site_added_spy), 3)
+            self.assertEqual(len(building_level_added_spy), 0)
             self.assertTrue(building_level_layer.commitChanges())
+            self.assertEqual(len(project_area_added_spy), 3)
+            self.assertEqual(len(development_site_added_spy), 3)
+            self.assertEqual(len(building_level_added_spy), 3)
 
             bl1 = None
             bl2 = None
@@ -241,6 +275,9 @@ class TestProjectUtils(unittest.TestCase):
             self.assertFalse(development_site_layer.isEditable())
             self.assertEqual(len(list(building_level_layer.getFeatures())), 3)
             self.assertFalse(building_level_layer.isEditable())
+            self.assertEqual(len(project_area_deleted_spy), 0)
+            self.assertEqual(len(development_site_deleted_spy), 0)
+            self.assertEqual(len(building_level_deleted_spy), 0)
 
             # delete a valid project area
             self.assertTrue(controller.delete_project_area(f1.id()))
@@ -253,6 +290,9 @@ class TestProjectUtils(unittest.TestCase):
             self.assertCountEqual([f.id() for f in building_level_layer.getFeatures()],
                                   [bl3.id()])
             self.assertFalse(building_level_layer.isEditable())
+            self.assertEqual(len(project_area_deleted_spy), 1)
+            self.assertEqual(len(development_site_deleted_spy), 2)
+            self.assertEqual(len(building_level_deleted_spy), 2)
 
             # nothing attached
             self.assertTrue(controller.delete_project_area(f3.id()))
@@ -265,6 +305,9 @@ class TestProjectUtils(unittest.TestCase):
             self.assertCountEqual([f.id() for f in building_level_layer.getFeatures()],
                                   [bl3.id()])
             self.assertFalse(building_level_layer.isEditable())
+            self.assertEqual(len(project_area_deleted_spy), 2)
+            self.assertEqual(len(development_site_deleted_spy), 2)
+            self.assertEqual(len(building_level_deleted_spy), 2)
 
             self.assertTrue(controller.delete_project_area(f2.id()))
             self.assertFalse([f.id() for f in project_area_layer.getFeatures()])
@@ -273,6 +316,9 @@ class TestProjectUtils(unittest.TestCase):
             self.assertFalse(development_site_layer.isEditable())
             self.assertFalse([f.id() for f in building_level_layer.getFeatures()])
             self.assertFalse(building_level_layer.isEditable())
+            self.assertEqual(len(project_area_deleted_spy), 3)
+            self.assertEqual(len(development_site_deleted_spy), 3)
+            self.assertEqual(len(building_level_deleted_spy), 3)
             controller.cleanup()
             p.clear()
 
