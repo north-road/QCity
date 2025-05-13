@@ -1,4 +1,4 @@
-from qgis.core import QgsVectorLayer, QgsMapLayerType, QgsFeature, QgsExpression
+from qgis.core import Qgis, QgsVectorLayer, QgsFeature, QgsExpression
 
 from qcity.core import SETTINGS_MANAGER, LayerType, PROJECT_CONTROLLER, DatabaseUtils
 from .page_controller import PageController
@@ -45,7 +45,7 @@ class DevelopmentSitesPageController(PageController):
         )
 
         self.og_widget.comboBox_auto_elevation.setAllowEmptyLayer(True)
-        self.og_widget.comboBox_auto_elevation.setFilters(QgsMapLayerType.RasterLayer)
+        self.og_widget.comboBox_auto_elevation.setFilters(Qgis.LayerFilter.RasterLayer)
         self.og_widget.checkBox_auto_elevation.toggled.connect(
             self.get_elevation_from_dem
         )

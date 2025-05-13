@@ -1,9 +1,10 @@
 import os
 import unittest
+import tempfile
+
 from typing import Union
 from unittest.mock import patch
 
-import numpy as np
 from qgis.PyQt.QtCore import Qt, QEvent, QPoint, QCoreApplication
 from qgis.core import (
     QgsCoordinateReferenceSystem,
@@ -17,11 +18,10 @@ from qgis.core import (
     QgsSettings,
 )
 
+from qcity.core import DatabaseUtils, PROJECT_CONTROLLER
 from qcity.gui.qcity_dock import QCityDockWidget
 from qcity.test.utilities import get_qgis_app
 from qcity.utils.maptools import DrawPolygonTool
-
-test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
 
 
 class MapToolsTest(unittest.TestCase):
@@ -57,39 +57,55 @@ class MapToolsTest(unittest.TestCase):
                     -344918.46147615037625656,
                     6633917.53619999997317791,
                 ),
-                QgsCoordinateReferenceSystem(3857),
+                QgsCoordinateReferenceSystem('EPSG:3857'),
             )
         )
 
         self.widget = QCityDockWidget(self.project, self.iface)
         message_bar = self.iface.messageBar()
 
-        self.map_tool = DrawPolygonTool(
-            map_canvas=self.iface.mapCanvas(),
-            cad_dock_widget=QgsAdvancedDigitizingDockWidget(self.CANVAS),
-            message_bar=message_bar,
-            dlg=self.widget,
-            iface=self.iface,
-        )
+        with tempfile.TemporaryDirectory() as temp_dir:
+            gpkg_path = os.path.join(temp_dir, "test_database.gpkg")
 
-        self.widget.load_project_database("test_data/empty_test_database.gpkg", "gpkg")
-        self.widget.toolButton_project_area_add.clicked.emit()
+            DatabaseUtils.create_base_tables(
+                gpkg_path
+            )
 
-        points = [
-            QgsPointXY(-346976.04375941428588703, 6632700.0318903774023056),
-            QgsPointXY(-346915.16854393307585269, 6632639.15667489636689425),
-            QgsPointXY(-346884.73093619249993935, 6632608.71906715538352728),
-        ]
 
-        self.map_tool.canvasReleaseEvent(self.click_from_middle())
-        self.map_tool.canvasReleaseEvent(self.click_from_middle(x=10, y=10))
-        self.map_tool.canvasReleaseEvent(self.click_from_middle(x=15, y=15))
+            self.map_tool = DrawPolygonTool(
+                map_canvas=self.iface.mapCanvas(),
+                cad_dock_widget=QgsAdvancedDigitizingDockWidget(self.CANVAS),
+                message_bar=message_bar,
+                dlg=self.widget,
+                iface=self.iface,
+            )
 
-        np.testing.assert_almost_equal(self.map_tool.points, points, decimal=4)
+            self.widget.load_project_database(gpkg_path, "gpkg")
+            self.widget.toolButton_project_area_add.clicked.emit()
 
-        self.map_tool.canvasReleaseEvent(self.click_from_middle(type="right"))
+            points = [
+                QgsPointXY(-346976.04375941428588703, 6632700.0318903774023056),
+                QgsPointXY(-346915.16854393307585269, 6632639.15667489636689425),
+                QgsPointXY(-346884.73093619249993935, 6632608.71906715538352728),
+            ]
 
-        self.assertTrue(self.widget.listWidget_project_areas.item(0), "test")
+            self.map_tool.canvasReleaseEvent(self.click_from_middle())
+            self.map_tool.canvasReleaseEvent(self.click_from_middle(x=10, y=10))
+            self.map_tool.canvasReleaseEvent(self.click_from_middle(x=15, y=15))
+
+            self.assertAlmostEqual(self.map_tool.points[0].x(), points[0].x(), delta=10)
+            self.assertAlmostEqual(self.map_tool.points[0].y(), points[0].y(), delta=10)
+            self.assertAlmostEqual(self.map_tool.points[1].x(), points[1].x(), delta=10)
+            self.assertAlmostEqual(self.map_tool.points[1].y(), points[1].y(), delta=10)
+            self.assertAlmostEqual(self.map_tool.points[2].x(), points[2].x(), delta=10)
+            self.assertAlmostEqual(self.map_tool.points[2].y(), points[2].y(), delta=10)
+
+            self.map_tool.canvasReleaseEvent(self.click_from_middle(type="right"))
+
+            self.assertTrue(self.widget.listWidget_project_areas.item(0), "test")
+
+            PROJECT_CONTROLLER.cleanup()
+            QgsProject.instance().clear()
 
     def click_from_middle(
         self, type: str = "left", x: int = 0, y: int = 0

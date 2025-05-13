@@ -42,9 +42,9 @@ class TestDatabaseUtils(unittest.TestCase):
             self.assertTrue(vl.isValid())
             self.assertEqual(vl.featureCount(), 0)
             fields = vl.fields()
-            date_idx = fields.lookupField('date')
+            date_idx = fields.lookupField('year')
             field = fields[date_idx]
-            self.assertEqual(field.type(), QVariant.Date)
+            self.assertEqual(field.type(), QVariant.Int)
             site_owner_idx = fields.lookupField('site_owner')
             field = fields[site_owner_idx]
             self.assertEqual(field.type(), QVariant.String)

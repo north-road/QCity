@@ -2,10 +2,13 @@ import unittest
 import os
 import tempfile
 
+from qgis.PyQt.QtCore import QCoreApplication
+
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
-    QgsVectorLayerUtils
+    QgsVectorLayerUtils,
+    QgsSettings
 )
 
 from qcity.core.project import ProjectController
@@ -17,9 +20,19 @@ test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
 
 from .utilities import get_qgis_app
 
-QGIS_APP = get_qgis_app()
 
 class TestProjectUtils(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        """Run before all tests"""
+        super().setUpClass()
+        QCoreApplication.setOrganizationName("QCiy_project_utils")
+        QCoreApplication.setOrganizationDomain("qcity_project_utils")
+        QCoreApplication.setApplicationName("qcity_project_utils")
+
+        _, CANVAS, cls.iface, cls.PARENT = get_qgis_app()
+        QgsSettings().clear()
 
     def test_add_layers(self) -> None:
         """
@@ -57,9 +70,10 @@ class TestProjectUtils(unittest.TestCase):
 
             building_areas_layer = controller.get_building_levels_layer()
             self.assertIsInstance(building_areas_layer, QgsVectorLayer)
-            self.assertGreaterEqual(building_areas_layer.fields().lookupField('count_1_bedroom_dwellings'), 0)
+            self.assertGreaterEqual(building_areas_layer.fields().lookupField('percent_1_bedroom_floorspace'), 0)
             self.assertEqual(controller.get_layer(LayerType.BuildingLevels), building_areas_layer)
             controller.cleanup()
+            p.clear()
 
     def test_layer_relations(self):
         """
@@ -85,6 +99,7 @@ class TestProjectUtils(unittest.TestCase):
             site_to_level = [p.relationManager().relation(r) for r in p.relationManager().relations() if p.relationManager().relation(r).referencedLayer() == controller.get_development_sites_layer()][0]
             self.assertEqual(site_to_level.referencingLayer(), controller.get_building_levels_layer())
             controller.cleanup()
+            p.clear()
 
     def test_project_database_path(self):
         """
@@ -103,6 +118,8 @@ class TestProjectUtils(unittest.TestCase):
         self.assertFalse(controller2.associated_database_path())
         controller.cleanup()
         controller2.cleanup()
+        p.clear()
+        p2.clear()
 
     def test_delete_project_area(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -190,15 +207,15 @@ class TestProjectUtils(unittest.TestCase):
             building_level_layer.startEditing()
             f = QgsVectorLayerUtils.createFeature(building_level_layer)
             f['development_site_pk'] = ds1_pk
-            f['office_floorspace'] = 44
+            f['percent_office_floorspace'] = 44
             self.assertTrue(building_level_layer.addFeature(f))
             f = QgsVectorLayerUtils.createFeature(building_level_layer)
             f['development_site_pk'] = ds1_pk
-            f['office_floorspace'] = 45
+            f['percent_office_floorspace'] = 45
             self.assertTrue(building_level_layer.addFeature(f))
             f = QgsVectorLayerUtils.createFeature(building_level_layer)
             f['development_site_pk'] = ds3_pk
-            f['office_floorspace'] = 46
+            f['percent_office_floorspace'] = 46
             self.assertTrue(building_level_layer.addFeature(f))
             self.assertTrue(building_level_layer.commitChanges())
 
@@ -206,11 +223,11 @@ class TestProjectUtils(unittest.TestCase):
             bl2 = None
             bl3 = None
             for f in building_level_layer.getFeatures():
-                if f['office_floorspace'] == 44:
+                if f['percent_office_floorspace'] == 44:
                     bl1 = f
-                elif f['office_floorspace'] == 45:
+                elif f['percent_office_floorspace'] == 45:
                     bl2 = f
-                elif f['office_floorspace'] == 46:
+                elif f['percent_office_floorspace'] == 46:
                     bl3 = f
 
             # delete project area which doesn't exist
@@ -257,6 +274,7 @@ class TestProjectUtils(unittest.TestCase):
             self.assertFalse([f.id() for f in building_level_layer.getFeatures()])
             self.assertFalse(building_level_layer.isEditable())
             controller.cleanup()
+            p.clear()
 
     def test_delete_development_site(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -344,15 +362,15 @@ class TestProjectUtils(unittest.TestCase):
             building_level_layer.startEditing()
             f = QgsVectorLayerUtils.createFeature(building_level_layer)
             f['development_site_pk'] = ds1_pk
-            f['office_floorspace'] = 44
+            f['percent_office_floorspace'] = 44
             self.assertTrue(building_level_layer.addFeature(f))
             f = QgsVectorLayerUtils.createFeature(building_level_layer)
             f['development_site_pk'] = ds1_pk
-            f['office_floorspace'] = 45
+            f['percent_office_floorspace'] = 45
             self.assertTrue(building_level_layer.addFeature(f))
             f = QgsVectorLayerUtils.createFeature(building_level_layer)
             f['development_site_pk'] = ds3_pk
-            f['office_floorspace'] = 46
+            f['percent_office_floorspace'] = 46
             self.assertTrue(building_level_layer.addFeature(f))
             self.assertTrue(building_level_layer.commitChanges())
 
@@ -360,11 +378,11 @@ class TestProjectUtils(unittest.TestCase):
             bl2 = None
             bl3 = None
             for f in building_level_layer.getFeatures():
-                if f['office_floorspace'] == 44:
+                if f['percent_office_floorspace'] == 44:
                     bl1 = f
-                elif f['office_floorspace'] == 45:
+                elif f['percent_office_floorspace'] == 45:
                     bl2 = f
-                elif f['office_floorspace'] == 46:
+                elif f['percent_office_floorspace'] == 46:
                     bl3 = f
 
             # delete development site which doesn't exist
@@ -412,6 +430,7 @@ class TestProjectUtils(unittest.TestCase):
             self.assertFalse([f.id() for f in building_level_layer.getFeatures()])
             self.assertFalse(building_level_layer.isEditable())
             controller.cleanup()
+            p.clear()
 
     def test_delete_building_level(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -499,15 +518,15 @@ class TestProjectUtils(unittest.TestCase):
             building_level_layer.startEditing()
             f = QgsVectorLayerUtils.createFeature(building_level_layer)
             f['development_site_pk'] = ds1_pk
-            f['office_floorspace'] = 44
+            f['percent_office_floorspace'] = 44
             self.assertTrue(building_level_layer.addFeature(f))
             f = QgsVectorLayerUtils.createFeature(building_level_layer)
             f['development_site_pk'] = ds1_pk
-            f['office_floorspace'] = 45
+            f['percent_office_floorspace'] = 45
             self.assertTrue(building_level_layer.addFeature(f))
             f = QgsVectorLayerUtils.createFeature(building_level_layer)
             f['development_site_pk'] = ds3_pk
-            f['office_floorspace'] = 46
+            f['percent_office_floorspace'] = 46
             self.assertTrue(building_level_layer.addFeature(f))
             self.assertTrue(building_level_layer.commitChanges())
 
@@ -515,11 +534,11 @@ class TestProjectUtils(unittest.TestCase):
             bl2 = None
             bl3 = None
             for f in building_level_layer.getFeatures():
-                if f['office_floorspace'] == 44:
+                if f['percent_office_floorspace'] == 44:
                     bl1 = f
-                elif f['office_floorspace'] == 45:
+                elif f['percent_office_floorspace'] == 45:
                     bl2 = f
-                elif f['office_floorspace'] == 46:
+                elif f['percent_office_floorspace'] == 46:
                     bl3 = f
 
             # delete building level which doesn't exist
@@ -567,6 +586,7 @@ class TestProjectUtils(unittest.TestCase):
             self.assertFalse([f.id() for f in building_level_layer.getFeatures()])
             self.assertFalse(building_level_layer.isEditable())
             controller.cleanup()
+            p.clear()
 
     def test_names(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -635,3 +655,4 @@ class TestProjectUtils(unittest.TestCase):
                 ['floor 1', 'Floor 3', 'Floor 4']
             )
             controller.cleanup()
+            p.clear()
