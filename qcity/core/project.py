@@ -1,6 +1,7 @@
 import math
 from typing import List, Optional
 
+from qgis.PyQt import sip
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.core import (
     Qgis,
@@ -25,6 +26,9 @@ class ProjectController(QObject):
     """
     Controller for working with QCity projects
     """
+    project_area_layer_changed = pyqtSignal()
+    development_site_layer_changed = pyqtSignal()
+    building_level_layer_changed = pyqtSignal()
 
     project_area_changed = pyqtSignal(int)
     development_site_changed = pyqtSignal(int)
@@ -46,6 +50,11 @@ class ProjectController(QObject):
     def __init__(self, project: QgsProject):
         super().__init__()
         self.project = project
+
+        self._current_project_area_layer: Optional[QgsVectorLayer] = None
+        self._current_development_sites_layer: Optional[QgsVectorLayer] = None
+        self._current_building_levels_layer: Optional[QgsVectorLayer] = None
+
         self.current_project_area_fid: Optional[int] = None
         self.current_development_site_fid: Optional[int] = None
 
@@ -73,37 +82,58 @@ class ProjectController(QObject):
         Connects/disconnects from current project layers
         """
         project_area_layer = self.get_project_area_layer()
-        if project_area_layer:
-            if disconnect:
-                project_area_layer.featureAdded.disconnect(self._project_area_added)
-                project_area_layer.featureDeleted.disconnect(self._project_area_deleted)
-                project_area_layer.attributeValueChanged.disconnect(self._project_area_attribute_changed)
-            else:
-                project_area_layer.featureAdded.connect(self._project_area_added)
-                project_area_layer.featureDeleted.connect(self._project_area_deleted)
-                project_area_layer.attributeValueChanged.connect(self._project_area_attribute_changed)
 
-        development_site_layers = self.get_development_sites_layer()
-        if development_site_layers:
-            if disconnect:
-                development_site_layers.featureAdded.disconnect(self._development_site_added)
-                development_site_layers.featureDeleted.disconnect(self._development_site_deleted)
-                development_site_layers.attributeValueChanged.disconnect(self._development_site_attribute_changed)
-            else:
-                development_site_layers.featureAdded.connect(self._development_site_added)
-                development_site_layers.featureDeleted.connect(self._development_site_deleted)
-                development_site_layers.attributeValueChanged.connect(self._development_site_attribute_changed)
+        if self._current_project_area_layer is not None and sip.isdeleted(self._current_project_area_layer):
+            self._current_project_area_layer = None
+        if self._current_development_sites_layer is not None and sip.isdeleted(self._current_development_sites_layer):
+            self._current_development_sites_layer = None
+        if self._current_building_levels_layer is not None and sip.isdeleted(self._current_building_levels_layer):
+            self._current_building_levels_layer = None
+
+        if self._current_project_area_layer and (disconnect or self._current_project_area_layer != project_area_layer):
+            self._current_project_area_layer.featureAdded.disconnect(self._project_area_added)
+            self._current_project_area_layer.featureDeleted.disconnect(self._project_area_deleted)
+            self._current_project_area_layer.attributeValueChanged.disconnect(self._project_area_attribute_changed)
+
+        if not disconnect and project_area_layer and project_area_layer != self._current_project_area_layer:
+            project_area_layer.featureAdded.connect(self._project_area_added)
+            project_area_layer.featureDeleted.connect(self._project_area_deleted)
+            project_area_layer.attributeValueChanged.connect(self._project_area_attribute_changed)
+        project_area_layer_changed = self._current_project_area_layer != project_area_layer
+        self._current_project_area_layer = project_area_layer
+
+        development_site_layer = self.get_development_sites_layer()
+        if self._current_development_sites_layer and (disconnect or self._current_development_sites_layer != development_site_layer):
+            self._current_development_sites_layer.featureAdded.disconnect(self._development_site_added)
+            self._current_development_sites_layer.featureDeleted.disconnect(self._development_site_deleted)
+            self._current_development_sites_layer.attributeValueChanged.disconnect(self._development_site_attribute_changed)
+
+        if not disconnect and development_site_layer and development_site_layer != self._current_development_sites_layer:
+            development_site_layer.featureAdded.connect(self._development_site_added)
+            development_site_layer.featureDeleted.connect(self._development_site_deleted)
+            development_site_layer.attributeValueChanged.connect(self._development_site_attribute_changed)
+        development_site_layer_changed = self._current_development_sites_layer != development_site_layer
+        self._current_development_sites_layer = development_site_layer
 
         building_levels_layer = self.get_building_levels_layer()
-        if building_levels_layer:
-            if disconnect:
-                building_levels_layer.featureAdded.disconnect(self._building_level_added)
-                building_levels_layer.featureDeleted.disconnect(self._building_level_deleted)
-                building_levels_layer.attributeValueChanged.disconnect(self._building_level_attribute_changed)
-            else:
-                building_levels_layer.featureAdded.connect(self._building_level_added)
-                building_levels_layer.featureDeleted.connect(self._building_level_deleted)
-                building_levels_layer.attributeValueChanged.connect(self._building_level_attribute_changed)
+        if self._current_building_levels_layer and (disconnect or self._current_building_levels_layer != building_levels_layer):
+            self._current_building_levels_layer.featureAdded.disconnect(self._building_level_added)
+            self._current_building_levels_layer.featureDeleted.disconnect(self._building_level_deleted)
+            self._current_building_levels_layer.attributeValueChanged.disconnect(self._building_level_attribute_changed)
+
+        if not disconnect and building_levels_layer and building_levels_layer != self._current_building_levels_layer:
+            building_levels_layer.featureAdded.connect(self._building_level_added)
+            building_levels_layer.featureDeleted.connect(self._building_level_deleted)
+            building_levels_layer.attributeValueChanged.connect(self._building_level_attribute_changed)
+        building_level_layer_changed = self._current_building_levels_layer != building_levels_layer
+        self._current_building_levels_layer = building_levels_layer
+
+        if project_area_layer_changed:
+            self.project_area_layer_changed.emit()
+        if development_site_layer_changed:
+            self.development_site_layer_changed.emit()
+        if building_level_layer_changed:
+            self.building_level_layer_changed.emit()
 
     def _project_area_added(self, project_area_fid: int):
         """

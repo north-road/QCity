@@ -113,6 +113,9 @@ class WidgetUtilsStatistics(QObject):
         Populates the project area combo box
         """
         area_layer = PROJECT_CONTROLLER.get_project_area_layer()
+        if not area_layer or not area_layer.isValid():
+            return
+
         name_to_id = {
             feature["name"]: feature.id() for feature in area_layer.getFeatures()
         }
