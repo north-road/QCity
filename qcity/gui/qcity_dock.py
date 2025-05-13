@@ -1,44 +1,37 @@
+import os
 from typing import Optional
 
-import json
-import os
-import shutil
-
+from qgis.PyQt import uic
+from qgis.PyQt.QtCore import QCoreApplication, Qt, pyqtSignal
+from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import (
     QWidget,
     QFileDialog,
     QGraphicsOpacityEffect,
     QListWidgetItem,
 )
-from qgis.PyQt import uic
-from qgis.PyQt.QtCore import QCoreApplication, Qt, pyqtSignal
-from qgis.PyQt.QtGui import QColor
 from qgis.core import (
-    QgsVectorFileWriter,
-    QgsFields,
-    QgsField,
-    QgsCoordinateTransformContext,
     QgsFeatureRequest,
     QgsVectorLayer,
     QgsProject,
     QgsFeature,
     Qgis,
     QgsFileUtils,
-    QgsRelation,
 )
 from qgis.gui import QgsDockWidget, QgsCollapsibleGroupBox
 
+from qcity.gui.widget_tab_development_sites import DevelopmentSitesPageController
+from qcity.gui.widget_tab_project_areas import ProjectAreasPageController
 from .widget_tab_building_levels import BuildingLevelsPageController
 from .widget_tab_statistics import WidgetUtilsStatistics
+from ..core import DatabaseUtils, PROJECT_CONTROLLER, LayerType
 from ..core import SETTINGS_MANAGER
 from ..gui.gui_utils import GuiUtils
-from qcity.gui.widget_tab_development_sites import DevelopmentSitesPageController
 
-from qcity.gui.widget_tab_project_areas import ProjectAreasPageController
-from ..core import DatabaseUtils, PROJECT_CONTROLLER, LayerType
+DOCK_WIDGET, _ = uic.loadUiType(
+    GuiUtils.get_ui_file_path('dockwidget_main.ui'))
 
-
-class QCityDockWidget(QgsDockWidget):
+class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
     """
     Main dock widget.
     """
@@ -47,9 +40,8 @@ class QCityDockWidget(QgsDockWidget):
 
     def __init__(self, project, iface) -> None:
         super(QCityDockWidget, self).__init__()
+        self.setupUi(self)
         self.setObjectName("QCityDockWidget")
-
-        uic.loadUi(GuiUtils.get_ui_file_path("dockwidget_main.ui"), self)
 
         self.pushButton_add_base_layer.setIcon(GuiUtils.get_icon('load_layers.svg'))
         self.toolButton_project_area_add.setIcon(GuiUtils.get_icon('add.svg'))
@@ -87,12 +79,17 @@ class QCityDockWidget(QgsDockWidget):
         )
 
         # Initialize tabs
-        self.project_area_controller = ProjectAreasPageController(self, self.tab_project_areas, self.listWidget_project_areas, self.label_current_project_area)
+        self.project_area_controller = ProjectAreasPageController(self, self.tab_project_areas,
+                                                                  self.listWidget_project_areas,
+                                                                  self.label_current_project_area)
         self.project_area_controller.add_feature_clicked.connect(self.on_add_feature_clicked)
-        self.development_site_controller = DevelopmentSitesPageController(self, self.tab_development_sites, self.listWidget_development_sites,  self.label_current_development_site)
+        self.development_site_controller = DevelopmentSitesPageController(self, self.tab_development_sites,
+                                                                          self.listWidget_development_sites,
+                                                                          self.label_current_development_site)
         self.development_site_controller.add_feature_clicked.connect(self.on_add_feature_clicked)
 
-        self.building_levels_controller = BuildingLevelsPageController(self, self.tab_building_levels, self.listWidget_building_levels)
+        self.building_levels_controller = BuildingLevelsPageController(self, self.tab_building_levels,
+                                                                       self.listWidget_building_levels)
         self.building_levels_controller.add_feature_clicked.connect(self.on_add_feature_clicked)
 
         WidgetUtilsStatistics(self)
@@ -278,7 +275,7 @@ class QCityDockWidget(QgsDockWidget):
         return QCoreApplication.translate("X", message)
 
     def get_feature_of_layer_by_name(
-        self, layer: QgsVectorLayer, item: QListWidgetItem
+            self, layer: QgsVectorLayer, item: QListWidgetItem
     ) -> QgsFeature:
         """Returns the feature with the name of the item"""
         filter_expression = f"\"name\" = '{item.text()}'"

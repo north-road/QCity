@@ -89,4 +89,4 @@ class QCityPlugin:
         :rtype: QString
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
-        return QCoreApplication.translate("X", message)
+        return QCoreApplication.translate("QCityPlugin", message)
