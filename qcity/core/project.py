@@ -1,5 +1,5 @@
 import math
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import QObject, pyqtSignal
@@ -854,5 +854,45 @@ class ProjectController(QObject):
             development_site_layer.commitChanges()
         self._block_ds_auto_updates -= 1
         return True
+
+    def calculate_project_area_stats(self, project_area_fid: int) -> Dict[str, float]:
+        """
+        Calculates the statistics of all development sites in a project area
+        """
+        totals = {
+            "commercial_floorspace": 0,
+            "office_floorspace": 0,
+            "residential_floorspace": 0,
+            "count_1_bedroom_dwellings": 0,
+            "count_2_bedroom_dwellings": 0,
+            "count_3_bedroom_dwellings": 0,
+            "count_4_bedroom_dwellings": 0,
+            "commercial_car_bays": 0,
+            "office_car_bays": 0,
+            "residential_car_bays": 0,
+            "commercial_bicycle_bays": 0,
+            "office_bicycle_bays": 0,
+            "residential_bicycle_bays": 0,
+        }
+
+        project_area_layer = self.get_project_area_layer()
+        project_area_feature = project_area_layer.getFeature(project_area_fid)
+        if not project_area_feature.isValid():
+            return {}
+
+        project_area_key = project_area_feature[DatabaseUtils.primary_key_for_layer(LayerType.ProjectAreas)]
+        request = QgsFeatureRequest().setFilterExpression(
+            QgsExpression.createFieldEqualityExpression(
+                DatabaseUtils.foreign_key_for_layer(LayerType.DevelopmentSites),
+                project_area_key)
+        )
+        development_site_layer = self.get_development_sites_layer()
+        all_keys = list(totals.keys())
+        for f in development_site_layer.getFeatures(request):
+            for field in all_keys:
+                totals[field] += f[field]
+
+        return totals
+
 
 PROJECT_CONTROLLER = ProjectController(QgsProject.instance())
