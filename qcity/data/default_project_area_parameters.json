@@ -55,7 +55,7 @@
         "type": "int",
         "default": 1
     },
-    "bicycler_parking_3_bedroom": {
+    "bicycle_parking_3_bedroom": {
         "type": "int",
         "default": 1
     },

@@ -54,7 +54,7 @@ class ProjectController(QObject):
         self.project.layersAdded.connect(self._update_project_layers)
         self.project.layersRemoved.connect(self._update_project_layers)
 
-        self._block_ds_auto_updates = False
+        self._block_ds_auto_updates = 0
 
     def cleanup(self):
         """
@@ -147,7 +147,24 @@ class ProjectController(QObject):
         if field_name in ('dwelling_size_1_bedroom',
                           'dwelling_size_2_bedroom',
                           'dwelling_size_3_bedroom',
-                          'dwelling_size_4_bedroom'):
+                          'dwelling_size_4_bedroom',
+                          'car_parking_1_bedroom',
+                          'car_parking_2_bedroom',
+                          'car_parking_3_bedroom',
+                          'car_parking_4_bedroom',
+                          'car_parking_commercial_bays_count',
+                          'car_parking_commercial_bays_area',
+                          'car_parking_office_bays_count',
+                          'car_parking_office_bays_area',
+                          'bicycle_parking_1_bedroom',
+                          'bicycle_parking_2_bedroom',
+                          'bicycle_parking_3_bedroom',
+                          'bicycle_parking_4_bedroom',
+                          'bicycle_parking_commercial_bays_count',
+                          'bicycle_parking_commercial_bays_area',
+                          'bicycle_parking_office_bays_count',
+                          'bicycle_parking_office_bays_area',
+                          ):
             project_area_feature = layer.getFeature(feature_id)
             if not project_area_feature.isValid():
                 return
@@ -163,6 +180,8 @@ class ProjectController(QObject):
             development_site_layer = self.get_development_sites_layer()
             for f in development_site_layer.getFeatures(request):
                 self.auto_calculate_development_site_floorspace(f.id())
+                self.auto_calculate_development_site_car_parking(f.id())
+                self.auto_calculate_development_site_bicycle_parking(f.id())
 
     def _development_site_added(self, development_site_fid: int):
         """
@@ -237,6 +256,16 @@ class ProjectController(QObject):
                 }
             )
             layer.commitChanges()
+
+        if field_name in ('commercial_floorspace',
+                          'office_floorspace',
+                          'residential_floorspace',
+                          'count_1_bedroom_dwellings',
+                          'count_2_bedroom_dwellings',
+                          'count_3_bedroom_dwellings',
+                          'count_4_bedroom_dwellings'):
+            self.auto_calculate_development_site_car_parking(feature_id)
+            self.auto_calculate_development_site_bicycle_parking(feature_id)
 
     def _building_level_attribute_changed(self, feature_id: int, field_index: int, value):
         """
@@ -674,8 +703,10 @@ class ProjectController(QObject):
             count_3_bedroom += math.floor(floor_3_bedroom / dwelling_size_3_bedroom)
             count_4_bedroom += math.floor(floor_4_bedroom / dwelling_size_4_bedroom)
 
-        self._block_ds_auto_updates = True
-        development_site_layer.startEditing()
+        self._block_ds_auto_updates += 1
+        was_editable = development_site_layer.isEditable()
+        if not was_editable:
+            development_site_layer.startEditing()
         development_site_layer.changeAttributeValues(
             development_site_fid, {
                 development_site_layer.fields().lookupField('commercial_floorspace'): total_commercial,
@@ -687,9 +718,111 @@ class ProjectController(QObject):
                 development_site_layer.fields().lookupField('count_4_bedroom_dwellings'): count_4_bedroom,
             }
         )
-        development_site_layer.commitChanges()
-        self._block_ds_auto_updates = False
+        if not was_editable:
+            development_site_layer.commitChanges()
+        self._block_ds_auto_updates -= 1
         return True
 
+    def auto_calculate_development_site_car_parking(self, development_site_fid: int) -> bool:
+        """
+        Auto calculates the development site car parking
+        """
+        development_site_layer = self.get_development_sites_layer()
+        if not development_site_layer:
+            return False
+
+        development_site_feature = development_site_layer.getFeature(development_site_fid)
+        if not development_site_feature.isValid():
+            return False
+
+        if not development_site_feature['auto_calculate_car_parking']:
+            return False
+
+        # find project area
+        project_area_layer = self.get_project_area_layer()
+        project_area_key = development_site_feature[DatabaseUtils.foreign_key_for_layer(LayerType.DevelopmentSites)]
+        request = QgsFeatureRequest().setFilterExpression(
+            QgsExpression.createFieldEqualityExpression(
+                DatabaseUtils.primary_key_for_layer(LayerType.ProjectAreas),
+                project_area_key)
+        )
+        project_area_feature = next(project_area_layer.getFeatures(request))
+
+        car_parks_1_bedroom = project_area_feature['car_parking_1_bedroom'] * development_site_feature['count_1_bedroom_dwellings']
+        car_parks_2_bedroom = project_area_feature['car_parking_2_bedroom'] * development_site_feature['count_2_bedroom_dwellings']
+        car_parks_3_bedroom = project_area_feature['car_parking_3_bedroom'] * development_site_feature['count_3_bedroom_dwellings']
+        car_parks_4_bedroom = project_area_feature['car_parking_4_bedroom'] * development_site_feature['count_4_bedroom_dwellings']
+        commercial_car_parks = math.ceil(project_area_feature['car_parking_commercial_bays_count'] * development_site_feature['commercial_floorspace'] / project_area_feature['car_parking_commercial_bays_area'])
+        office_car_parks = math.ceil(project_area_feature['car_parking_office_bays_count'] * development_site_feature['office_floorspace'] / project_area_feature[
+            'car_parking_office_bays_area'])
+
+        self._block_ds_auto_updates += 1
+        was_editable = development_site_layer.isEditable()
+        if not was_editable:
+            development_site_layer.startEditing()
+        development_site_layer.changeAttributeValues(
+            development_site_fid, {
+                development_site_layer.fields().lookupField('residential_car_bays'): car_parks_1_bedroom + car_parks_2_bedroom + car_parks_3_bedroom + car_parks_4_bedroom,
+                development_site_layer.fields().lookupField(
+                    'commercial_car_bays'): commercial_car_parks,
+                development_site_layer.fields().lookupField(
+                    'office_car_bays'): office_car_parks
+            }
+        )
+        if not was_editable:
+            development_site_layer.commitChanges()
+        self._block_ds_auto_updates -= 1
+        return True
+
+    def auto_calculate_development_site_bicycle_parking(self, development_site_fid: int) -> bool:
+        """
+        Auto calculates the development site bicycle parking
+        """
+        development_site_layer = self.get_development_sites_layer()
+        if not development_site_layer:
+            return False
+
+        development_site_feature = development_site_layer.getFeature(development_site_fid)
+        if not development_site_feature.isValid():
+            return False
+
+        if not development_site_feature['auto_calculate_bicycle_parking']:
+            return False
+
+        # find project area
+        project_area_layer = self.get_project_area_layer()
+        project_area_key = development_site_feature[DatabaseUtils.foreign_key_for_layer(LayerType.DevelopmentSites)]
+        request = QgsFeatureRequest().setFilterExpression(
+            QgsExpression.createFieldEqualityExpression(
+                DatabaseUtils.primary_key_for_layer(LayerType.ProjectAreas),
+                project_area_key)
+        )
+        project_area_feature = next(project_area_layer.getFeatures(request))
+
+        bicycle_parks_1_bedroom = project_area_feature['bicycle_parking_1_bedroom'] * development_site_feature['count_1_bedroom_dwellings']
+        bicycle_parks_2_bedroom = project_area_feature['bicycle_parking_2_bedroom'] * development_site_feature['count_2_bedroom_dwellings']
+        bicycle_parks_3_bedroom = project_area_feature['bicycle_parking_3_bedroom'] * development_site_feature['count_3_bedroom_dwellings']
+        bicycle_parks_4_bedroom = project_area_feature['bicycle_parking_4_bedroom'] * development_site_feature['count_4_bedroom_dwellings']
+        commercial_bicycle_parks = math.ceil(project_area_feature['bicycle_parking_commercial_bays_count'] * development_site_feature['commercial_floorspace'] / project_area_feature['bicycle_parking_commercial_bays_area'])
+        office_bicycle_parks = math.ceil(project_area_feature['bicycle_parking_office_bays_count'] * development_site_feature['office_floorspace'] / project_area_feature[
+            'bicycle_parking_office_bays_area'])
+
+        self._block_ds_auto_updates += 1
+        was_editable = development_site_layer.isEditable()
+        if not was_editable:
+            development_site_layer.startEditing()
+        development_site_layer.changeAttributeValues(
+            development_site_fid, {
+                development_site_layer.fields().lookupField('residential_bicycle_bays'): bicycle_parks_1_bedroom + bicycle_parks_2_bedroom + bicycle_parks_3_bedroom + bicycle_parks_4_bedroom,
+                development_site_layer.fields().lookupField(
+                    'commercial_bicycle_bays'): commercial_bicycle_parks,
+                development_site_layer.fields().lookupField(
+                    'office_bicycle_bays'): office_bicycle_parks
+            }
+        )
+        if not was_editable:
+            development_site_layer.commitChanges()
+        self._block_ds_auto_updates -= 1
+        return True
 
 PROJECT_CONTROLLER = ProjectController(QgsProject.instance())

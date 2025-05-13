@@ -59,7 +59,12 @@ class DevelopmentSitesPageController(PageController):
         self.og_widget.auto_calculate_floorspace.toggled.connect(
             self._auto_calculate_floorspace_toggled
         )
-
+        self.og_widget.auto_calculate_car_parking.toggled.connect(
+            self._auto_calculate_car_parking_toggled
+        )
+        self.og_widget.auto_calculate_bicycle_parking.toggled.connect(
+            self._auto_calculate_bicycle_parking_toggled
+        )
     #    self.og_widget.listWidget_development_sites.currentItemChanged.connect(
     #       lambda item: SETTINGS_MANAGER.restore_checkbox_state(
     #          self.og_widget.checkBox_auto_elevation, item
@@ -124,6 +129,24 @@ class DevelopmentSitesPageController(PageController):
             return
 
         PROJECT_CONTROLLER.auto_calculate_development_site_floorspace(self.current_feature_id)
+
+    def _auto_calculate_car_parking_toggled(self, active: bool):
+        """
+        Called when the auto calculate car parking option is toggled
+        """
+        if self._block_feature_updates or not active:
+            return
+
+        PROJECT_CONTROLLER.auto_calculate_development_site_car_parking(self.current_feature_id)
+
+    def _auto_calculate_bicycle_parking_toggled(self, active: bool):
+        """
+        Called when the auto calculate bicycle parking option is toggled
+        """
+        if self._block_feature_updates or not active:
+            return
+
+        PROJECT_CONTROLLER.auto_calculate_development_site_bicycle_parking(self.current_feature_id)
 
     def get_elevation_from_dem(self, checked) -> None:
         """Gets the elevation for a centroid in a polygon feature and sets it as an attribute."""

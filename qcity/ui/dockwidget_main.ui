@@ -398,7 +398,7 @@
                 </widget>
                </item>
                <item row="2" column="1">
-                <widget class="QgsSpinBox" name="bicycler_parking_3_bedroom"/>
+                <widget class="QgsSpinBox" name="bicycle_parking_3_bedroom"/>
                </item>
                <item row="3" column="1">
                 <widget class="QgsSpinBox" name="bicycle_parking_4_bedroom"/>
@@ -1719,7 +1719,7 @@
   <tabstop>car_parking_office_bays_area</tabstop>
   <tabstop>bicycle_parking_1_bedroom</tabstop>
   <tabstop>bicycle_parking_2_bedroom</tabstop>
-  <tabstop>bicycler_parking_3_bedroom</tabstop>
+  <tabstop>bicycle_parking_3_bedroom</tabstop>
   <tabstop>bicycle_parking_4_bedroom</tabstop>
   <tabstop>bicycle_parking_commercial_bays_count</tabstop>
   <tabstop>bicycle_parking_commercial_bays_area</tabstop>
