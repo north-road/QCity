@@ -35,11 +35,13 @@ class ProjectController(QObject):
 
     development_site_added = pyqtSignal(QgsFeature)
     development_site_deleted = pyqtSignal(int)
-    development_site_attribute_changed = pyqtSignal(int, str, object)
+    # final argument is project area feature id
+    development_site_attribute_changed = pyqtSignal(int, str, object, int)
 
     building_level_added = pyqtSignal(QgsFeature)
     building_level_deleted = pyqtSignal(int)
-    building_level_attribute_changed = pyqtSignal(int, str, object)
+    # final two arguments are project area and development site feature ids
+    building_level_attribute_changed = pyqtSignal(int, str, object, int, int)
 
     def __init__(self, project: QgsProject):
         super().__init__()
@@ -175,8 +177,11 @@ class ProjectController(QObject):
         layer = self.get_development_sites_layer()
         field_name = layer.fields()[field_index].name()
 
+        original_feature = layer.getFeature(feature_id)
+        project_area_key = original_feature[DatabaseUtils.foreign_key_for_layer(LayerType.DevelopmentSites)]
+
         self.development_site_attribute_changed.emit(
-            feature_id, field_name, value
+            feature_id, field_name, value, project_area_key
         )
 
     def _building_level_attribute_changed(self, feature_id: int, field_index: int, value):
@@ -190,8 +195,20 @@ class ProjectController(QObject):
         layer = self.get_building_levels_layer()
         field_name = layer.fields()[field_index].name()
 
+        original_feature = layer.getFeature(feature_id)
+        development_site_key = original_feature[DatabaseUtils.foreign_key_for_layer(LayerType.BuildingLevels)]
+        request = QgsFeatureRequest().setFilterExpression(
+            QgsExpression.createFieldEqualityExpression(DatabaseUtils.primary_key_for_layer(LayerType.DevelopmentSites),
+                                                        development_site_key)
+        )
+        development_site_layer = self.get_development_sites_layer()
+        development_site_features = [f for f in development_site_layer.getFeatures(request)]
+        development_site_feature = development_site_features[0]
+
+        project_area_key = development_site_feature[DatabaseUtils.foreign_key_for_layer(LayerType.DevelopmentSites)]
+
         self.building_level_attribute_changed.emit(
-            feature_id, field_name, value
+            feature_id, field_name, value, project_area_key, development_site_key
         )
 
     def _building_level_added(self, building_level_fid: int):

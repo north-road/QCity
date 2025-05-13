@@ -753,7 +753,7 @@ class TestProjectUtils(unittest.TestCase):
             f['address'] = 'a1'
             self.assertTrue(development_site_layer.addFeature(f))
             f = QgsVectorLayerUtils.createFeature(development_site_layer)
-            f['project_area_pk'] = f1_pk
+            f['project_area_pk'] = f2_pk
             f['address'] = 'a2'
             self.assertTrue(development_site_layer.addFeature(f))
             self.assertTrue(development_site_layer.commitChanges())
@@ -778,7 +778,7 @@ class TestProjectUtils(unittest.TestCase):
             f['percent_office_floorspace'] = 44
             self.assertTrue(building_level_layer.addFeature(f))
             f = QgsVectorLayerUtils.createFeature(building_level_layer)
-            f['development_site_pk'] = ds1_pk
+            f['development_site_pk'] = ds2_pk
             f['percent_office_floorspace'] = 45
             self.assertTrue(building_level_layer.addFeature(f))
             self.assertTrue(building_level_layer.commitChanges())
@@ -800,12 +800,12 @@ class TestProjectUtils(unittest.TestCase):
             self.assertEqual(len(project_area_attribute_changed_spy), 0)
             self.assertEqual(len(development_site_attribute_changed_spy), 1)
             self.assertEqual(len(building_level_attribute_changed_spy), 0)
-            self.assertEqual(development_site_attribute_changed_spy[-1], [ds1_pk, 'name', 11])
-            development_site_layer.changeAttributeValue(ds2_pk, 2, 12)
+            self.assertEqual(development_site_attribute_changed_spy[-1], [ds1_pk, 'name', 11, f1_pk])
+            development_site_layer.changeAttributeValue(ds2_pk, 3, 'xxx')
             self.assertEqual(len(project_area_attribute_changed_spy), 0)
             self.assertEqual(len(development_site_attribute_changed_spy), 2)
             self.assertEqual(len(building_level_attribute_changed_spy), 0)
-            self.assertEqual(development_site_attribute_changed_spy[-1], [ds2_pk, 'project_area_pk', 12])
+            self.assertEqual(development_site_attribute_changed_spy[-1], [ds2_pk, 'address', 'xxx', f2_pk])
 
             project_area_layer.startEditing()
             project_area_layer.changeAttributeValue(f1_pk, 2, 14)
@@ -820,16 +820,16 @@ class TestProjectUtils(unittest.TestCase):
             self.assertEqual(len(building_level_attribute_changed_spy), 0)
 
             building_level_layer.startEditing()
-            building_level_layer.changeAttributeValue(bl1['fid'], 2, 24)
+            building_level_layer.changeAttributeValue(bl1['fid'], 4, 24)
             self.assertEqual(len(project_area_attribute_changed_spy), 2)
             self.assertEqual(len(development_site_attribute_changed_spy), 2)
             self.assertEqual(len(building_level_attribute_changed_spy), 1)
-            self.assertEqual(building_level_attribute_changed_spy[-1], [bl1['fid'], 'development_site_pk', 24])
+            self.assertEqual(building_level_attribute_changed_spy[-1], [bl1['fid'], 'percent_commercial_floorspace', 24, f1_pk, ds1_pk])
             building_level_layer.changeAttributeValue(bl2['fid'], 3, 25)
             self.assertEqual(len(project_area_attribute_changed_spy), 2)
             self.assertEqual(len(development_site_attribute_changed_spy), 2)
             self.assertEqual(len(building_level_attribute_changed_spy), 2)
-            self.assertEqual(building_level_attribute_changed_spy[-1], [bl2['fid'], 'level_height', 25])
+            self.assertEqual(building_level_attribute_changed_spy[-1], [bl2['fid'], 'level_height', 25, f2_pk, ds2_pk])
 
             controller.cleanup()
             p.clear()
