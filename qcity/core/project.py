@@ -211,6 +211,8 @@ class ProjectController(QObject):
             feature_id, field_name, value, project_area_key, development_site_key
         )
 
+        self.auto_calculate_development_site_floorspace(development_site_feature.id())
+
     def _building_level_added(self, building_level_fid: int):
         """
         Called when a new building level is added to the layer
@@ -547,6 +549,9 @@ class ProjectController(QObject):
 
         development_site_feature = development_site_layer.getFeature(development_site_fid)
         if not development_site_feature.isValid():
+            return False
+
+        if not development_site_feature['auto_calculate_floorspace']:
             return False
 
         development_site_primary_key = development_site_feature[
