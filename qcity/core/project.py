@@ -519,9 +519,9 @@ class ProjectController(QObject):
             floor_area_m2 = da.convertAreaMeasurement(
                 da.measureArea(level.geometry()), Qgis.AreaUnit.SquareMeters
             )
-            total_commercial += level['percent_commercial_floorspace'] * floor_area_m2
-            total_office += level['percent_office_floorspace'] * floor_area_m2
-            total_residential += level['percent_residential_floorspace'] * floor_area_m2
+            total_commercial += level['percent_commercial_floorspace'] / 100 * floor_area_m2
+            total_office += level['percent_office_floorspace']  / 100 * floor_area_m2
+            total_residential += level['percent_residential_floorspace'] / 100 * floor_area_m2
 
         development_site_layer.startEditing()
         development_site_layer.changeAttributeValues(
