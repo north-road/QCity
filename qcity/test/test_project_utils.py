@@ -14,8 +14,7 @@ from qgis.core import (
 
 from qcity.core.project import ProjectController
 
-from qcity.core.database import DatabaseUtils
-from qcity.core import LayerType
+from qcity.core import DatabaseUtils, LayerUtils, LayerType
 
 test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
 
@@ -700,5 +699,137 @@ class TestProjectUtils(unittest.TestCase):
                 controller.get_unique_names(LayerType.BuildingLevels),
                 ['floor 1', 'Floor 3', 'Floor 4']
             )
+            controller.cleanup()
+            p.clear()
+
+    def test_attribute_change_signals(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            gpkg_path = os.path.join(temp_dir, "test_database.gpkg")
+
+            DatabaseUtils.create_base_tables(
+                gpkg_path
+            )
+
+            p = QgsProject.instance()
+            controller = ProjectController(p)
+            controller.add_database_layers_to_project(p, gpkg_path)
+
+            project_area_attribute_changed_spy = QSignalSpy(controller.project_area_attribute_changed)
+            development_site_attribute_changed_spy = QSignalSpy(controller.development_site_attribute_changed)
+            building_level_attribute_changed_spy = QSignalSpy(controller.building_level_attribute_changed)
+
+            project_area_layer = controller.get_project_area_layer()
+            project_area_layer.startEditing()
+            # create some initial features
+            f = QgsVectorLayerUtils.createFeature(project_area_layer)
+            f['car_parking_1_bedroom'] = 1
+            f['car_parking_2_bedroom'] = 2
+            f['car_parking_3_bedroom'] = 3
+            f['car_parking_4_bedroom'] = 4
+            self.assertTrue(project_area_layer.addFeature(f))
+            f = QgsVectorLayerUtils.createFeature(project_area_layer)
+            f['car_parking_1_bedroom'] = 11
+            f['car_parking_2_bedroom'] = 12
+            f['car_parking_3_bedroom'] = 13
+            f['car_parking_4_bedroom'] = 14
+            self.assertTrue(project_area_layer.addFeature(f))
+            self.assertTrue(project_area_layer.commitChanges())
+
+            f1 = None
+            f2 = None
+            for f in project_area_layer.getFeatures():
+                if f['car_parking_1_bedroom'] == 1:
+                    f1 = f
+                elif f['car_parking_1_bedroom'] == 11:
+                    f2 = f
+
+            f1_pk = f1['fid']
+            f2_pk = f2['fid']
+
+            development_site_layer = controller.get_development_sites_layer()
+            development_site_layer.startEditing()
+            f = QgsVectorLayerUtils.createFeature(development_site_layer)
+            f['project_area_pk'] = f1_pk
+            f['address'] = 'a1'
+            self.assertTrue(development_site_layer.addFeature(f))
+            f = QgsVectorLayerUtils.createFeature(development_site_layer)
+            f['project_area_pk'] = f1_pk
+            f['address'] = 'a2'
+            self.assertTrue(development_site_layer.addFeature(f))
+            self.assertTrue(development_site_layer.commitChanges())
+
+            ds1 = None
+            ds2 = None
+            for f in development_site_layer.getFeatures():
+                if f['address'] == 'a1':
+                    ds1 = f
+                elif f['address'] == 'a2':
+                    ds2 = f
+
+            ds1_pk = ds1['fid']
+            ds2_pk = ds2['fid']
+
+            # make some building levels
+
+            building_level_layer = controller.get_building_levels_layer()
+            building_level_layer.startEditing()
+            f = QgsVectorLayerUtils.createFeature(building_level_layer)
+            f['development_site_pk'] = ds1_pk
+            f['percent_office_floorspace'] = 44
+            self.assertTrue(building_level_layer.addFeature(f))
+            f = QgsVectorLayerUtils.createFeature(building_level_layer)
+            f['development_site_pk'] = ds1_pk
+            f['percent_office_floorspace'] = 45
+            self.assertTrue(building_level_layer.addFeature(f))
+            self.assertTrue(building_level_layer.commitChanges())
+
+            bl1 = None
+            bl2 = None
+            for f in building_level_layer.getFeatures():
+                if f['percent_office_floorspace'] == 44:
+                    bl1 = f
+                elif f['percent_office_floorspace'] == 45:
+                    bl2 = f
+
+            self.assertEqual(len(project_area_attribute_changed_spy), 0)
+            self.assertEqual(len(development_site_attribute_changed_spy), 0)
+            self.assertEqual(len(building_level_attribute_changed_spy), 0)
+
+            development_site_layer.startEditing()
+            development_site_layer.changeAttributeValue(ds1_pk, 1, 11)
+            self.assertEqual(len(project_area_attribute_changed_spy), 0)
+            self.assertEqual(len(development_site_attribute_changed_spy), 1)
+            self.assertEqual(len(building_level_attribute_changed_spy), 0)
+            self.assertEqual(development_site_attribute_changed_spy[-1], [ds1_pk, 'name', 11])
+            development_site_layer.changeAttributeValue(ds2_pk, 2, 12)
+            self.assertEqual(len(project_area_attribute_changed_spy), 0)
+            self.assertEqual(len(development_site_attribute_changed_spy), 2)
+            self.assertEqual(len(building_level_attribute_changed_spy), 0)
+            self.assertEqual(development_site_attribute_changed_spy[-1], [ds2_pk, 'project_area_pk', 12])
+
+            project_area_layer.startEditing()
+            project_area_layer.changeAttributeValue(f1_pk, 2, 14)
+            self.assertEqual(len(project_area_attribute_changed_spy), 1)
+            self.assertEqual(project_area_attribute_changed_spy[-1], [f1_pk, 'dwelling_size_1_bedroom', 14])
+            self.assertEqual(len(development_site_attribute_changed_spy), 2)
+            self.assertEqual(len(building_level_attribute_changed_spy), 0)
+            project_area_layer.changeAttributeValue(f2_pk, 3, 15)
+            self.assertEqual(len(project_area_attribute_changed_spy), 2)
+            self.assertEqual(project_area_attribute_changed_spy[-1], [f2_pk, 'dwelling_size_2_bedroom', 15])
+            self.assertEqual(len(development_site_attribute_changed_spy), 2)
+            self.assertEqual(len(building_level_attribute_changed_spy), 0)
+
+            building_level_layer.startEditing()
+            building_level_layer.changeAttributeValue(bl1['fid'], 2, 24)
+            self.assertEqual(len(project_area_attribute_changed_spy), 2)
+            self.assertEqual(len(development_site_attribute_changed_spy), 2)
+            self.assertEqual(len(building_level_attribute_changed_spy), 1)
+            self.assertEqual(building_level_attribute_changed_spy[-1], [bl1['fid'], 'development_site_pk', 24])
+            building_level_layer.changeAttributeValue(bl2['fid'], 3, 25)
+            self.assertEqual(len(project_area_attribute_changed_spy), 2)
+            self.assertEqual(len(development_site_attribute_changed_spy), 2)
+            self.assertEqual(len(building_level_attribute_changed_spy), 2)
+            self.assertEqual(building_level_attribute_changed_spy[-1], [bl2['fid'], 'level_height', 25])
+
             controller.cleanup()
             p.clear()
