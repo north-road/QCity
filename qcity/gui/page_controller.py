@@ -83,7 +83,7 @@ class PageController(QObject):
         """
         self.list_widget.setEnabled(True)
 
-        item = QListWidgetItem(self.list_widget)
+        item = QListWidgetItem()
         item.setText(feature[
                          DatabaseUtils.name_field_for_layer(self.layer_type)
                      ])

@@ -170,23 +170,11 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         file_name = QgsFileUtils.addExtensionFromFilter(file_name, selected_filter)
         SETTINGS_MANAGER.set_last_used_database_folder(os.path.split(file_name)[0])
 
-        self.listWidget_project_areas.clear()
         SETTINGS_MANAGER.set_database_path(file_name)
 
         PROJECT_CONTROLLER.set_associated_database_path(file_name)
         if add_layers:
             PROJECT_CONTROLLER.add_database_layers_to_project(self.project, file_name)
-
-        area_layer = PROJECT_CONTROLLER.get_project_area_layer()
-        if not area_layer:
-            return
-
-        feats = area_layer.getFeatures()
-        for feat in feats:
-            item = QListWidgetItem(self.listWidget_project_areas)
-            item.setText(feat["name"])
-            item.setData(Qt.UserRole, feat.id())
-            self.listWidget_project_areas.addItem(item)
 
         # Click on first project area item to initialize all other listwidgets
         for widget in [

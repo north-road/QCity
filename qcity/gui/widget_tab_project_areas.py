@@ -39,9 +39,28 @@ class ProjectAreasPageController(PageController):
             self.rename_current_selection
         )
 
+        PROJECT_CONTROLLER.project_area_layer_changed.connect(
+            self.populate_project_area_combo_box
+        )
+
         self.og_widget.pushButton_import_project_areas.clicked.connect(
             self.import_project_area_geometries
         )
+
+        self.populate_project_area_combo_box()
+
+    def populate_project_area_combo_box(self):
+        """
+        Populates the project area list
+        """
+        area_layer = self.get_layer()
+        if not area_layer:
+            return
+
+        self.list_widget.clear()
+        feats = area_layer.getFeatures()
+        for feat in feats:
+            self.add_feature_to_list(feat)
 
     def _on_project_area_added(self, feature: QgsFeature):
         """
