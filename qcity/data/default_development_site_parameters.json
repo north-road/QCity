@@ -23,10 +23,6 @@
         "type": "string",
         "default": ""
     },
-    "site_elevation": {
-        "type": "double",
-        "default": 0
-    },
     "auto_calculate_floorspace": {
         "type": "bool",
         "default": true

@@ -110,23 +110,6 @@ class SettingsManager(QObject):
 
         return attributes
 
-    def restore_checkbox_state(self, checkbox, item) -> None:
-        state = QgsSettings().value(
-            f"{self.SETTINGS_KEY}/checkBoxState_{checkbox.objectName()}_{item.text()}",
-            section=QgsSettings.Plugins,
-        )
-        if isinstance(state, bool):
-            checkbox.setChecked(state)
-        else:
-            checkbox.setChecked(False)
-
-    def save_checkbox_state(self, checkbox, item) -> None:
-        QgsSettings().setValue(
-            f"{self.SETTINGS_KEY}/checkBoxState_{checkbox.objectName()}_{item.text()}",
-            checkbox.isChecked(),
-            section=QgsSettings.Plugins,
-        )
-
 
 # Settings manager singleton instance
 SETTINGS_MANAGER = SettingsManager()

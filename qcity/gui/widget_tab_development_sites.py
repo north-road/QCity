@@ -36,26 +36,6 @@ class DevelopmentSitesPageController(PageController):
             self.rename_current_selection
         )
 
-        self.og_widget.site_elevation.valueChanged.connect(
-            lambda value: SETTINGS_MANAGER.save_widget_value_to_layer(
-                self.og_widget.site_elevation,
-                value,
-                SETTINGS_MANAGER.development_site_prefix,
-            )
-        )
-
-        self.og_widget.comboBox_auto_elevation.setAllowEmptyLayer(True)
-        self.og_widget.comboBox_auto_elevation.setFilters(Qgis.LayerFilter.RasterLayer)
-        self.og_widget.checkBox_auto_elevation.toggled.connect(
-            self.get_elevation_from_dem
-        )
-        self.og_widget.checkBox_auto_elevation.toggled.connect(
-            lambda: SETTINGS_MANAGER.save_checkbox_state(
-                self.og_widget.checkBox_auto_elevation,
-                self.og_widget.listWidget_development_sites.currentItem(),
-            )
-        )
-
         self.og_widget.auto_calculate_floorspace.toggled.connect(
             self._auto_calculate_floorspace_toggled
         )
@@ -65,11 +45,6 @@ class DevelopmentSitesPageController(PageController):
         self.og_widget.auto_calculate_bicycle_parking.toggled.connect(
             self._auto_calculate_bicycle_parking_toggled
         )
-    #    self.og_widget.listWidget_development_sites.currentItemChanged.connect(
-    #       lambda item: SETTINGS_MANAGER.restore_checkbox_state(
-    #          self.og_widget.checkBox_auto_elevation, item
-    #       )
-    #   )
 
     def _on_development_site_added(self, feature: QgsFeature):
         """
@@ -147,31 +122,3 @@ class DevelopmentSitesPageController(PageController):
             return
 
         PROJECT_CONTROLLER.auto_calculate_development_site_bicycle_parking(self.current_feature_id)
-
-    def get_elevation_from_dem(self, checked) -> None:
-        """Gets the elevation for a centroid in a polygon feature and sets it as an attribute."""
-        if checked:
-            try:
-                gpkg_path = f"{SETTINGS_MANAGER.get_database_path()}|layername={SETTINGS_MANAGER.development_site_prefix}"
-                layer = QgsVectorLayer(gpkg_path, "", "ogr")
-                name = self.og_widget.listWidget_development_sites.currentItem()
-
-                dem_layer = self.og_widget.comboBox_auto_elevation.currentLayer()
-                provider = dem_layer.dataProvider()
-
-                feature = self.og_widget.get_feature_of_layer_by_name(layer, name)
-                geom = feature.geometry()
-                centroid = geom.centroid().asPoint()
-                sample_value = int(provider.sample(centroid, 1)[0])
-                feature["elevation"] = sample_value
-                self.og_widget.spinBox_dev_site_elevation.setValue(sample_value)
-                self.og_widget.spinBox_dev_site_elevation.setEnabled(False)
-                layer.updateFeature(feature)
-            except AttributeError:
-                return
-            except Exception as e:
-                # TODO: Catch various exceptions here
-                raise e
-        else:
-            self.og_widget.spinBox_dev_site_elevation.setValue(0)
-            self.og_widget.spinBox_dev_site_elevation.setEnabled(True)

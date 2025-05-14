@@ -201,8 +201,6 @@ class PageController(QObject):
                     widget.setCurrentIndex(match_index)
                 else:
                     widget.setCurrentIndex(-1)
-            else:
-                assert False
 
     def remove_current_selection(self) -> None:
         """
