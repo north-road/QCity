@@ -74,6 +74,7 @@ class ProjectController(QObject):
         self.project.layersRemoved.connect(self._update_project_layers)
 
         self._block_ds_auto_updates = 0
+        self._block_floor_height_updates = 0
 
     def cleanup(self):
         """
@@ -368,6 +369,9 @@ class ProjectController(QObject):
                           'percent_3_bedroom_floorspace',
                           'percent_4_bedroom_floorspace'):
             self.auto_calculate_development_site_floorspace(development_site_feature.id())
+        if field_name in ('level_index', 'level_height'):
+            if not self._block_floor_height_updates:
+                self.update_floor_heights(development_site_feature.id())
 
     def _building_level_added(self, building_level_fid: int):
         """
@@ -592,6 +596,7 @@ class ProjectController(QObject):
 
         current_cumulative_height = 0.0
 
+        self._block_floor_height_updates += 1
         for i, level_data in enumerate(all_levels_in_site_data):
             new_level_index_val = i + 1
             new_base_height_val = current_cumulative_height
@@ -605,6 +610,79 @@ class ProjectController(QObject):
                 return False
 
             current_cumulative_height += level_data['height']  # Use pre-fetched height
+
+        self._block_floor_height_updates -= 1
+
+        if not was_editable:
+            if not building_level_layer.commitChanges():
+                return False
+
+        return True
+
+    def update_floor_heights(self, development_site_id: int) -> bool:
+        """
+        Recalculated building floor heights for a development site
+        """
+        if self._block_floor_height_updates:
+            return False
+
+        development_site_layer = self.get_development_sites_layer()
+        development_site_feature = development_site_layer.getFeature(development_site_id)
+        development_site_pk = development_site_feature[DatabaseUtils.primary_key_for_layer(LayerType.DevelopmentSites)]
+
+        building_level_layer = self.get_building_levels_layer()
+        if not building_level_layer:
+            return False
+
+        level_index_field_name = 'level_index'
+        level_height_field_name = 'level_height'
+        base_height_field_name = 'base_height'
+        development_site_fk_field = DatabaseUtils.foreign_key_for_layer(LayerType.BuildingLevels)
+
+        # fetch all building levels for this development site
+        request = QgsFeatureRequest().setFilterExpression(
+            QgsExpression.createFieldEqualityExpression(development_site_fk_field, development_site_pk)
+        )
+
+        all_levels_in_site_data = []
+        for f in building_level_layer.getFeatures(request):
+            level_idx_val = f[level_index_field_name]
+            all_levels_in_site_data.append({
+                'fid': f.id(),
+                'current_index': level_idx_val,
+                'base_height': f[base_height_field_name],
+                'height': f[level_height_field_name] if f[level_height_field_name] is not NULL else 0.0,
+            })
+        all_levels_in_site_data.sort(key=lambda x: x['current_index'])
+
+        was_editable = building_level_layer.isEditable()
+        if not was_editable:
+            if not building_level_layer.startEditing():
+                return False
+
+        fields = building_level_layer.fields()
+        level_index_fidx = fields.lookupField(level_index_field_name)
+        base_height_fidx = fields.lookupField(base_height_field_name)
+
+        current_cumulative_height = 0.0
+
+        self._block_floor_height_updates += 1
+        for i, level_data in enumerate(all_levels_in_site_data):
+            new_level_index_val = i + 1
+            new_base_height_val = current_cumulative_height
+
+            if level_data['current_index'] != new_level_index_val or level_data['base_height'] != new_base_height_val:
+                attrs_to_update = {
+                    level_index_fidx: new_level_index_val,
+                    base_height_fidx: new_base_height_val
+                }
+
+                if not building_level_layer.changeAttributeValues(level_data['fid'], attrs_to_update):
+                    return False
+
+            current_cumulative_height += level_data['height']
+
+        self._block_floor_height_updates -= 1
 
         if not was_editable:
             if not building_level_layer.commitChanges():
