@@ -1010,7 +1010,7 @@
                 <item>
                  <widget class="QToolButton" name="button_move_up">
                   <property name="toolTip">
-                   <string>Rename selected building level</string>
+                   <string>Move building level up</string>
                   </property>
                   <property name="text">
                    <string/>
@@ -1020,7 +1020,7 @@
                 <item>
                  <widget class="QToolButton" name="button_move_down">
                   <property name="toolTip">
-                   <string>Rename selected building level</string>
+                   <string>Move building level down</string>
                   </property>
                   <property name="text">
                    <string/>

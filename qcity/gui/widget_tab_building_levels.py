@@ -1,4 +1,5 @@
-from qgis.core import QgsExpression, QgsFeature
+from qgis.PyQt.QtCore import Qt
+from qgis.core import QgsExpression, QgsFeature, QgsFeatureRequest
 
 from qcity.core import LayerType, PROJECT_CONTROLLER, DatabaseUtils
 from .page_controller import PageController
@@ -33,6 +34,13 @@ class BuildingLevelsPageController(PageController):
             self.rename_current_selection
         )
 
+        self.og_widget.button_move_up.clicked.connect(
+            self.move_up
+        )
+        self.og_widget.button_move_down.clicked.connect(
+            self.move_down
+        )
+
     def _on_building_level_added(self, feature: QgsFeature):
         """
         Called when a new development site is created
@@ -60,8 +68,34 @@ class BuildingLevelsPageController(PageController):
         level_layer.setSubsetString(
             QgsExpression.createFieldEqualityExpression(foreign_key, development_site_fid))
 
-        for feat in level_layer.getFeatures():
+        request = QgsFeatureRequest()
+        request.setOrderBy(
+            QgsFeatureRequest.OrderBy([QgsFeatureRequest.OrderByClause("level_index", ascending=False)])
+        )
+
+        for feat in level_layer.getFeatures(request):
             self.add_feature_to_list(feat, set_current=False)
 
     def delete_feature_and_child_objects(self, feature_id: int) -> bool:
         return PROJECT_CONTROLLER.delete_building_level(feature_id)
+
+    def move_up(self):
+        self._move_current_layer(up=True)
+
+    def move_down(self):
+        self._move_current_layer(up=False)
+
+    def _move_current_layer(self, up: bool):
+        selected_items = self.list_widget.selectedItems()
+        if not selected_items:
+            return
+
+        feature_id = selected_items[0].data(Qt.UserRole)
+        if PROJECT_CONTROLLER.move_building_level(feature_id, up):
+            old_row = self.list_widget.row(selected_items[0])
+            item = self.list_widget.takeItem(old_row)
+            if up:
+                self.list_widget.insertItem(old_row-1, item)
+            else:
+                self.list_widget.insertItem(old_row+1, item)
+            self.list_widget.setCurrentRow(self.list_widget.row(item))

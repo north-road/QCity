@@ -528,6 +528,90 @@ class ProjectController(QObject):
 
         return current_floor_height
 
+    def move_building_level(self, building_level_fid: int, up: bool=True) -> bool:
+        """
+        Moves a building level up or down
+        """
+        building_level_layer = self.get_building_levels_layer()
+        if not building_level_layer:
+            return False
+
+        feature_to_move = building_level_layer.getFeature(building_level_fid)
+        if not feature_to_move.isValid():
+            return False
+
+        level_index_field_name = 'level_index'
+        level_height_field_name = 'level_height'
+        base_height_field_name = 'base_height'
+        development_site_fk_field = DatabaseUtils.foreign_key_for_layer(LayerType.BuildingLevels)
+
+        development_site_pk = feature_to_move[development_site_fk_field]
+
+        # fetch all building levels for this development site
+        request = QgsFeatureRequest().setFilterExpression(
+            QgsExpression.createFieldEqualityExpression(development_site_fk_field, development_site_pk)
+        )
+
+        all_levels_in_site_data = []
+        for f in building_level_layer.getFeatures(request):
+            level_idx_val = f[level_index_field_name]
+            all_levels_in_site_data.append({
+                'fid': f.id(),
+                'current_index': level_idx_val,
+                'height': f[level_height_field_name] if f[level_height_field_name] is not NULL else 0.0,
+            })
+        all_levels_in_site_data.sort(key=lambda x: x['current_index'])
+
+        original_list_idx = -1
+        for i, level_data in enumerate(all_levels_in_site_data):
+            if level_data['fid'] == building_level_fid:
+                original_list_idx = i
+                break
+
+        if up:
+            new_list_idx = original_list_idx + 1
+        else:  # down
+            new_list_idx = original_list_idx - 1
+
+        if new_list_idx < 0:
+            new_list_idx = 0
+        elif new_list_idx >= len(all_levels_in_site_data):
+            new_list_idx = len(all_levels_in_site_data) - 1
+
+        moved_item = all_levels_in_site_data.pop(original_list_idx)
+        all_levels_in_site_data.insert(new_list_idx, moved_item)
+
+        was_editable = building_level_layer.isEditable()
+        if not was_editable:
+            if not building_level_layer.startEditing():
+                return False
+
+        fields = building_level_layer.fields()
+        level_index_fidx = fields.lookupField(level_index_field_name)
+        base_height_fidx = fields.lookupField(base_height_field_name)
+
+        current_cumulative_height = 0.0
+
+        for i, level_data in enumerate(all_levels_in_site_data):
+            new_level_index_val = i + 1
+            new_base_height_val = current_cumulative_height
+
+            attrs_to_update = {
+                level_index_fidx: new_level_index_val,
+                base_height_fidx: new_base_height_val
+            }
+
+            if not building_level_layer.changeAttributeValues(level_data['fid'], attrs_to_update):
+                return False
+
+            current_cumulative_height += level_data['height']  # Use pre-fetched height
+
+        if not was_editable:
+            if not building_level_layer.commitChanges():
+                return False
+
+        return True
+
     def create_feature(self, layer: LayerType,
                        name: str,
                        geometry: QgsGeometry,

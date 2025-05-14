@@ -53,6 +53,8 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         self.toolButton_building_level_add.setIcon(GuiUtils.get_icon('add.svg'))
         self.toolButton_building_level_remove.setIcon(GuiUtils.get_icon('remove.svg'))
         self.toolButton_building_level_rename.setIcon(GuiUtils.get_icon('rename.svg'))
+        self.button_move_up.setIcon(GuiUtils.get_icon('up.svg'))
+        self.button_move_down.setIcon(GuiUtils.get_icon('down.svg'))
 
         self.project = project
         self.iface = iface
