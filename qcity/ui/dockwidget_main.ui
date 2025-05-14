@@ -1695,7 +1695,7 @@
   <tabstop>pushButton_load_database</tabstop>
   <tabstop>comboBox_base_layers</tabstop>
   <tabstop>pushButton_add_base_layer</tabstop>
-  <tabstop>scrollArea_7</tabstop>
+  <tabstop>project_area_scroll_area</tabstop>
   <tabstop>listWidget_project_areas</tabstop>
   <tabstop>toolButton_project_area_add</tabstop>
   <tabstop>toolButton_project_area_remove</tabstop>

@@ -5,7 +5,6 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QCoreApplication, Qt, pyqtSignal
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import (
-    QWidget,
     QFileDialog,
     QGraphicsOpacityEffect,
     QListWidgetItem,
@@ -18,7 +17,7 @@ from qgis.core import (
     Qgis,
     QgsFileUtils,
 )
-from qgis.gui import QgsDockWidget, QgsCollapsibleGroupBox
+from qgis.gui import QgsDockWidget
 
 from qcity.gui.widget_tab_development_sites import DevelopmentSitesPageController
 from qcity.gui.widget_tab_project_areas import ProjectAreasPageController
@@ -63,7 +62,7 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
 
         self.opacity_effect = QGraphicsOpacityEffect()
 
-        self.disable_widgets()
+        self.set_widgets_enabled(False)
 
         self.pushButton_add_base_layer.clicked.connect(self.add_base_layers)
         self.pushButton_create_database.clicked.connect(
@@ -142,7 +141,7 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
             gpkg_path
         )
 
-        self.enable_widgets()
+        self.set_widgets_enabled(True)
 
         PROJECT_CONTROLLER.set_associated_database_path(gpkg_path)
         PROJECT_CONTROLLER.add_database_layers_to_project(self.project, gpkg_path)
@@ -191,7 +190,7 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         self.groupbox_car_parking.setEnabled(True)
         self.groupbox_bike_parking.setEnabled(True)
 
-        self.enable_widgets()
+        self.set_widgets_enabled(True)
 
         PROJECT_CONTROLLER.create_layer_relations()
 
@@ -220,25 +219,14 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         self.comboBox_base_layers.setCurrentIndex(0)
         self.pushButton_add_base_layer.setEnabled(False)
 
-    def enable_widgets(self) -> None:
+    def set_widgets_enabled(self, enabled: bool) -> None:
         """
-        Set all widgets to be enabled.
+        Set all widgets to be enabled/disabled except database buttons.
         """
-        for i in range(self.tabWidget.count()):
-            tab = self.tabWidget.widget(i)
-            for child in tab.findChildren(QWidget):
-                child.setDisabled(False)
-
-        self.pushButton_add_base_layer.setEnabled(False)
-
-    def disable_widgets(self) -> None:
-        """
-        Set all widgets to be disabled except database buttons.
-        """
-        self.tab_development_sites.setEnabled(False)
-        self.tab_building_levels.setEnabled(False)
-        self.tab_statistics.setEnabled(False)
-        self.project_area_scroll_area.setEnabled(False)
+        self.tab_development_sites.setEnabled(enabled)
+        self.tab_building_levels.setEnabled(enabled)
+        self.tab_statistics.setEnabled(enabled)
+        self.project_area_scroll_area.setEnabled(enabled)
 
     @staticmethod
     def tr(message: str) -> str:
