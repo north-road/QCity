@@ -201,6 +201,8 @@ class PageController(QObject):
                     widget.setCurrentIndex(match_index)
                 else:
                     widget.setCurrentIndex(-1)
+            elif isinstance(widget, QLabel):
+                widget.setText(str(value))
 
     def remove_current_selection(self) -> None:
         """
