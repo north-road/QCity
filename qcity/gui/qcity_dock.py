@@ -243,16 +243,6 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate("X", message)
 
-    def get_feature_of_layer_by_name(
-            self, layer: QgsVectorLayer, item: QListWidgetItem
-    ) -> QgsFeature:
-        """Returns the feature with the name of the item"""
-        filter_expression = f"\"name\" = '{item.text()}'"
-        request = QgsFeatureRequest().setFilterExpression(filter_expression)
-        iterator = layer.getFeatures(request)
-
-        return next(iterator)
-
     def on_add_feature_clicked(self):
         """
         Triggered when add feature is clicked in a page
