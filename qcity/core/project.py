@@ -161,8 +161,6 @@ class ProjectController(QObject):
                 renderer = QgsVectorLayer3DRenderer(symbol)
                 building_levels_layer.setRenderer3D(renderer)
 
-
-
         building_level_layer_changed = self._current_building_levels_layer != building_levels_layer
         self._current_building_levels_layer = building_levels_layer
 
