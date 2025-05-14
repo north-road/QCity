@@ -1,6 +1,6 @@
 import os
-from typing import Optional
 from pathlib import Path
+from typing import Optional
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QCoreApplication, Qt, pyqtSignal
@@ -210,24 +210,31 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         temp_project.read(base_project_path)
         source_root = temp_project.layerTreeRoot()
 
-        def add_layer(_layer: QgsLayerTreeLayer, _dest_parent: QgsLayerTreeGroup):
+        def add_layer(_layer: QgsLayerTreeLayer, _dest_parent: QgsLayerTreeGroup, _at_index: Optional[int]=None):
             new_layer = _layer.layer().clone()
             QgsProject.instance().addMapLayer(new_layer, addToLegend=False)
-            _dest_parent.addLayer(new_layer)
+            if _at_index is not None:
+                _dest_parent.insertLayer(_at_index, new_layer)
+            else:
+                _dest_parent.addLayer(new_layer)
 
-        def add_group(_group: QgsLayerTreeGroup, _dest_parent: QgsLayerTreeGroup):
-            new_group = _dest_parent.addGroup(_group.name())
+        def add_group(_group: QgsLayerTreeGroup, _dest_parent: QgsLayerTreeGroup, _at_index: Optional[int]=None):
+            if _at_index is not None:
+                new_group = _dest_parent.insertGroup(_at_index, _group.name())
+            else:
+                new_group = _dest_parent.addGroup(_group.name())
+
             for source_child in _group.children():
                 add_node(source_child, new_group)
 
-        def add_node(_node: QgsLayerTreeNode, _dest_parent: QgsLayerTreeGroup):
+        def add_node(_node: QgsLayerTreeNode, _dest_parent: QgsLayerTreeGroup, _at_index: Optional[int]=None):
             if isinstance(_node, QgsLayerTreeGroup):
-                add_group(_node, _dest_parent)
+                add_group(_node, _dest_parent, _at_index)
             elif isinstance(_node, QgsLayerTreeLayer):
-                add_layer(_node, _dest_parent)
+                add_layer(_node, _dest_parent, _at_index)
 
-        for child in source_root.children():
-            add_node(child, QgsProject.instance().layerTreeRoot())
+        for target_index, child in enumerate(source_root.children()):
+            add_node(child, QgsProject.instance().layerTreeRoot(), target_index)
 
         self.comboBox_base_layers.setCurrentIndex(0)
 
