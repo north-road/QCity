@@ -7,13 +7,9 @@ from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import (
     QFileDialog,
     QGraphicsOpacityEffect,
-    QListWidgetItem,
 )
 from qgis.core import (
-    QgsFeatureRequest,
-    QgsVectorLayer,
     QgsProject,
-    QgsFeature,
     Qgis,
     QgsFileUtils,
 )
@@ -76,6 +72,7 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         self.comboBox_base_layers.setItemData(
             0, QColor(0, 0, 0, 100), Qt.ItemDataRole.ForegroundRole
         )
+        self.set_add_button_activation()
 
         # Initialize tabs
         self.project_area_controller = ProjectAreasPageController(self, self.tab_project_areas,
@@ -104,10 +101,7 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
 
     def set_add_button_activation(self) -> None:
         """Sets the add button for the base layers enabled/disabled, based on the current item text"""
-        if self.comboBox_base_layers.currentIndex() == "Add base layers":
-            self.pushButton_add_base_layer.setEnabled(False)
-        else:
-            self.pushButton_add_base_layer.setEnabled(True)
+        self.pushButton_add_base_layer.setEnabled(self.comboBox_base_layers.currentIndex() > 0)
 
     def set_base_layer_items(self):
         """Adds all possible base layers to the selection combobox"""
