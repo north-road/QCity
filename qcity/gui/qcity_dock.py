@@ -13,7 +13,7 @@ from qgis.core import (
     QgsProject,
     Qgis,
     QgsFileUtils,
-QgsLayerTreeGroup, QgsLayerTreeLayer, QgsLayerTreeNode
+    QgsLayerTreeGroup, QgsLayerTreeLayer, QgsLayerTreeNode
 )
 from qgis.gui import QgsDockWidget
 
@@ -27,6 +27,7 @@ from ..gui.gui_utils import GuiUtils
 
 DOCK_WIDGET, _ = uic.loadUiType(
     GuiUtils.get_ui_file_path('dockwidget_main.ui'))
+
 
 class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
     """
