@@ -53,12 +53,11 @@ class SettingsManager(QObject):
     def get_base_layers_items(self) -> List[str]:
         """Returns a list of all project files in plugin project directory."""
         project_paths = list()
+        project_folder = os.path.join(self.plugin_path, "..", "data", "projects")
 
-        for path in os.listdir(
-            os.path.join(self.plugin_path, "..", "data", "projects")
-        ):
-            if path.endswith(".qgz"):
-                project_paths.append(path.removesuffix(".qgz"))
+        for path in os.listdir(project_folder):
+            if path.lower().endswith(".qgz") or path.lower().endswith(".qgs"):
+                project_paths.append(project_folder + '/' + path)
 
         return project_paths
 

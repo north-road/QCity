@@ -1,5 +1,6 @@
 import os
 from typing import Optional
+from pathlib import Path
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QCoreApplication, Qt, pyqtSignal
@@ -12,6 +13,7 @@ from qgis.core import (
     QgsProject,
     Qgis,
     QgsFileUtils,
+QgsLayerTreeGroup, QgsLayerTreeLayer, QgsLayerTreeNode
 )
 from qgis.gui import QgsDockWidget
 
@@ -105,7 +107,10 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
 
     def set_base_layer_items(self):
         """Adds all possible base layers to the selection combobox"""
-        self.comboBox_base_layers.addItems(SETTINGS_MANAGER.get_base_layers_items())
+        base_projects = SETTINGS_MANAGER.get_base_layers_items()
+        for project in base_projects:
+            project_base_name = Path(project).stem
+            self.comboBox_base_layers.addItem(project_base_name, project)
 
     def create_new_project_database(self, file_name: Optional[str] = None, selected_filter: str = ".gpkg") -> None:
         """Opens a QFileDialog and returns the path to the new project Geopackage."""
@@ -196,22 +201,34 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
 
     def add_base_layers(self) -> None:
         """Adds the selected layer in the combo box to the canvas."""
-        base_project_path = os.path.join(
-            SETTINGS_MANAGER.plugin_path,
-            "..",
-            "data",
-            "projects",
-            f"{self.comboBox_base_layers.currentText()}.qgz",
-        )
+        base_project_path = self.comboBox_base_layers.currentData()
+        if not base_project_path:
+            return
+
         temp_project = QgsProject()
         temp_project.read(base_project_path)
-        layers = [layer for layer in temp_project.mapLayers().values()]
+        source_root = temp_project.layerTreeRoot()
 
-        for layer in layers:
-            self.project.addMapLayer(layer)
+        def add_layer(_layer: QgsLayerTreeLayer, _dest_parent: QgsLayerTreeGroup):
+            new_layer = _layer.layer().clone()
+            QgsProject.instance().addMapLayer(new_layer, addToLegend=False)
+            _dest_parent.addLayer(new_layer)
+
+        def add_group(_group: QgsLayerTreeGroup, _dest_parent: QgsLayerTreeGroup):
+            new_group = _dest_parent.addGroup(_group.name())
+            for source_child in _group.children():
+                add_node(source_child, new_group)
+
+        def add_node(_node: QgsLayerTreeNode, _dest_parent: QgsLayerTreeGroup):
+            if isinstance(_node, QgsLayerTreeGroup):
+                add_group(_node, _dest_parent)
+            elif isinstance(_node, QgsLayerTreeLayer):
+                add_layer(_node, _dest_parent)
+
+        for child in source_root.children():
+            add_node(child, QgsProject.instance().layerTreeRoot())
 
         self.comboBox_base_layers.setCurrentIndex(0)
-        self.pushButton_add_base_layer.setEnabled(False)
 
     def set_widgets_enabled(self, enabled: bool) -> None:
         """
