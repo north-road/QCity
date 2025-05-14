@@ -3,6 +3,8 @@ from typing import List, Optional, Dict
 
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import QObject, pyqtSignal
+from qgis.PyQt.QtGui import QColor
+
 from qgis.core import (
     NULL,
     Qgis,
@@ -15,7 +17,14 @@ from qgis.core import (
     QgsExpression,
     QgsVectorLayerUtils,
     QgsGeometry,
-    QgsDistanceArea
+    QgsDistanceArea,
+    QgsMapLayerElevationProperties,
+    QgsProperty,
+)
+from qgis._3d import (
+    QgsVectorLayer3DRenderer,
+    QgsPolygon3DSymbol,
+    QgsPhongMaterialSettings
 )
 
 from .database import DatabaseUtils
@@ -126,6 +135,34 @@ class ProjectController(QObject):
             building_levels_layer.featureAdded.connect(self._building_level_added)
             building_levels_layer.featureDeleted.connect(self._building_level_deleted)
             building_levels_layer.attributeValueChanged.connect(self._building_level_attribute_changed)
+
+            elevation_props = building_levels_layer.elevationProperties()
+            elevation_props.setExtrusionEnabled(True)
+            elevation_props.dataDefinedProperties().setProperty(
+                QgsMapLayerElevationProperties.ZOffset,
+                QgsProperty.fromField('base_height')
+            )
+            elevation_props.dataDefinedProperties().setProperty(
+                QgsMapLayerElevationProperties.ExtrusionHeight,
+                QgsProperty.fromField('level_height')
+            )
+
+            if not building_levels_layer.renderer3D():
+                symbol = QgsPolygon3DSymbol()
+                symbol.setDefaultPropertiesFromLayer(building_levels_layer)
+                symbol.setEdgesEnabled(True)
+                symbol.setEdgeWidth(2)
+
+                material = QgsPhongMaterialSettings()
+                material.setDiffuse(QColor(160,160,160))
+                material.setAmbient(QColor(90, 90, 90))
+                symbol.setMaterialSettings(material)
+
+                renderer = QgsVectorLayer3DRenderer(symbol)
+                building_levels_layer.setRenderer3D(renderer)
+
+
+
         building_level_layer_changed = self._current_building_levels_layer != building_levels_layer
         self._current_building_levels_layer = building_levels_layer
 
