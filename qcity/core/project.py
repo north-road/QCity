@@ -4,6 +4,7 @@ from typing import List, Optional, Dict
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.core import (
+    NULL,
     Qgis,
     QgsProject,
     QgsVectorLayer,
@@ -438,7 +439,64 @@ class ProjectController(QObject):
             DatabaseUtils.name_field_for_layer(layer)
         )), key=str.casefold)
 
-    def create_feature(self, layer: LayerType, name: str, geometry: QgsGeometry) -> QgsFeature:
+    def get_next_building_level(self, development_site_fid: int) -> int:
+        """
+        Returns the next building level to use for a new level added to the
+        matching development site.
+        """
+        development_site_layer = self.get_development_sites_layer()
+        development_site_feature = development_site_layer.getFeature(development_site_fid)
+
+        # find matching building levels
+        development_site_primary_key = development_site_feature[DatabaseUtils.primary_key_for_layer(LayerType.DevelopmentSites)]
+        building_levels_filter = QgsExpression.createFieldEqualityExpression(
+            DatabaseUtils.foreign_key_for_layer(LayerType.BuildingLevels),
+            development_site_primary_key
+        )
+        request = QgsFeatureRequest().setFilterExpression(
+            building_levels_filter
+        )
+        building_level_layer = self.get_building_levels_layer()
+
+        max_building_level = None
+        for f in building_level_layer.getFeatures(request):
+            level = f['level_index']
+            if level != NULL and (max_building_level is None or level > max_building_level):
+                max_building_level = level
+
+        return (max_building_level + 1) if max_building_level else 1
+
+    def get_floor_base_height(self, development_site_fid: int, level_index: int) -> float:
+        """
+        Calculates the base floor height for all floors below the specified index
+        """
+        development_site_layer = self.get_development_sites_layer()
+        development_site_feature = development_site_layer.getFeature(development_site_fid)
+
+        # find matching building levels
+        development_site_primary_key = development_site_feature[DatabaseUtils.primary_key_for_layer(LayerType.DevelopmentSites)]
+        building_levels_filter = QgsExpression.createFieldEqualityExpression(
+            DatabaseUtils.foreign_key_for_layer(LayerType.BuildingLevels),
+            development_site_primary_key
+        )
+        request = QgsFeatureRequest().setFilterExpression(
+            building_levels_filter
+        )
+        request.combineFilterExpression(f'"level_index" < {level_index}')
+        building_level_layer = self.get_building_levels_layer()
+
+        current_floor_height = 0
+        for f in building_level_layer.getFeatures(request):
+            height = f['level_height']
+            if height != NULL:
+                current_floor_height += height
+
+        return current_floor_height
+
+    def create_feature(self, layer: LayerType,
+                       name: str,
+                       geometry: QgsGeometry,
+                       initial_attributes: Optional[Dict[str,object]]=None) -> QgsFeature:
         """
         Creates a new feature, initialized with defaults, for the given layer
         """
@@ -446,17 +504,20 @@ class ProjectController(QObject):
         if not map_layer:
             return QgsFeature()
 
-        initial_attributes = {}
+        attributes = {}
+        if initial_attributes:
+            for key, value in initial_attributes.items():
+                attributes[map_layer.fields().lookupField(key)] = value
 
         for field_index, field in enumerate(map_layer.fields()):
             if field.name() == DatabaseUtils.name_field_for_layer(layer):
-                initial_attributes[field_index] = name
-            else:
+                attributes[field_index] = name
+            elif initial_attributes is None or field.name() not in initial_attributes:
                 default_value = DatabaseUtils.get_field_default(layer, field.name())
                 if default_value is not None:
-                    initial_attributes[field_index] = default_value
+                    attributes[field_index] = default_value
 
-        feature = QgsVectorLayerUtils.createFeature(map_layer, geometry, initial_attributes)
+        feature = QgsVectorLayerUtils.createFeature(map_layer, geometry, attributes)
         return feature
 
     def create_layer_relations(self):

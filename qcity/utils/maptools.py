@@ -192,13 +192,20 @@ class DrawPolygonTool(QgsMapToolDigitizeFeature):
         polygon = QgsGeometry.fromPolygonXY(
             [[QgsPointXY(x, y) for x, y in self.points]]
         )
-        feature = PROJECT_CONTROLLER.create_feature(self._layer_type,
-                                                    feature_name,
-                                                    polygon)
-
+        initial_attributes = {}
         foreign_key = DatabaseUtils.foreign_key_for_layer(self._layer_type)
         if foreign_key:
-            feature.setAttribute(foreign_key, self._parent_pk)
+            initial_attributes[foreign_key] = self._parent_pk
+        if self._layer_type == LayerType.BuildingLevels:
+            initial_attributes["level_index"] = PROJECT_CONTROLLER.get_next_building_level(
+                self._parent_pk)
+            initial_attributes["base_height"] = PROJECT_CONTROLLER.get_floor_base_height(
+                self._parent_pk, initial_attributes["level_index"])
+
+        feature = PROJECT_CONTROLLER.create_feature(self._layer_type,
+                                                    feature_name,
+                                                    polygon,
+                                                    initial_attributes)
 
         layer.startEditing()
         layer.addFeature(feature)
