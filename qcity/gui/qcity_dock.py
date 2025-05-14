@@ -235,17 +235,10 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         """
         Set all widgets to be disabled except database buttons.
         """
-        for i in range(self.tabWidget.count()):
-            tab = self.tabWidget.widget(i)
-            for child in tab.findChildren(QWidget):
-                if child in [
-                    self.pushButton_create_database,
-                    self.pushButton_load_database,
-                ]:
-                    continue
-                if isinstance(child, QgsCollapsibleGroupBox):
-                    child.setCollapsed(True)
-                child.setDisabled(True)
+        self.tab_development_sites.setEnabled(False)
+        self.tab_building_levels.setEnabled(False)
+        self.tab_statistics.setEnabled(False)
+        self.project_area_scroll_area.setEnabled(False)
 
     @staticmethod
     def tr(message: str) -> str:

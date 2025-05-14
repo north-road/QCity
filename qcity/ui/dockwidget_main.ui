@@ -66,7 +66,7 @@
          </layout>
         </item>
         <item row="2" column="0">
-         <widget class="QScrollArea" name="scrollArea_7">
+         <widget class="QScrollArea" name="project_area_scroll_area">
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
