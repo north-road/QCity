@@ -4,7 +4,7 @@ from qgis.PyQt.QtCore import QObject, QDir
 from qgis.PyQt.QtWidgets import QLabel, QFileDialog
 from qgis.core import QgsFileUtils
 
-from qcity.core import PROJECT_CONTROLLER
+from qcity.core import PROJECT_CONTROLLER, SETTINGS_MANAGER
 
 
 class WidgetUtilsStatistics(QObject):
@@ -63,13 +63,15 @@ class WidgetUtilsStatistics(QObject):
 
     def export_statistics_csv(self) -> None:
         """Exports the statistics tab to a CSV file."""
+        last_path = SETTINGS_MANAGER.last_used_export_path()
         csv_filename, _ = QFileDialog.getSaveFileName(
-            self.og_widget, self.tr("Export to CSV"), QDir.homePath(), "CSV Files (*.csv)"
+            self.og_widget, self.tr("Export to CSV"), last_path, "CSV Files (*.csv)"
         )
         if not csv_filename:
             return
 
         csv_filename = QgsFileUtils.addExtensionFromFilter(csv_filename, '*.csv')
+        SETTINGS_MANAGER.set_last_used_export_path(csv_filename)
 
         totals = PROJECT_CONTROLLER.calculate_project_area_stats(
             self.og_widget.comboBox_statistics_projects.currentData()

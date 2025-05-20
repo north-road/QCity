@@ -80,6 +80,25 @@ class SettingsManager(QObject):
             QDir.homePath(), section=QgsSettings.Plugins
         )
 
+    def set_last_used_export_path(self, path: str):
+        """
+        Sets the last used export path
+        """
+        QgsSettings().setValue(
+            f"{self.SETTINGS_KEY}/last_used_export_path",
+            path,
+            section=QgsSettings.Plugins,
+        )
+
+    def last_used_export_path(self) -> str:
+        """
+        Returns the last used export path
+        """
+        return QgsSettings().value(
+            f"{self.SETTINGS_KEY}/last_used_export_path",
+            QDir.homePath(), section=QgsSettings.Plugins
+        )
+
     def set_database_path(self, database_path: str) -> None:
         """
         Sets the current database path.
