@@ -680,7 +680,7 @@ class ProjectController(QObject):
                 if not building_level_layer.changeAttributeValues(level_data['fid'], attrs_to_update):
                     return False
 
-            current_cumulative_height += level_data['height']
+            current_cumulative_height += level_data['height'] or 0
 
         self._block_floor_height_updates -= 1
 
