@@ -10,8 +10,8 @@
 [general]
 name=QCity
 qgisMinimumVersion=3.34
-description=CLA SmartSlope
-version=0.0
+description=Urban planning tools
+version=0.1
 author=North Road
 email=
 
