@@ -400,6 +400,9 @@ class ProjectController(QObject):
     @staticmethod
     def add_database_layers_to_project(project: QgsProject, database_path: str) -> None:
         """Adds the layers from the gpkg to the canvas"""
+        for _, layer in project.mapLayers().items():
+            layer.setCustomProperty('_qcity_role', '')
+
         area_layer = QgsVectorLayer(
             f"{database_path}|layername={SETTINGS_MANAGER.project_area_prefix}",
             SETTINGS_MANAGER.project_area_prefix,

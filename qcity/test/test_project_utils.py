@@ -72,6 +72,25 @@ class TestProjectUtils(unittest.TestCase):
             self.assertIsInstance(building_areas_layer, QgsVectorLayer)
             self.assertGreaterEqual(building_areas_layer.fields().lookupField('percent_1_bedroom_floorspace'), 0)
             self.assertEqual(controller.get_layer(LayerType.BuildingLevels), building_areas_layer)
+
+            # add more layers, original ones should be unset
+            gpkg_path2 = os.path.join(temp_dir, "test_database2.gpkg")
+
+            DatabaseUtils.create_base_tables(
+                gpkg_path2
+            )
+            controller.add_database_layers_to_project(p, gpkg_path2)
+
+            self.assertFalse(project_area_layer.customProperty('_qcity_role'))
+            self.assertFalse(development_sites_layer.customProperty('_qcity_role'))
+            self.assertFalse(building_areas_layer.customProperty('_qcity_role'))
+            self.assertNotEqual(controller.get_layer(LayerType.ProjectAreas), project_area_layer)
+            self.assertIsNotNone(controller.get_layer(LayerType.ProjectAreas))
+            self.assertNotEqual(controller.get_layer(LayerType.DevelopmentSites), development_sites_layer)
+            self.assertIsNotNone(controller.get_layer(LayerType.DevelopmentSites))
+            self.assertNotEqual(controller.get_layer(LayerType.BuildingLevels), building_areas_layer)
+            self.assertIsNotNone(controller.get_layer(LayerType.BuildingLevels))
+
             controller.cleanup()
             p.clear()
 
