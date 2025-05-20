@@ -1,9 +1,9 @@
 import csv
 
-from qgis.PyQt.QtCore import QObject, QDir
+from qgis.PyQt.QtCore import QObject, QDir, QUrl
 from qgis.PyQt.QtWidgets import QLabel, QFileDialog
-from qgis.core import QgsFileUtils
-
+from qgis.core import Qgis, QgsFileUtils
+from qgis.utils import iface
 from qcity.core import PROJECT_CONTROLLER, SETTINGS_MANAGER
 
 
@@ -83,6 +83,13 @@ class WidgetUtilsStatistics(QObject):
 
             for key, value in totals.items():
                 writer.writerow([key, value])
+
+        iface.messageBar().pushMessage(
+            self.tr( "Export to CSV" ),
+            self.tr( "Successfully exported statistics to <a href=\"{}\">{}</a>" ).format(
+                QUrl.fromLocalFile( csv_filename ).toString(),
+                QDir.toNativeSeparators( csv_filename ) ),
+            Qgis.MessageLevel.Success, 0)
 
     def populate_project_area_combo_box(self) -> None:
         """
