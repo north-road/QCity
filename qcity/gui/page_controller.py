@@ -256,7 +256,7 @@ class PageController(QObject):
         existing_names = PROJECT_CONTROLLER.get_unique_names(self.layer_type)
 
         dialog = QgsNewNameDialog(
-            initial="",
+            initial=selected_item.text(),
             existing=existing_names,
             cs=Qt.CaseSensitivity.CaseSensitive,
             parent=self.og_widget.iface.mainWindow(),
@@ -264,8 +264,11 @@ class PageController(QObject):
 
         dialog.setWindowTitle(self.tr("Rename {}").format(self.layer_type.as_title_case(plural=False)))
         dialog.setAllowEmptyName(False)
+        dialog.setOverwriteEnabled(False)
         dialog.setHintString(
             self.tr("Enter a new name for the {}").format(self.layer_type.as_sentence_case(plural=False)))
+        dialog.setConflictingNameWarning(
+            self.tr("A {} with this name already exists").format(self.layer_type.as_sentence_case(plural=False)))
 
         if dialog.exec_() != QDialog.DialogCode.Accepted:
             return
