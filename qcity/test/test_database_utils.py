@@ -72,8 +72,8 @@ class TestDatabaseUtils(unittest.TestCase):
              50
         )
         self.assertEqual(
-            DatabaseUtils.get_field_default(LayerType.DevelopmentSites, "site_elevation"),
-             0
+            DatabaseUtils.get_field_default(LayerType.DevelopmentSites, "site_status"),
+             'P'
         )
         self.assertEqual(
             DatabaseUtils.get_field_default(LayerType.BuildingLevels, "level_height"),
