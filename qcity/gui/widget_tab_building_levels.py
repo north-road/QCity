@@ -41,6 +41,70 @@ class BuildingLevelsPageController(PageController):
             self.move_down
         )
 
+        for w in (
+            self.og_widget.percent_commercial_floorspace,
+            self.og_widget.percent_office_floorspace,
+            self.og_widget.percent_residential_floorspace,
+        ):
+            w.valueChanged.connect(
+                self._update_floorspace_total
+            )
+
+        for w in (
+            self.og_widget.percent_1_bedroom_floorspace,
+            self.og_widget.percent_2_bedroom_floorspace,
+            self.og_widget.percent_3_bedroom_floorspace,
+            self.og_widget.percent_4_bedroom_floorspace
+        ):
+            w.valueChanged.connect(
+                self._update_residential_space_total
+            )
+
+    def _update_floorspace_total(self):
+        """
+        Update total floorspace label
+        """
+
+        total = 0
+        for w in (
+            self.og_widget.percent_commercial_floorspace,
+            self.og_widget.percent_office_floorspace,
+            self.og_widget.percent_residential_floorspace,
+        ):
+            total += w.value()
+
+        self.og_widget.floorspace_sum.setText(str(total))
+        f = self.og_widget.floorspace_sum.font()
+        f.setBold(True)
+        self.og_widget.floorspace_sum.setFont(f)
+        if total > 100:
+            self.og_widget.floorspace_sum.setStyleSheet('color: red')
+        else:
+            self.og_widget.floorspace_sum.setStyleSheet('')
+
+    def _update_residential_space_total(self):
+        """
+        Update total residential space label
+        """
+
+        total = 0
+        for w in (
+            self.og_widget.percent_1_bedroom_floorspace,
+            self.og_widget.percent_2_bedroom_floorspace,
+            self.og_widget.percent_3_bedroom_floorspace,
+            self.og_widget.percent_4_bedroom_floorspace
+        ):
+            total += w.value()
+
+        self.og_widget.residential_sum.setText(str(total))
+        f = self.og_widget.residential_sum.font()
+        f.setBold(True)
+        self.og_widget.residential_sum.setFont(f)
+        if total > 100:
+            self.og_widget.residential_sum.setStyleSheet('color: red')
+        else:
+            self.og_widget.residential_sum.setStyleSheet('')
+
     def _on_building_level_added(self, feature: QgsFeature):
         """
         Called when a new development site is created
