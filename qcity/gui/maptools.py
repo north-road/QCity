@@ -40,8 +40,8 @@ from qgis.gui import (
     QgsSnapIndicator,
 )
 
-from ..core import LayerType, PROJECT_CONTROLLER, DatabaseUtils
-from ..gui.qcity_dock import QCityDockWidget
+from qcity.core import LayerType, PROJECT_CONTROLLER, DatabaseUtils
+from qcity.gui.qcity_dock import QCityDockWidget
 
 
 class DrawPolygonTool(QgsMapToolDigitizeFeature):

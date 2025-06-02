@@ -3,7 +3,7 @@ from qgis.PyQt.QtWidgets import QAction
 from qgis.core import QgsProject
 
 from .core import PROJECT_CONTROLLER
-from .utils.maptools import DrawPolygonTool, MapToolHandler
+from qcity.gui.maptools import DrawPolygonTool, MapToolHandler
 
 from .gui.gui_utils import GuiUtils
 from .gui.qcity_dock import (
