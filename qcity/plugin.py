@@ -39,13 +39,9 @@ class QCityPlugin:
 
         self.action_maptool = QAction("QCity", self.iface.mainWindow())
 
-        message_bar = self.iface.messageBar()
         self.map_tool = DrawPolygonTool(
             map_canvas=self.iface.mapCanvas(),
-            cad_dock_widget=self.iface.cadDockWidget(),
-            message_bar=message_bar,
-            dlg=self.widget,
-            iface=self.iface,
+            cad_dock_widget=self.iface.cadDockWidget()
         )
 
         self.handler = MapToolHandler(self.map_tool, self.action_maptool)

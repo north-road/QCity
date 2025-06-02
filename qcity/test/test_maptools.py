@@ -62,7 +62,6 @@ class MapToolsTest(unittest.TestCase):
         )
 
         self.widget = QCityDockWidget(self.project, self.iface)
-        message_bar = self.iface.messageBar()
 
         with tempfile.TemporaryDirectory() as temp_dir:
             gpkg_path = os.path.join(temp_dir, "test_database.gpkg")
@@ -71,13 +70,9 @@ class MapToolsTest(unittest.TestCase):
                 gpkg_path
             )
 
-
             self.map_tool = DrawPolygonTool(
                 map_canvas=self.iface.mapCanvas(),
-                cad_dock_widget=QgsAdvancedDigitizingDockWidget(self.CANVAS),
-                message_bar=message_bar,
-                dlg=self.widget,
-                iface=self.iface,
+                cad_dock_widget=QgsAdvancedDigitizingDockWidget(self.CANVAS)
             )
 
             self.widget.load_project_database(gpkg_path, "gpkg")
