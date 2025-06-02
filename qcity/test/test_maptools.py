@@ -21,7 +21,7 @@ from qgis.core import (
 from qcity.core import DatabaseUtils, PROJECT_CONTROLLER
 from qcity.gui.qcity_dock import QCityDockWidget
 from qcity.test.utilities import get_qgis_app
-from qcity.utils.maptools import DrawPolygonTool
+from qcity.gui.maptools import DrawPolygonTool
 
 
 class MapToolsTest(unittest.TestCase):
