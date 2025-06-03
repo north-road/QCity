@@ -107,7 +107,7 @@ class BuildingLevelsPageController(PageController):
         ):
             return
 
-        self.add_feature_to_list(feature)
+        self.add_feature_to_list(feature, add_to_top=True)
 
     def _on_building_level_deleted(self, feature_id: int):
         """
