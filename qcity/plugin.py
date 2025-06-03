@@ -1,9 +1,9 @@
 from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtWidgets import QAction
-from qgis.core import QgsProject
+from qgis.core import QgsProject, Qgis
 
 from .core import PROJECT_CONTROLLER
-from qcity.gui.maptools import DrawPolygonTool, MapToolHandler
+from qcity.gui.maptools import DrawPolygonTool, DrawPolygonToolOld, MapToolHandler
 
 from .gui.gui_utils import GuiUtils
 from .gui.qcity_dock import (
@@ -39,10 +39,16 @@ class QCityPlugin:
 
         self.action_maptool = QAction("QCity", self.iface.mainWindow())
 
-        self.map_tool = DrawPolygonTool(
-            map_canvas=self.iface.mapCanvas(),
-            cad_dock_widget=self.iface.cadDockWidget()
-        )
+        if Qgis.QGIS_VERSION_INT >= 34300:
+            self.map_tool = DrawPolygonTool(
+                map_canvas=self.iface.mapCanvas(),
+                cad_dock_widget=self.iface.cadDockWidget()
+            )
+        else:
+            self.map_tool = DrawPolygonToolOld(
+                map_canvas=self.iface.mapCanvas(),
+                cad_dock_widget=self.iface.cadDockWidget()
+            )
 
         self.handler = MapToolHandler(self.map_tool, self.action_maptool)
         self.iface.registerMapToolHandler(self.handler)
