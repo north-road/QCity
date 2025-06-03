@@ -57,7 +57,7 @@ class MapToolsTest(unittest.TestCase):
                     -344918.46147615037625656,
                     6633917.53619999997317791,
                 ),
-                QgsCoordinateReferenceSystem('EPSG:3857'),
+                QgsCoordinateReferenceSystem("EPSG:3857"),
             )
         )
 
@@ -66,13 +66,11 @@ class MapToolsTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             gpkg_path = os.path.join(temp_dir, "test_database.gpkg")
 
-            DatabaseUtils.create_base_tables(
-                gpkg_path
-            )
+            DatabaseUtils.create_base_tables(gpkg_path)
 
             self.map_tool = DrawPolygonTool(
                 map_canvas=self.iface.mapCanvas(),
-                cad_dock_widget=QgsAdvancedDigitizingDockWidget(self.CANVAS)
+                cad_dock_widget=QgsAdvancedDigitizingDockWidget(self.CANVAS),
             )
 
             self.widget.load_project_database(gpkg_path, "gpkg")

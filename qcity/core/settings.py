@@ -57,7 +57,7 @@ class SettingsManager(QObject):
 
         for path in os.listdir(project_folder):
             if path.lower().endswith(".qgz") or path.lower().endswith(".qgs"):
-                project_paths.append(project_folder + '/' + path)
+                project_paths.append(project_folder + "/" + path)
 
         return project_paths
 
@@ -77,7 +77,8 @@ class SettingsManager(QObject):
         """
         return QgsSettings().value(
             f"{self.SETTINGS_KEY}/last_used_database_folder",
-            QDir.homePath(), section=QgsSettings.Plugins
+            QDir.homePath(),
+            section=QgsSettings.Plugins,
         )
 
     def set_last_used_export_path(self, path: str):
@@ -96,7 +97,8 @@ class SettingsManager(QObject):
         """
         return QgsSettings().value(
             f"{self.SETTINGS_KEY}/last_used_export_path",
-            QDir.homePath(), section=QgsSettings.Plugins
+            QDir.homePath(),
+            section=QgsSettings.Plugins,
         )
 
     def set_database_path(self, database_path: str) -> None:

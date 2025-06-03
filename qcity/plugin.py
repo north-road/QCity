@@ -12,7 +12,6 @@ from .gui.qcity_dock import (
 
 
 class QCityPlugin:
-
     def __init__(self, iface):
         self.dlg_config = None
         self.iface = iface
@@ -42,12 +41,12 @@ class QCityPlugin:
         if Qgis.QGIS_VERSION_INT >= 34300:
             self.map_tool = DrawPolygonTool(
                 map_canvas=self.iface.mapCanvas(),
-                cad_dock_widget=self.iface.cadDockWidget()
+                cad_dock_widget=self.iface.cadDockWidget(),
             )
         else:
             self.map_tool = DrawPolygonToolOld(
                 map_canvas=self.iface.mapCanvas(),
-                cad_dock_widget=self.iface.cadDockWidget()
+                cad_dock_widget=self.iface.cadDockWidget(),
             )
 
         self.handler = MapToolHandler(self.map_tool, self.action_maptool)

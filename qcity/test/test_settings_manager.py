@@ -31,11 +31,13 @@ class TestSettingsManager(unittest.TestCase):
         """
         Test last used database folder
         """
-        self.assertEqual(self.settings_manager.last_used_database_folder(),
-                         QDir.homePath())
-        self.settings_manager.set_last_used_database_folder('/home/test/dbs')
-        self.assertEqual(self.settings_manager.last_used_database_folder(),
-                         '/home/test/dbs')
+        self.assertEqual(
+            self.settings_manager.last_used_database_folder(), QDir.homePath()
+        )
+        self.settings_manager.set_last_used_database_folder("/home/test/dbs")
+        self.assertEqual(
+            self.settings_manager.last_used_database_folder(), "/home/test/dbs"
+        )
 
 
 if __name__ == "__main__":

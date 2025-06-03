@@ -1,10 +1,6 @@
 from typing import Optional, Union
 
-from qgis.core import (
-    QgsVectorLayer,
-    QgsRuleBasedRenderer,
-    QgsSingleSymbolRenderer
-)
+from qgis.core import QgsVectorLayer, QgsRuleBasedRenderer, QgsSingleSymbolRenderer
 from .enums import LayerType
 from .project import PROJECT_CONTROLLER
 
@@ -16,10 +12,10 @@ class LayerUtils:
 
     @staticmethod
     def store_value(
-            layer_type: LayerType,
-            feature_id: int,
-            field_name: str,
-            value: Union[float, int, str]
+        layer_type: LayerType,
+        feature_id: int,
+        field_name: str,
+        value: Union[float, int, str],
     ) -> bool:
         """
         Stores a value in a QCity database layer
@@ -42,7 +38,9 @@ class LayerUtils:
         return True
 
     @staticmethod
-    def set_renderer_filter(layer: QgsVectorLayer, filter_string: Optional[str]) -> bool:
+    def set_renderer_filter(
+        layer: QgsVectorLayer, filter_string: Optional[str]
+    ) -> bool:
         """
         Morphs a layer's renderer to respect the specified filter string
         """
@@ -72,8 +70,9 @@ class LayerUtils:
 
             # current renderer is NOT rule based, upgrade to rule based
             root_rule = QgsRuleBasedRenderer.Rule(None)
-            new_rule = QgsRuleBasedRenderer.Rule(current_renderer.symbol().clone(),
-                                                 filterExp = filter_string)
+            new_rule = QgsRuleBasedRenderer.Rule(
+                current_renderer.symbol().clone(), filterExp=filter_string
+            )
             root_rule.appendChild(new_rule)
             rule_based = QgsRuleBasedRenderer(root_rule)
             layer.setRenderer(rule_based)

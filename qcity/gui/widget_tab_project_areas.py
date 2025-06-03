@@ -1,11 +1,6 @@
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import (
-    QFileDialog
-)
-from qgis.core import (
-    QgsFeature,
-    QgsVectorLayer
-)
+from qgis.PyQt.QtWidgets import QFileDialog
+from qgis.core import QgsFeature, QgsVectorLayer
 
 from qcity.core import SETTINGS_MANAGER, LayerType, PROJECT_CONTROLLER
 from .page_controller import PageController
@@ -17,15 +12,13 @@ class ProjectAreasPageController(PageController):
     """
 
     def __init__(self, og_widget, tab_widget, list_widget, current_label):
-        super().__init__(LayerType.ProjectAreas, og_widget, tab_widget, list_widget, current_label)
+        super().__init__(
+            LayerType.ProjectAreas, og_widget, tab_widget, list_widget, current_label
+        )
         self.skip_fields_for_widgets = ("fid", "name")
 
-        PROJECT_CONTROLLER.project_area_added.connect(
-            self._on_project_area_added
-        )
-        PROJECT_CONTROLLER.project_area_deleted.connect(
-            self._on_project_area_deleted
-        )
+        PROJECT_CONTROLLER.project_area_added.connect(self._on_project_area_added)
+        PROJECT_CONTROLLER.project_area_deleted.connect(self._on_project_area_deleted)
 
         self.og_widget.toolButton_project_area_add.clicked.connect(
             self.add_feature_clicked

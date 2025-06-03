@@ -70,7 +70,7 @@ class WidgetUtilsStatistics(QObject):
         if not csv_filename:
             return
 
-        csv_filename = QgsFileUtils.addExtensionFromFilter(csv_filename, '*.csv')
+        csv_filename = QgsFileUtils.addExtensionFromFilter(csv_filename, "*.csv")
         SETTINGS_MANAGER.set_last_used_export_path(csv_filename)
 
         totals = PROJECT_CONTROLLER.calculate_project_area_stats(
@@ -85,11 +85,14 @@ class WidgetUtilsStatistics(QObject):
                 writer.writerow([key, value])
 
         iface.messageBar().pushMessage(
-            self.tr( "Export to CSV" ),
-            self.tr( "Successfully exported statistics to <a href=\"{}\">{}</a>" ).format(
-                QUrl.fromLocalFile( csv_filename ).toString(),
-                QDir.toNativeSeparators( csv_filename ) ),
-            Qgis.MessageLevel.Success, 0)
+            self.tr("Export to CSV"),
+            self.tr('Successfully exported statistics to <a href="{}">{}</a>').format(
+                QUrl.fromLocalFile(csv_filename).toString(),
+                QDir.toNativeSeparators(csv_filename),
+            ),
+            Qgis.MessageLevel.Success,
+            0,
+        )
 
     def populate_project_area_combo_box(self) -> None:
         """
@@ -106,4 +109,3 @@ class WidgetUtilsStatistics(QObject):
         self.og_widget.comboBox_statistics_projects.clear()
         for name in names_sorted:
             self.og_widget.comboBox_statistics_projects.addItem(name, name_to_id[name])
-

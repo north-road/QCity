@@ -1,8 +1,19 @@
 from typing import Optional
 
 from qgis.PyQt.QtCore import Qt, QObject, pyqtSignal
-from qgis.PyQt.QtWidgets import QWidget, QSpinBox, QDoubleSpinBox, QListWidget, QLabel, QLineEdit, QComboBox, QDialog, \
-    QMessageBox, QListWidgetItem, QCheckBox
+from qgis.PyQt.QtWidgets import (
+    QWidget,
+    QSpinBox,
+    QDoubleSpinBox,
+    QListWidget,
+    QLabel,
+    QLineEdit,
+    QComboBox,
+    QDialog,
+    QMessageBox,
+    QListWidgetItem,
+    QCheckBox,
+)
 from qgis.core import QgsFeature, NULL, QgsReferencedRectangle, QgsVectorLayer
 from qgis.gui import QgsNewNameDialog, QgsSpinBox, QgsDoubleSpinBox
 
@@ -14,17 +25,20 @@ class PageController(QObject):
     """
     Base QObject class for dock page controllers
     """
+
     add_feature_clicked = pyqtSignal()
 
-    def __init__(self,
-                 layer_type: LayerType,
-                 og_widget: 'QCityDockWidget',
-                 tab_widget: QWidget,
-                 list_widget: QListWidget,
-                 current_item_label: QLabel = None):
+    def __init__(
+        self,
+        layer_type: LayerType,
+        og_widget: "QCityDockWidget",
+        tab_widget: QWidget,
+        list_widget: QListWidget,
+        current_item_label: QLabel = None,
+    ):
         super().__init__(og_widget)
         self.layer_type = layer_type
-        self.og_widget: 'QCityDockWidget' = og_widget
+        self.og_widget: "QCityDockWidget" = og_widget
         self.tab_widget: QWidget = tab_widget
         self.list_widget: QListWidget = list_widget
         self.current_item_label = current_item_label
@@ -34,19 +48,15 @@ class PageController(QObject):
         self.current_feature_id: Optional[int] = None
 
         if self.tab_widget is not None:
-            for spin_box in self.tab_widget.findChildren(
-                    (QSpinBox, QDoubleSpinBox)
-            ):
+            for spin_box in self.tab_widget.findChildren((QSpinBox, QDoubleSpinBox)):
                 spin_box.valueChanged.connect(self.save_widget_value_to_feature)
 
             for spin_box in self.tab_widget.findChildren(
-                    (QgsSpinBox, QgsDoubleSpinBox)
+                (QgsSpinBox, QgsDoubleSpinBox)
             ):
                 spin_box.setShowClearButton(False)
 
-            for line_edit in self.tab_widget.findChildren(
-                    QLineEdit
-            ):
+            for line_edit in self.tab_widget.findChildren(QLineEdit):
                 p = line_edit.parent()
                 is_child_of_spinbox = False
                 while p:
@@ -57,15 +67,13 @@ class PageController(QObject):
                 if not is_child_of_spinbox:
                     line_edit.textChanged.connect(self.save_widget_value_to_feature)
 
-            for checkbox in self.tab_widget.findChildren(
-                    QCheckBox
-            ):
+            for checkbox in self.tab_widget.findChildren(QCheckBox):
                 checkbox.toggled.connect(self.save_widget_value_to_feature)
 
-            for combo in self.tab_widget.findChildren(
-                    QComboBox
-            ):
-                field_config = DatabaseUtils.get_field_config(self.layer_type, combo.objectName())
+            for combo in self.tab_widget.findChildren(QComboBox):
+                field_config = DatabaseUtils.get_field_config(
+                    self.layer_type, combo.objectName()
+                )
                 if field_config is not None and "map" in field_config:
                     for code, value in field_config["map"].items():
                         combo.addItem(value, code)
@@ -84,9 +92,7 @@ class PageController(QObject):
         self.list_widget.setEnabled(True)
 
         item = QListWidgetItem()
-        item.setText(feature[
-                         DatabaseUtils.name_field_for_layer(self.layer_type)
-                     ])
+        item.setText(feature[DatabaseUtils.name_field_for_layer(self.layer_type)])
         item.setData(Qt.UserRole, feature.id())
 
         self.list_widget.addItem(item)
@@ -105,9 +111,7 @@ class PageController(QObject):
             return
 
         self.current_feature_id = current_item.data(Qt.UserRole)
-        self.set_feature(
-            self.get_feature_by_id(self.current_feature_id)
-        )
+        self.set_feature(self.get_feature_by_id(self.current_feature_id))
 
         if self.current_item_label is not None:
             self.current_item_label.setText(current_item.text())
@@ -150,10 +154,9 @@ class PageController(QObject):
         elif isinstance(widget, QCheckBox):
             value = widget.isChecked()
 
-        LayerUtils.store_value(self.layer_type,
-                               self.current_feature_id,
-                               field_name, value
-                               )
+        LayerUtils.store_value(
+            self.layer_type, self.current_feature_id, field_name, value
+        )
 
     def set_feature(self, feature: QgsFeature):
         """
@@ -175,9 +178,7 @@ class PageController(QObject):
                 continue
 
             widget_name = field_name
-            widget = self.og_widget.findChild(
-                (QWidget), widget_name
-            )
+            widget = self.og_widget.findChild((QWidget), widget_name)
             if isinstance(widget, QSpinBox):
                 if value == NULL:
                     continue
@@ -213,23 +214,25 @@ class PageController(QObject):
         if not selected_items:
             return
 
-        feature_ids = {
-            item.data(Qt.UserRole): item for item in selected_items
-        }
+        feature_ids = {item.data(Qt.UserRole): item for item in selected_items}
         if len(feature_ids) == 1:
             item_text = next(iter(feature_ids.values())).text()
         else:
-            item_text = ', '.join(t.text() for t in feature_ids.values())
-        if QMessageBox.warning(self.list_widget,
-                               self.tr('Remove {}').format(self.layer_type.as_title_case(plural=False)),
-                               self.tr(
-                                   'Are you sure you want to remove {}? This will permanently delete the {} and all related objects from the database.').format(
-                                   item_text,
-                                   self.layer_type.as_sentence_case(plural=False)
-                               ),
-                               QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                               QMessageBox.StandardButton.No
-                               ) != QMessageBox.StandardButton.Yes:
+            item_text = ", ".join(t.text() for t in feature_ids.values())
+        if (
+            QMessageBox.warning(
+                self.list_widget,
+                self.tr("Remove {}").format(
+                    self.layer_type.as_title_case(plural=False)
+                ),
+                self.tr(
+                    "Are you sure you want to remove {}? This will permanently delete the {} and all related objects from the database."
+                ).format(item_text, self.layer_type.as_sentence_case(plural=False)),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No,
+            )
+            != QMessageBox.StandardButton.Yes
+        ):
             return
 
         for feature_id, item in feature_ids.items():
@@ -262,13 +265,21 @@ class PageController(QObject):
             parent=self.og_widget.iface.mainWindow(),
         )
 
-        dialog.setWindowTitle(self.tr("Rename {}").format(self.layer_type.as_title_case(plural=False)))
+        dialog.setWindowTitle(
+            self.tr("Rename {}").format(self.layer_type.as_title_case(plural=False))
+        )
         dialog.setAllowEmptyName(False)
         dialog.setOverwriteEnabled(False)
         dialog.setHintString(
-            self.tr("Enter a new name for the {}").format(self.layer_type.as_sentence_case(plural=False)))
+            self.tr("Enter a new name for the {}").format(
+                self.layer_type.as_sentence_case(plural=False)
+            )
+        )
         dialog.setConflictingNameWarning(
-            self.tr("A {} with this name already exists").format(self.layer_type.as_sentence_case(plural=False)))
+            self.tr("A {} with this name already exists").format(
+                self.layer_type.as_sentence_case(plural=False)
+            )
+        )
 
         if dialog.exec_() != QDialog.DialogCode.Accepted:
             return
@@ -280,15 +291,22 @@ class PageController(QObject):
 
         layer = self.get_layer()
         layer.startEditing()
-        layer.changeAttributeValue(feature_id, layer.fields().lookupField(
-            DatabaseUtils.name_field_for_layer(self.layer_type)), new_feat_name)
+        layer.changeAttributeValue(
+            feature_id,
+            layer.fields().lookupField(
+                DatabaseUtils.name_field_for_layer(self.layer_type)
+            ),
+            new_feat_name,
+        )
         layer.commitChanges()
 
     def zoom_to_feature(self, feature: QgsFeature):
         """
         Centers the canvas on a feature
         """
-        feature_bbox = QgsReferencedRectangle(feature.geometry().boundingBox(), self.get_layer().crs())
+        feature_bbox = QgsReferencedRectangle(
+            feature.geometry().boundingBox(), self.get_layer().crs()
+        )
 
         CanvasUtils.zoom_to_extent_if_not_visible(
             self.og_widget.iface.mapCanvas(),
