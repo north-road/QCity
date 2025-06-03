@@ -131,17 +131,23 @@ class SettingsManager(QObject):
 
         return attributes
 
-    def use_rule_based_layer_filters(self):
+    def use_rule_based_layer_filters(self) -> bool:
         """
         Returns True if rule based layer filters are enabled.
         """
         return False
 
-    def use_layer_subset_filters(self):
+    def use_layer_subset_filters(self) -> bool:
         """
         Returns True if layer subset filters are enabled.
         """
         return False
+
+    def synchronize_layer_selection(self) -> bool:
+        """
+        Returns True if layer feature selection should be set when selecting features from QCity lists
+        """
+        return True
 
 
 # Settings manager singleton instance

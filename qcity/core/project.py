@@ -945,6 +945,9 @@ class ProjectController(QObject):
                 ),
             )
 
+        if SETTINGS_MANAGER.synchronize_layer_selection():
+            project_area_layer.selectByIds([project_area_fid])
+
     def set_current_development_site(self, development_site_fid: int):
         """
         Sets the feature ID for the current development site
@@ -973,6 +976,17 @@ class ProjectController(QObject):
                     development_site_primary_key,
                 ),
             )
+
+        if SETTINGS_MANAGER.synchronize_layer_selection():
+            development_site_layer.selectByIds([development_site_fid])
+
+    def set_current_building_level(self, building_level_fid: int):
+        """
+        Sets the feature ID for the current building level feature
+        """
+        building_level_layer = self.get_building_levels_layer()
+        if SETTINGS_MANAGER.synchronize_layer_selection():
+            building_level_layer.selectByIds([building_level_fid])
 
     def delete_project_area(self, project_area_fid: int) -> bool:
         """
