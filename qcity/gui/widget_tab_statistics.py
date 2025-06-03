@@ -8,6 +8,22 @@ from qcity.core import PROJECT_CONTROLLER, SETTINGS_MANAGER
 
 
 class WidgetUtilsStatistics(QObject):
+    STATS_MAPPING = {
+        "commercial_floorspace": "label_statistics_dev_stats_commercial_floorspace",
+        "office_floorspace": "label_statistics_dev_stats_office_floorspace",
+        "residential_floorspace": "label_statistics_dev_stats_residential_floorspace",
+        "count_1_bedroom_dwellings": "label_statistics_dev_stats_1_bedroom_dwellings",
+        "count_2_bedroom_dwellings": "label_statistics_dev_stats_2_bedroom_dwellings",
+        "count_3_bedroom_dwellings": "label_statistics_dev_stats_3_bedroom_dwellings",
+        "count_4_bedroom_dwellings": "label_statistics_dev_stats_4_bedroom_dwellings",
+        "commercial_car_bays": "label_statistics_car_parking_stats_commercial_car_parks",
+        "office_car_bays": "label_statistics_car_parking_stats_office_car_bays",
+        "residential_car_bays": "label_statistics_car_parking_stats_residential_car_bays",
+        "commercial_bicycle_bays": "label_statistics_bike_parking_stats_commercial_bike_parks",
+        "office_bicycle_bays": "label_statistics_bike_parking_stats_office_bike_bays",
+        "residential_bicycle_bays": "label_statistics_bike_parking_stats_residential_bike_bays",
+    }
+
     def __init__(self, og_widget):
         super().__init__(og_widget)
         self.og_widget = og_widget
@@ -26,6 +42,25 @@ class WidgetUtilsStatistics(QObject):
             self.update_development_statistics
         )
 
+        self.og_widget.comboBox_statistics_projects.currentIndexChanged.connect(
+            self._invalidate_stats
+        )
+        PROJECT_CONTROLLER.project_area_attribute_changed.connect(
+            self._invalidate_stats
+        )
+        PROJECT_CONTROLLER.development_site_added.connect(self._invalidate_stats)
+        PROJECT_CONTROLLER.development_site_deleted.connect(self._invalidate_stats)
+        PROJECT_CONTROLLER.development_site_attribute_changed.connect(
+            self._invalidate_stats
+        )
+        PROJECT_CONTROLLER.building_level_added.connect(self._invalidate_stats)
+        PROJECT_CONTROLLER.building_level_deleted.connect(self._invalidate_stats)
+        PROJECT_CONTROLLER.building_level_attribute_changed.connect(
+            self._invalidate_stats
+        )
+
+        self._invalidate_stats()
+
         self.populate_project_area_combo_box()
 
         self.og_widget.pushButton_csv_export.clicked.connect(self.export_statistics_csv)
@@ -34,32 +69,19 @@ class WidgetUtilsStatistics(QObject):
         """
         Accumulates the values of all properties belonging to building levels and sets the values in the statistics tab
         """
-        stats_mapping = {
-            "commercial_floorspace": "label_statistics_dev_stats_commercial_floorspace",
-            "office_floorspace": "label_statistics_dev_stats_office_floorspace",
-            "residential_floorspace": "label_statistics_dev_stats_residential_floorspace",
-            "count_1_bedroom_dwellings": "label_statistics_dev_stats_1_bedroom_dwellings",
-            "count_2_bedroom_dwellings": "label_statistics_dev_stats_2_bedroom_dwellings",
-            "count_3_bedroom_dwellings": "label_statistics_dev_stats_3_bedroom_dwellings",
-            "count_4_bedroom_dwellings": "label_statistics_dev_stats_4_bedroom_dwellings",
-            "commercial_car_bays": "label_statistics_car_parking_stats_commercial_car_parks",
-            "office_car_bays": "label_statistics_car_parking_stats_office_car_bays",
-            "residential_car_bays": "label_statistics_car_parking_stats_residential_car_bays",
-            "commercial_bicycle_bays": "label_statistics_bike_parking_stats_commercial_bike_parks",
-            "office_bicycle_bays": "label_statistics_bike_parking_stats_office_bike_bays",
-            "residential_bicycle_bays": "label_statistics_bike_parking_stats_residential_bike_bays",
-        }
-
         totals = PROJECT_CONTROLLER.calculate_project_area_stats(
             self.og_widget.comboBox_statistics_projects.currentData()
         )
         if not totals:
             return
 
-        for stat, widget_name in stats_mapping.items():
+        for stat, widget_name in WidgetUtilsStatistics.STATS_MAPPING.items():
             label = self.og_widget.findChild(QLabel, widget_name)
             if label:
                 label.setText(str(round(totals[stat], 2)))
+
+        self.og_widget.button_update_stats.setStyleSheet("")
+        self.og_widget.button_update_stats.setText("Update")
 
     def export_statistics_csv(self) -> None:
         """Exports the statistics tab to a CSV file."""
@@ -109,3 +131,14 @@ class WidgetUtilsStatistics(QObject):
         self.og_widget.comboBox_statistics_projects.clear()
         for name in names_sorted:
             self.og_widget.comboBox_statistics_projects.addItem(name, name_to_id[name])
+
+    def _invalidate_stats(self):
+        """
+        Invalidates current stats when anything changes
+        """
+        for _, widget_name in WidgetUtilsStatistics.STATS_MAPPING.items():
+            label = self.og_widget.findChild(QLabel, widget_name)
+            if label:
+                label.setText("-")
+        self.og_widget.button_update_stats.setStyleSheet("color: red")
+        self.og_widget.button_update_stats.setText("Requires Update")
