@@ -25,3 +25,9 @@ class WidgetTest(unittest.TestCase):
     def test_config_ui(self):
         ui = QCityDockWidget(QgsProject(), IFACE)
         ui.show()
+
+
+if __name__ == "__main__":
+    suite = unittest.makeSuite(WidgetTest)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)

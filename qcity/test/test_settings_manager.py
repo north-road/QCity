@@ -39,4 +39,6 @@ class TestSettingsManager(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    suite = unittest.makeSuite(TestSettingsManager)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)

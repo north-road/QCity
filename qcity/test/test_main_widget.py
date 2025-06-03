@@ -64,3 +64,9 @@ class QCityProjectMainWidgetTest(unittest.TestCase):
 
         # This needs to be updated if the base layers are changed
         self.assertEqual(widget.listWidget_project_areas.item(0).text(), "1")
+
+
+if __name__ == "__main__":
+    suite = unittest.makeSuite(QCityProjectMainWidgetTest)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)

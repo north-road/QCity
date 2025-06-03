@@ -198,3 +198,9 @@ class TestLayerUtils(unittest.TestCase):
         renderer4_1 = QgsRuleBasedRenderer(root_rule_4_1)
         layer4_1.setRenderer(renderer4_1)
         self.assertEqual(len(layer4_1.renderer().rootRule().children()), 0)
+
+
+if __name__ == "__main__":
+    suite = unittest.makeSuite(TestLayerUtils)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
