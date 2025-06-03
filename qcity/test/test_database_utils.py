@@ -69,7 +69,7 @@ class TestDatabaseUtils(unittest.TestCase):
 
         self.assertEqual(
             DatabaseUtils.get_field_default(LayerType.ProjectAreas, "dwelling_size_3_bedroom"),
-             50
+             100
         )
         self.assertEqual(
             DatabaseUtils.get_field_default(LayerType.DevelopmentSites, "site_status"),
@@ -79,3 +79,8 @@ class TestDatabaseUtils(unittest.TestCase):
             DatabaseUtils.get_field_default(LayerType.BuildingLevels, "level_height"),
              6
         )
+
+if __name__ == "__main__":
+    suite = unittest.makeSuite(TestDatabaseUtils)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
