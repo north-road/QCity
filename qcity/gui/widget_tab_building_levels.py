@@ -1,5 +1,12 @@
 from qgis.PyQt.QtCore import Qt
-from qgis.core import QgsExpression, QgsFeature, QgsFeatureRequest
+from qgis.core import (
+    Qgis,
+    QgsFeature,
+    QgsFeatureRequest,
+    QgsDistanceArea,
+    QgsProject,
+    QgsExpression,
+)
 
 from qcity.core import LayerType, PROJECT_CONTROLLER, DatabaseUtils, SETTINGS_MANAGER
 from .page_controller import PageController
@@ -20,6 +27,9 @@ class BuildingLevelsPageController(PageController):
         PROJECT_CONTROLLER.building_level_added.connect(self._on_building_level_added)
         PROJECT_CONTROLLER.building_level_deleted.connect(
             self._on_building_level_deleted
+        )
+        PROJECT_CONTROLLER.project_area_attribute_changed.connect(
+            self._update_residential_space_total
         )
 
         self.og_widget.toolButton_building_level_add.clicked.connect(
@@ -88,7 +98,7 @@ class BuildingLevelsPageController(PageController):
         ):
             total += w.value()
 
-        self.og_widget.residential_sum.setText(str(total))
+        self.og_widget.residential_sum.setText(str(round(total, 2)))
         f = self.og_widget.residential_sum.font()
         f.setBold(True)
         self.og_widget.residential_sum.setFont(f)
@@ -96,6 +106,73 @@ class BuildingLevelsPageController(PageController):
             self.og_widget.residential_sum.setStyleSheet("color: red")
         else:
             self.og_widget.residential_sum.setStyleSheet("")
+
+        feature = self.get_feature_by_id(self.current_feature_id)
+        da = QgsDistanceArea()
+        da.setEllipsoid(QgsProject.instance().ellipsoid())
+        da.setSourceCrs(
+            self.get_layer().crs(), QgsProject.instance().transformContext()
+        )
+
+        floor_area_m2 = da.convertAreaMeasurement(
+            da.measureArea(feature.geometry()), Qgis.AreaUnit.SquareMeters
+        )
+        total_residential_area = (
+            self.og_widget.percent_residential_floorspace.value() / 100 * floor_area_m2
+        )
+        total_bedroom_area = []
+        for w in (
+            self.og_widget.percent_1_bedroom_floorspace,
+            self.og_widget.percent_2_bedroom_floorspace,
+            self.og_widget.percent_3_bedroom_floorspace,
+            self.og_widget.percent_4_bedroom_floorspace,
+        ):
+            total_bedroom_area.append(w.value() / 100 * total_residential_area)
+
+        project_area_feature = PROJECT_CONTROLLER.get_project_area_layer().getFeature(
+            PROJECT_CONTROLLER.current_project_area_fid
+        )
+        dwelling_sizes = []
+        for bedroom_size_field in (
+            "dwelling_size_1_bedroom",
+            "dwelling_size_2_bedroom",
+            "dwelling_size_3_bedroom",
+            "dwelling_size_4_bedroom",
+        ):
+            dwelling_sizes.append(project_area_feature[bedroom_size_field])
+
+        for bedroom, label in enumerate(
+            [
+                self.og_widget.label_1bed_unallocated,
+                self.og_widget.label_2bed_unallocated,
+                self.og_widget.label_3bed_unallocated,
+                self.og_widget.label_4bed_unallocated,
+            ]
+        ):
+            label.setText(
+                str(round(total_bedroom_area[bedroom] % dwelling_sizes[bedroom], 2))
+            )
+
+        for bedroom, label in enumerate(
+            [
+                self.og_widget.label_1bed_dwellings,
+                self.og_widget.label_2bed_dwellings,
+                self.og_widget.label_3bed_dwellings,
+                self.og_widget.label_4bed_dwellings,
+            ]
+        ):
+            label_text = str(bedroom) if bedroom < 4 else "4+"
+            label.setText(
+                f"{label_text} bedroom dwellings ({int(total_bedroom_area[bedroom] // dwelling_sizes[bedroom])})"
+            )
+
+        total_leftover_residential = sum(
+            total_bedroom_area[bedroom] % dwelling_sizes[bedroom]
+            for bedroom in range(4)
+        )
+        self.og_widget.label_residential_unallocated.setText(
+            str(round(total_leftover_residential, 2))
+        )
 
     def _on_building_level_added(self, feature: QgsFeature):
         """
