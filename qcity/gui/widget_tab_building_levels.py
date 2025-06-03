@@ -1,7 +1,7 @@
 from qgis.PyQt.QtCore import Qt
 from qgis.core import QgsExpression, QgsFeature, QgsFeatureRequest
 
-from qcity.core import LayerType, PROJECT_CONTROLLER, DatabaseUtils
+from qcity.core import LayerType, PROJECT_CONTROLLER, DatabaseUtils, SETTINGS_MANAGER
 from .page_controller import PageController
 
 
@@ -129,10 +129,13 @@ class BuildingLevelsPageController(PageController):
         level_layer = self.get_layer()
         self.list_widget.clear()
         foreign_key = DatabaseUtils.foreign_key_for_layer(self.layer_type)
-        level_layer.setSubsetString(
-            QgsExpression.createFieldEqualityExpression(foreign_key, development_site_fid))
+
+        filter_expression = QgsExpression.createFieldEqualityExpression(foreign_key, development_site_fid)
+        if SETTINGS_MANAGER.use_layer_subset_filters():
+            level_layer.setSubsetString(filter_expression)
 
         request = QgsFeatureRequest()
+        request.setFilterExpression(filter_expression)
         request.setOrderBy(
             QgsFeatureRequest.OrderBy([QgsFeatureRequest.OrderByClause("level_index", ascending=False)])
         )

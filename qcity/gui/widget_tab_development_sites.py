@@ -1,4 +1,4 @@
-from qgis.core import Qgis, QgsVectorLayer, QgsFeature, QgsExpression
+from qgis.core import Qgis, QgsFeatureRequest, QgsFeature, QgsExpression
 
 from qcity.core import SETTINGS_MANAGER, LayerType, PROJECT_CONTROLLER, DatabaseUtils
 from .page_controller import PageController
@@ -83,8 +83,13 @@ class DevelopmentSitesPageController(PageController):
         site_layer = self.get_layer()
         self.list_widget.clear()
         foreign_key = DatabaseUtils.foreign_key_for_layer(self.layer_type)
-        site_layer.setSubsetString(
-            QgsExpression.createFieldEqualityExpression(foreign_key, project_area_fid))
+
+        filter_expression = QgsExpression.createFieldEqualityExpression(foreign_key, project_area_fid)
+        if SETTINGS_MANAGER.use_layer_subset_filters():
+            site_layer.setSubsetString(filter_expression)
+
+        request = QgsFeatureRequest()
+        request.setFilterExpression(filter_expression)
 
         for feat in site_layer.getFeatures():
             self.add_feature_to_list(feat, set_current=False)
