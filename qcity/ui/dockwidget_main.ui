@@ -295,12 +295,6 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="0" column="1">
-                  <widget class="QgsSpinBox" name="car_parking_commercial_bays_count"/>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QgsSpinBox" name="car_parking_office_bays_count"/>
-                 </item>
                  <item row="0" column="3">
                   <widget class="QgsDoubleSpinBox" name="car_parking_commercial_bays_area">
                    <property name="maximum">
@@ -321,6 +315,12 @@
                     <string>m²</string>
                    </property>
                   </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QgsDoubleSpinBox" name="car_parking_commercial_bays_count"/>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QgsDoubleSpinBox" name="car_parking_office_bays_count"/>
                  </item>
                 </layout>
                </item>
@@ -437,18 +437,12 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="0" column="1">
-                  <widget class="QgsSpinBox" name="bicycle_parking_commercial_bays_count"/>
-                 </item>
                  <item row="0" column="0">
                   <widget class="QLabel" name="label_19">
                    <property name="text">
                     <string>Commercial</string>
                    </property>
                   </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QgsSpinBox" name="bicycle_parking_office_bays_count"/>
                  </item>
                  <item row="1" column="3">
                   <widget class="QgsDoubleSpinBox" name="bicycle_parking_office_bays_area">
@@ -470,6 +464,12 @@
                     <string>m²</string>
                    </property>
                   </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QgsDoubleSpinBox" name="bicycle_parking_commercial_bays_count"/>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QgsDoubleSpinBox" name="bicycle_parking_office_bays_count"/>
                  </item>
                 </layout>
                </item>

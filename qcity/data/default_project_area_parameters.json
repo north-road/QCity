@@ -32,7 +32,7 @@
         "default": 3
     },
     "car_parking_commercial_bays_count": {
-        "type": "int",
+        "type": "double",
         "default": 5
     },
     "car_parking_commercial_bays_area": {
@@ -40,7 +40,7 @@
         "default": 100
     },
     "car_parking_office_bays_count": {
-        "type": "int",
+        "type": "double",
         "default": 5
     },
     "car_parking_office_bays_area": {
@@ -64,7 +64,7 @@
         "default": 2
     },
     "bicycle_parking_commercial_bays_count": {
-        "type": "int",
+        "type": "double",
         "default": 1
     },
     "bicycle_parking_commercial_bays_area": {
@@ -72,7 +72,7 @@
         "default": 100
     },
     "bicycle_parking_office_bays_count": {
-        "type": "int",
+        "type": "double",
         "default": 1
     },
     "bicycle_parking_office_bays_area": {
