@@ -152,7 +152,9 @@ class DrawPolygonToolOld(QgsMapToolDigitizeFeature):
         """
         layer = PROJECT_CONTROLLER.get_layer(self._layer_type)
 
-        existing_names = PROJECT_CONTROLLER.get_unique_names(self._layer_type, self._parent_pk)
+        existing_names = PROJECT_CONTROLLER.get_unique_names(
+            self._layer_type, self._parent_pk
+        )
         feature_name_exists = feature_name in existing_names
 
         if not feature_name or feature_name_exists:
@@ -257,7 +259,9 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
         """
         layer = PROJECT_CONTROLLER.get_layer(self._layer_type)
 
-        existing_names = PROJECT_CONTROLLER.get_unique_names(self._layer_type, self._parent_pk)
+        existing_names = PROJECT_CONTROLLER.get_unique_names(
+            self._layer_type, self._parent_pk
+        )
         feature_name_exists = feature_name in existing_names
 
         if not feature_name or feature_name_exists:
