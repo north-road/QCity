@@ -727,12 +727,15 @@ class TestProjectUtils(unittest.TestCase):
             development_site_layer = controller.get_development_sites_layer()
             development_site_layer.startEditing()
             f = QgsVectorLayerUtils.createFeature(development_site_layer)
+            f["project_area_pk"] = 1
             f["name"] = "dev site 1"
             self.assertTrue(development_site_layer.addFeature(f))
             f = QgsVectorLayerUtils.createFeature(development_site_layer)
+            f["project_area_pk"] = 1
             f["name"] = "Development site 2"
             self.assertTrue(development_site_layer.addFeature(f))
             f = QgsVectorLayerUtils.createFeature(development_site_layer)
+            f["project_area_pk"] = 2
             f["name"] = "Aaa 3"
             self.assertTrue(development_site_layer.addFeature(f))
             self.assertTrue(development_site_layer.commitChanges())
@@ -760,6 +763,15 @@ class TestProjectUtils(unittest.TestCase):
                 controller.get_unique_names(LayerType.DevelopmentSites),
                 ["Aaa 3", "dev site 1", "Development site 2"],
             )
+            self.assertEqual(
+                controller.get_unique_names(LayerType.DevelopmentSites, 1),
+                ["dev site 1", "Development site 2"],
+            )
+            self.assertEqual(
+                controller.get_unique_names(LayerType.DevelopmentSites, 2),
+                ["Aaa 3"],
+            )
+
             self.assertEqual(
                 controller.get_unique_names(LayerType.BuildingLevels),
                 ["floor 1", "Floor 3", "Floor 4"],
