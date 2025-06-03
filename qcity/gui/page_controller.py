@@ -91,7 +91,7 @@ class PageController(QObject):
                 self.set_current_feature_from_list
             )
 
-    def add_feature_to_list(self, feature: QgsFeature, set_current: bool = True):
+    def add_feature_to_list(self, feature: QgsFeature, set_current: bool = True, add_to_top: bool = False):
         """
         Adds a new feature to the list widget
         """
@@ -101,7 +101,11 @@ class PageController(QObject):
         item.setText(feature[DatabaseUtils.name_field_for_layer(self.layer_type)])
         item.setData(Qt.UserRole, feature.id())
 
-        self.list_widget.addItem(item)
+        if not add_to_top or self.list_widget.count() == 0:
+            self.list_widget.addItem(item)
+        else:
+            self.list_widget.insertItem(0, item)
+
         if set_current:
             row = self.list_widget.row(item)
             self.list_widget.setCurrentRow(row)
