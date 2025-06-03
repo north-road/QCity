@@ -1,6 +1,7 @@
 from typing import Optional
 
 from qgis.PyQt.QtCore import Qt, QObject, pyqtSignal
+from qgis.PyQt.QtGui import QFontMetrics
 from qgis.PyQt.QtWidgets import (
     QWidget,
     QSpinBox,
@@ -46,6 +47,11 @@ class PageController(QObject):
         self._block_feature_updates = False
 
         self.current_feature_id: Optional[int] = None
+
+        if self.list_widget is not None:
+            fm = QFontMetrics(self.list_widget.font())
+            row_height = fm.height()
+            self.list_widget.setMinimumHeight(row_height * 10)
 
         if self.tab_widget is not None:
             for spin_box in self.tab_widget.findChildren((QSpinBox, QDoubleSpinBox)):
