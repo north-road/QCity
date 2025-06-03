@@ -129,6 +129,18 @@ class SettingsManager(QObject):
 
         return attributes
 
+    def use_rule_based_layer_filters(self):
+        """
+        Returns True if rule based layer filters are enabled.
+        """
+        return False
+
+    def use_layer_subset_filters(self):
+        """
+        Returns True if layer subset filters are enabled.
+        """
+        return False
+
 
 # Settings manager singleton instance
 SETTINGS_MANAGER = SettingsManager()

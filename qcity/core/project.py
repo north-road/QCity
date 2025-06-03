@@ -780,11 +780,12 @@ class ProjectController(QObject):
 
         from .layer import LayerUtils
 
-        LayerUtils.set_renderer_filter(
-            project_area_layer,
-            QgsExpression.createFieldEqualityExpression(DatabaseUtils.primary_key_for_layer(LayerType.ProjectAreas),
-                                                        project_area_primary_key)
-        )
+        if SETTINGS_MANAGER.use_rule_based_layer_filters():
+            LayerUtils.set_renderer_filter(
+                project_area_layer,
+                QgsExpression.createFieldEqualityExpression(DatabaseUtils.primary_key_for_layer(LayerType.ProjectAreas),
+                                                            project_area_primary_key)
+            )
 
     def set_current_development_site(self, development_site_fid: int):
         """
@@ -803,11 +804,12 @@ class ProjectController(QObject):
 
         from .layer import LayerUtils
 
-        LayerUtils.set_renderer_filter(
-            development_site_layer,
-            QgsExpression.createFieldEqualityExpression(DatabaseUtils.primary_key_for_layer(LayerType.DevelopmentSites),
-                                                        development_site_primary_key)
-        )
+        if SETTINGS_MANAGER.use_rule_based_layer_filters():
+            LayerUtils.set_renderer_filter(
+                development_site_layer,
+                QgsExpression.createFieldEqualityExpression(DatabaseUtils.primary_key_for_layer(LayerType.DevelopmentSites),
+                                                            development_site_primary_key)
+            )
 
     def delete_project_area(self, project_area_fid: int) -> bool:
         """
