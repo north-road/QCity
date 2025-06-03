@@ -91,7 +91,9 @@ class PageController(QObject):
                 self.set_current_feature_from_list
             )
 
-    def add_feature_to_list(self, feature: QgsFeature, set_current: bool = True, add_to_top: bool = False):
+    def add_feature_to_list(
+        self, feature: QgsFeature, set_current: bool = True, add_to_top: bool = False
+    ):
         """
         Adds a new feature to the list widget
         """

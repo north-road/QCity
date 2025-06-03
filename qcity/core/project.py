@@ -564,7 +564,9 @@ class ProjectController(QObject):
             return self.get_building_levels_layer()
         return None
 
-    def get_unique_names(self, layer: LayerType, parent_key: Optional[int] = None) -> List[str]:
+    def get_unique_names(
+        self, layer: LayerType, parent_key: Optional[int] = None
+    ) -> List[str]:
         """
         Gets a list of all existing unique names for the specified layer type,
         sorted alphabetically.
@@ -574,11 +576,7 @@ class ProjectController(QObject):
 
         if parent_key is None:
             return sorted(
-                map_layer.uniqueValues(
-                    map_layer.fields().lookupField(
-                        name_field
-                    )
-                ),
+                map_layer.uniqueValues(map_layer.fields().lookupField(name_field)),
                 key=str.casefold,
             )
 
@@ -587,7 +585,11 @@ class ProjectController(QObject):
             foreign_key_name,
             parent_key,
         )
-        request = QgsFeatureRequest().setFilterExpression(_filter).setSubsetOfAttributes([name_field],map_layer.fields())
+        request = (
+            QgsFeatureRequest()
+            .setFilterExpression(_filter)
+            .setSubsetOfAttributes([name_field], map_layer.fields())
+        )
         values = set()
         for f in map_layer.getFeatures(request):
             values.add(f[name_field])
