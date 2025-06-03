@@ -140,6 +140,10 @@ class BuildingLevelsPageController(PageController):
         for feat in level_layer.getFeatures(request):
             self.add_feature_to_list(feat, set_current=False)
 
+    def set_feature(self, feature: QgsFeature):
+        super().set_feature(feature)
+        PROJECT_CONTROLLER.set_current_building_level(feature.id())
+
     def delete_feature_and_child_objects(self, feature_id: int) -> bool:
         return PROJECT_CONTROLLER.delete_building_level(feature_id)
 
