@@ -1,19 +1,19 @@
 {
     "dwelling_size_1_bedroom": {
         "type": "double",
-        "default": 30
+        "default": 50
     },
     "dwelling_size_2_bedroom": {
         "type": "double",
-        "default": 40
+        "default": 70
     },
     "dwelling_size_3_bedroom": {
         "type": "double",
-        "default": 50
+        "default": 100
     },
     "dwelling_size_4_bedroom": {
         "type": "double",
-        "default": 60
+        "default": 120
     },
     "car_parking_1_bedroom": {
         "type": "int",
