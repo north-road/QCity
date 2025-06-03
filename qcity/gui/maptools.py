@@ -47,9 +47,7 @@ class DrawPolygonToolOld(QgsMapToolDigitizeFeature):
     """
 
     def __init__(
-            self,
-            map_canvas: QgsMapCanvas,
-            cad_dock_widget: QgsAdvancedDigitizingDockWidget
+        self, map_canvas: QgsMapCanvas, cad_dock_widget: QgsAdvancedDigitizingDockWidget
     ) -> None:
         super().__init__(map_canvas, cad_dock_widget, QgsMapToolCapture.CaptureLine)
         self.default_color: QColor = QColor(255, 0, 0, 100)
@@ -128,8 +126,14 @@ class DrawPolygonToolOld(QgsMapToolDigitizeFeature):
                 return
 
             feature_name, ok = QInputDialog.getText(
-                self.canvas(), self.tr("Create {}").format(self._layer_type.as_title_case(plural=False)),
-                self.tr("Input {} name").format(self._layer_type.as_sentence_case(plural=False)))
+                self.canvas(),
+                self.tr("Create {}").format(
+                    self._layer_type.as_title_case(plural=False)
+                ),
+                self.tr("Input {} name").format(
+                    self._layer_type.as_sentence_case(plural=False)
+                ),
+            )
 
             if not ok:
                 self.cleanup()
@@ -138,9 +142,7 @@ class DrawPolygonToolOld(QgsMapToolDigitizeFeature):
             if self.rubber_band:
                 self.clearRubberBands()
 
-            self.create_feature(
-                feature_name
-            )
+            self.create_feature(feature_name)
 
             self.cleanup()
 
@@ -171,15 +173,18 @@ class DrawPolygonToolOld(QgsMapToolDigitizeFeature):
         if foreign_key:
             initial_attributes[foreign_key] = self._parent_pk
         if self._layer_type == LayerType.BuildingLevels:
-            initial_attributes["level_index"] = PROJECT_CONTROLLER.get_next_building_level(
-                self._parent_pk)
-            initial_attributes["base_height"] = PROJECT_CONTROLLER.get_floor_base_height(
-                self._parent_pk, initial_attributes["level_index"])
+            initial_attributes["level_index"] = (
+                PROJECT_CONTROLLER.get_next_building_level(self._parent_pk)
+            )
+            initial_attributes["base_height"] = (
+                PROJECT_CONTROLLER.get_floor_base_height(
+                    self._parent_pk, initial_attributes["level_index"]
+                )
+            )
 
-        feature = PROJECT_CONTROLLER.create_feature(self._layer_type,
-                                                    feature_name,
-                                                    polygon,
-                                                    initial_attributes)
+        feature = PROJECT_CONTROLLER.create_feature(
+            self._layer_type, feature_name, polygon, initial_attributes
+        )
 
         layer.startEditing()
         layer.addFeature(feature)
@@ -211,9 +216,7 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
     """
 
     def __init__(
-            self,
-            map_canvas: QgsMapCanvas,
-            cad_dock_widget: QgsAdvancedDigitizingDockWidget
+        self, map_canvas: QgsMapCanvas, cad_dock_widget: QgsAdvancedDigitizingDockWidget
     ) -> None:
         super().__init__(map_canvas, cad_dock_widget, QgsMapToolCapture.CapturePolygon)
         self.points: List[QgsPointXY] = []
@@ -236,15 +239,17 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
             return
 
         feature_name, ok = QInputDialog.getText(
-            self.canvas(), self.tr("Create {}").format(self._layer_type.as_title_case(plural=False)),
-            self.tr("Input {} name").format(self._layer_type.as_sentence_case(plural=False)))
+            self.canvas(),
+            self.tr("Create {}").format(self._layer_type.as_title_case(plural=False)),
+            self.tr("Input {} name").format(
+                self._layer_type.as_sentence_case(plural=False)
+            ),
+        )
 
         if not ok:
             return
 
-        self.create_feature(
-            feature_name, polygon
-        )
+        self.create_feature(feature_name, polygon)
 
     def create_feature(self, feature_name: str, polygon: QgsGeometry) -> None:
         """
@@ -269,20 +274,22 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
         if foreign_key:
             initial_attributes[foreign_key] = self._parent_pk
         if self._layer_type == LayerType.BuildingLevels:
-            initial_attributes["level_index"] = PROJECT_CONTROLLER.get_next_building_level(
-                self._parent_pk)
-            initial_attributes["base_height"] = PROJECT_CONTROLLER.get_floor_base_height(
-                self._parent_pk, initial_attributes["level_index"])
+            initial_attributes["level_index"] = (
+                PROJECT_CONTROLLER.get_next_building_level(self._parent_pk)
+            )
+            initial_attributes["base_height"] = (
+                PROJECT_CONTROLLER.get_floor_base_height(
+                    self._parent_pk, initial_attributes["level_index"]
+                )
+            )
 
-        feature = PROJECT_CONTROLLER.create_feature(self._layer_type,
-                                                    feature_name,
-                                                    polygon,
-                                                    initial_attributes)
+        feature = PROJECT_CONTROLLER.create_feature(
+            self._layer_type, feature_name, polygon, initial_attributes
+        )
 
         layer.startEditing()
         layer.addFeature(feature)
         layer.commitChanges()
-
 
 
 class MapToolHandler(QgsAbstractMapToolHandler):
@@ -290,11 +297,11 @@ class MapToolHandler(QgsAbstractMapToolHandler):
         super().__init__(tool, action)
 
     def isCompatibleWithLayer(
-            self, layer: Union[QgsVectorLayer, QgsRasterLayer], context
+        self, layer: Union[QgsVectorLayer, QgsRasterLayer], context
     ) -> None:
         # this tool can only be activated when an editable vector layer is selected
         return (
-                isinstance(layer, QgsVectorLayer)
-                and layer.isEditable()
-                and layer.geometryType() == Qgis.GeometryType.Polygon
+            isinstance(layer, QgsVectorLayer)
+            and layer.isEditable()
+            and layer.geometryType() == Qgis.GeometryType.Polygon
         )

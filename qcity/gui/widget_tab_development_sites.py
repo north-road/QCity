@@ -10,8 +10,14 @@ class DevelopmentSitesPageController(PageController):
     """
 
     def __init__(self, og_widget, tab_widget, list_widget, current_item_label):
-        super().__init__(LayerType.DevelopmentSites, og_widget, tab_widget, list_widget, current_item_label)
-        self.skip_fields_for_widgets = ['fid', 'name', 'project_area_pk']
+        super().__init__(
+            LayerType.DevelopmentSites,
+            og_widget,
+            tab_widget,
+            list_widget,
+            current_item_label,
+        )
+        self.skip_fields_for_widgets = ["fid", "name", "project_area_pk"]
 
         PROJECT_CONTROLLER.project_area_changed.connect(self.on_project_area_changed)
         PROJECT_CONTROLLER.development_site_added.connect(
@@ -50,9 +56,10 @@ class DevelopmentSitesPageController(PageController):
         """
         Called when a new development site is created
         """
-        if feature[
-            DatabaseUtils.foreign_key_for_layer(self.layer_type)
-        ] != PROJECT_CONTROLLER.current_project_area_fid:
+        if (
+            feature[DatabaseUtils.foreign_key_for_layer(self.layer_type)]
+            != PROJECT_CONTROLLER.current_project_area_fid
+        ):
             return
 
         self.add_feature_to_list(feature)
@@ -63,7 +70,9 @@ class DevelopmentSitesPageController(PageController):
         """
         self.remove_item_from_list(feature_id)
 
-    def _on_development_site_attribute_changed(self, feature_id: int, field_name: str, value):
+    def _on_development_site_attribute_changed(
+        self, feature_id: int, field_name: str, value
+    ):
         """
         Called when an attribute is changed for a development site
         """
@@ -71,9 +80,7 @@ class DevelopmentSitesPageController(PageController):
             return
 
         self._block_feature_updates = True
-        self.set_widget_values({
-            field_name: value
-        })
+        self.set_widget_values({field_name: value})
         self._block_feature_updates = False
 
     def on_project_area_changed(self, project_area_fid: int):
@@ -84,7 +91,9 @@ class DevelopmentSitesPageController(PageController):
         self.list_widget.clear()
         foreign_key = DatabaseUtils.foreign_key_for_layer(self.layer_type)
 
-        filter_expression = QgsExpression.createFieldEqualityExpression(foreign_key, project_area_fid)
+        filter_expression = QgsExpression.createFieldEqualityExpression(
+            foreign_key, project_area_fid
+        )
         if SETTINGS_MANAGER.use_layer_subset_filters():
             site_layer.setSubsetString(filter_expression)
 
@@ -108,7 +117,9 @@ class DevelopmentSitesPageController(PageController):
         if self._block_feature_updates or not active:
             return
 
-        PROJECT_CONTROLLER.auto_calculate_development_site_floorspace(self.current_feature_id)
+        PROJECT_CONTROLLER.auto_calculate_development_site_floorspace(
+            self.current_feature_id
+        )
 
     def _auto_calculate_car_parking_toggled(self, active: bool):
         """
@@ -117,7 +128,9 @@ class DevelopmentSitesPageController(PageController):
         if self._block_feature_updates or not active:
             return
 
-        PROJECT_CONTROLLER.auto_calculate_development_site_car_parking(self.current_feature_id)
+        PROJECT_CONTROLLER.auto_calculate_development_site_car_parking(
+            self.current_feature_id
+        )
 
     def _auto_calculate_bicycle_parking_toggled(self, active: bool):
         """
@@ -126,4 +139,6 @@ class DevelopmentSitesPageController(PageController):
         if self._block_feature_updates or not active:
             return
 
-        PROJECT_CONTROLLER.auto_calculate_development_site_bicycle_parking(self.current_feature_id)
+        PROJECT_CONTROLLER.auto_calculate_development_site_bicycle_parking(
+            self.current_feature_id
+        )

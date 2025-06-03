@@ -1,1 +1,1 @@
-from .canvas_utils import CanvasUtils # NOQA
+from .canvas_utils import CanvasUtils  # NOQA

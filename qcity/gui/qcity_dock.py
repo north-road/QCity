@@ -13,7 +13,9 @@ from qgis.core import (
     QgsProject,
     Qgis,
     QgsFileUtils,
-    QgsLayerTreeGroup, QgsLayerTreeLayer, QgsLayerTreeNode
+    QgsLayerTreeGroup,
+    QgsLayerTreeLayer,
+    QgsLayerTreeNode,
 )
 from qgis.gui import QgsDockWidget
 
@@ -25,8 +27,7 @@ from ..core import DatabaseUtils, PROJECT_CONTROLLER, LayerType
 from ..core import SETTINGS_MANAGER
 from ..gui.gui_utils import GuiUtils
 
-DOCK_WIDGET, _ = uic.loadUiType(
-    GuiUtils.get_ui_file_path('dockwidget_main.ui'))
+DOCK_WIDGET, _ = uic.loadUiType(GuiUtils.get_ui_file_path("dockwidget_main.ui"))
 
 
 class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
@@ -41,20 +42,20 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         self.setupUi(self)
         self.setObjectName("QCityDockWidget")
 
-        self.pushButton_add_base_layer.setIcon(GuiUtils.get_icon('load_layers.svg'))
-        self.toolButton_project_area_add.setIcon(GuiUtils.get_icon('add.svg'))
-        self.toolButton_project_area_remove.setIcon(GuiUtils.get_icon('remove.svg'))
-        self.toolButton_project_area_rename.setIcon(GuiUtils.get_icon('rename.svg'))
+        self.pushButton_add_base_layer.setIcon(GuiUtils.get_icon("load_layers.svg"))
+        self.toolButton_project_area_add.setIcon(GuiUtils.get_icon("add.svg"))
+        self.toolButton_project_area_remove.setIcon(GuiUtils.get_icon("remove.svg"))
+        self.toolButton_project_area_rename.setIcon(GuiUtils.get_icon("rename.svg"))
 
-        self.toolButton_development_site_add.setIcon(GuiUtils.get_icon('add.svg'))
-        self.toolButton_development_site_remove.setIcon(GuiUtils.get_icon('remove.svg'))
-        self.toolButton_development_site_rename.setIcon(GuiUtils.get_icon('rename.svg'))
+        self.toolButton_development_site_add.setIcon(GuiUtils.get_icon("add.svg"))
+        self.toolButton_development_site_remove.setIcon(GuiUtils.get_icon("remove.svg"))
+        self.toolButton_development_site_rename.setIcon(GuiUtils.get_icon("rename.svg"))
 
-        self.toolButton_building_level_add.setIcon(GuiUtils.get_icon('add.svg'))
-        self.toolButton_building_level_remove.setIcon(GuiUtils.get_icon('remove.svg'))
-        self.toolButton_building_level_rename.setIcon(GuiUtils.get_icon('rename.svg'))
-        self.button_move_up.setIcon(GuiUtils.get_icon('up.svg'))
-        self.button_move_down.setIcon(GuiUtils.get_icon('down.svg'))
+        self.toolButton_building_level_add.setIcon(GuiUtils.get_icon("add.svg"))
+        self.toolButton_building_level_remove.setIcon(GuiUtils.get_icon("remove.svg"))
+        self.toolButton_building_level_rename.setIcon(GuiUtils.get_icon("rename.svg"))
+        self.button_move_up.setIcon(GuiUtils.get_icon("up.svg"))
+        self.button_move_down.setIcon(GuiUtils.get_icon("down.svg"))
 
         self.project = project
         self.iface = iface
@@ -79,18 +80,31 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         self.set_add_button_activation()
 
         # Initialize tabs
-        self.project_area_controller = ProjectAreasPageController(self, self.tab_project_areas,
-                                                                  self.listWidget_project_areas,
-                                                                  self.label_current_project_area)
-        self.project_area_controller.add_feature_clicked.connect(self.on_add_feature_clicked)
-        self.development_site_controller = DevelopmentSitesPageController(self, self.tab_development_sites,
-                                                                          self.listWidget_development_sites,
-                                                                          self.label_current_development_site)
-        self.development_site_controller.add_feature_clicked.connect(self.on_add_feature_clicked)
+        self.project_area_controller = ProjectAreasPageController(
+            self,
+            self.tab_project_areas,
+            self.listWidget_project_areas,
+            self.label_current_project_area,
+        )
+        self.project_area_controller.add_feature_clicked.connect(
+            self.on_add_feature_clicked
+        )
+        self.development_site_controller = DevelopmentSitesPageController(
+            self,
+            self.tab_development_sites,
+            self.listWidget_development_sites,
+            self.label_current_development_site,
+        )
+        self.development_site_controller.add_feature_clicked.connect(
+            self.on_add_feature_clicked
+        )
 
-        self.building_levels_controller = BuildingLevelsPageController(self, self.tab_building_levels,
-                                                                       self.listWidget_building_levels)
-        self.building_levels_controller.add_feature_clicked.connect(self.on_add_feature_clicked)
+        self.building_levels_controller = BuildingLevelsPageController(
+            self, self.tab_building_levels, self.listWidget_building_levels
+        )
+        self.building_levels_controller.add_feature_clicked.connect(
+            self.on_add_feature_clicked
+        )
 
         WidgetUtilsStatistics(self)
 
@@ -105,7 +119,9 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
 
     def set_add_button_activation(self) -> None:
         """Sets the add button for the base layers enabled/disabled, based on the current item text"""
-        self.pushButton_add_base_layer.setEnabled(self.comboBox_base_layers.currentIndex() > 0)
+        self.pushButton_add_base_layer.setEnabled(
+            self.comboBox_base_layers.currentIndex() > 0
+        )
 
     def set_base_layer_items(self):
         """Adds all possible base layers to the selection combobox"""
@@ -114,14 +130,17 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
             project_base_name = Path(project).stem
             self.comboBox_base_layers.addItem(project_base_name, project)
 
-    def create_new_project_database(self, file_name: Optional[str] = None, selected_filter: str = ".gpkg") -> None:
+    def create_new_project_database(
+        self, file_name: Optional[str] = None, selected_filter: str = ".gpkg"
+    ) -> None:
         """Opens a QFileDialog and returns the path to the new project Geopackage."""
         # Have the file_name as an argument to enable testing
         if not file_name:
             file_name, selected_filter = QFileDialog.getSaveFileName(
-                self, self.tr("Choose Project Database Path"),
+                self,
+                self.tr("Choose Project Database Path"),
                 SETTINGS_MANAGER.last_used_database_folder(),
-                "GeoPackage (*.gpkg)"
+                "GeoPackage (*.gpkg)",
             )
 
         if not file_name:
@@ -138,9 +157,7 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         self.listWidget_development_sites.clear()
         self.label_current_development_site.setText("Project")
 
-        DatabaseUtils.create_base_tables(
-            gpkg_path
-        )
+        DatabaseUtils.create_base_tables(gpkg_path)
 
         self.set_widgets_enabled(True)
 
@@ -154,14 +171,17 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
             level=Qgis.Success,
         )
 
-    def load_project_database(self, file_name: str, selected_filter: str = "", add_layers: bool = True) -> None:
+    def load_project_database(
+        self, file_name: str, selected_filter: str = "", add_layers: bool = True
+    ) -> None:
         """Loads a project database from a .gpkg file."""
         # Have the file_name as an argument to enable testing
         if not file_name:
             file_name, selected_filter = QFileDialog.getOpenFileName(
-                self, self.tr("Choose Project Database Path"),
+                self,
+                self.tr("Choose Project Database Path"),
                 SETTINGS_MANAGER.last_used_database_folder(),
-                "GeoPackage (*.gpkg)"
+                "GeoPackage (*.gpkg)",
             )
 
         if file_name == "":
@@ -211,7 +231,11 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         temp_project.read(base_project_path)
         source_root = temp_project.layerTreeRoot()
 
-        def add_layer(_layer: QgsLayerTreeLayer, _dest_parent: QgsLayerTreeGroup, _at_index: Optional[int]=None):
+        def add_layer(
+            _layer: QgsLayerTreeLayer,
+            _dest_parent: QgsLayerTreeGroup,
+            _at_index: Optional[int] = None,
+        ):
             new_layer = _layer.layer().clone()
             QgsProject.instance().addMapLayer(new_layer, addToLegend=False)
             if _at_index is not None:
@@ -219,7 +243,11 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
             else:
                 _dest_parent.addLayer(new_layer)
 
-        def add_group(_group: QgsLayerTreeGroup, _dest_parent: QgsLayerTreeGroup, _at_index: Optional[int]=None):
+        def add_group(
+            _group: QgsLayerTreeGroup,
+            _dest_parent: QgsLayerTreeGroup,
+            _at_index: Optional[int] = None,
+        ):
             if _at_index is not None:
                 new_group = _dest_parent.insertGroup(_at_index, _group.name())
             else:
@@ -228,7 +256,11 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
             for source_child in _group.children():
                 add_node(source_child, new_group)
 
-        def add_node(_node: QgsLayerTreeNode, _dest_parent: QgsLayerTreeGroup, _at_index: Optional[int]=None):
+        def add_node(
+            _node: QgsLayerTreeNode,
+            _dest_parent: QgsLayerTreeGroup,
+            _at_index: Optional[int] = None,
+        ):
             if isinstance(_node, QgsLayerTreeGroup):
                 add_group(_node, _dest_parent, _at_index)
             elif isinstance(_node, QgsLayerTreeLayer):

@@ -8,11 +8,12 @@ from qgis.core import (
     QgsVectorLayer,
     QgsVectorFileWriter,
     QgsCoordinateTransformContext,
-    QgsProject
+    QgsProject,
 )
 
 from .settings import SETTINGS_MANAGER
 from .enums import LayerType
+
 
 class DatabaseUtils:
     """
@@ -37,8 +38,8 @@ class DatabaseUtils:
         """
         return {
             LayerType.ProjectAreas: None,
-            LayerType.DevelopmentSites: 'project_area_pk',
-            LayerType.BuildingLevels: 'development_site_pk',
+            LayerType.DevelopmentSites: "project_area_pk",
+            LayerType.BuildingLevels: "development_site_pk",
         }[layer]
 
     @staticmethod
@@ -48,8 +49,8 @@ class DatabaseUtils:
         """
         return {
             LayerType.ProjectAreas: "name",
-            LayerType.DevelopmentSites: 'name',
-            LayerType.BuildingLevels: 'name',
+            LayerType.DevelopmentSites: "name",
+            LayerType.BuildingLevels: "name",
         }[layer]
 
     @staticmethod
@@ -75,7 +76,7 @@ class DatabaseUtils:
             gpkg_path,
             SETTINGS_MANAGER.project_area_prefix,
             SETTINGS_MANAGER._default_project_area_parameters_path,
-            create_file=True
+            create_file=True,
         )
         DatabaseUtils.create_base_table(
             gpkg_path,
@@ -123,10 +124,12 @@ class DatabaseUtils:
         return config.get("default")
 
     @staticmethod
-    def create_base_table(gpkg_path: str,
-                          table_name: str,
-                          json_config_path: str,
-                          create_file: bool = False) -> None:
+    def create_base_table(
+        gpkg_path: str,
+        table_name: str,
+        json_config_path: str,
+        create_file: bool = False,
+    ) -> None:
         """Creates a GeoPackage layer with attributes based on JSON data."""
         with open(json_config_path, "r") as file:
             data = json.load(file)
@@ -134,7 +137,11 @@ class DatabaseUtils:
         fields = QgsFields()
         fields.append(QgsField("name", QVariant.String))
         for field_name, config in data.items():
-            fields.append(QgsField(field_name, DatabaseUtils.qvariant_type_from_string(config['type'])))
+            fields.append(
+                QgsField(
+                    field_name, DatabaseUtils.qvariant_type_from_string(config["type"])
+                )
+            )
 
         layer = QgsVectorLayer("Polygon?crs=EPSG:7844", table_name, "memory")
         layer.dataProvider().addAttributes(fields)
@@ -143,13 +150,19 @@ class DatabaseUtils:
         options = QgsVectorFileWriter.SaveVectorOptions()
         options.driverName = "GPKG"
         options.layerName = table_name
-        options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer if not create_file else QgsVectorFileWriter.CreateOrOverwriteFile
+        options.actionOnExistingFile = (
+            QgsVectorFileWriter.CreateOrOverwriteLayer
+            if not create_file
+            else QgsVectorFileWriter.CreateOrOverwriteFile
+        )
 
-        error, error_message, new_filename, new_layer = QgsVectorFileWriter.writeAsVectorFormatV3(
-            layer, gpkg_path, QgsCoordinateTransformContext(), options
+        error, error_message, new_filename, new_layer = (
+            QgsVectorFileWriter.writeAsVectorFormatV3(
+                layer, gpkg_path, QgsCoordinateTransformContext(), options
+            )
         )
 
         if not error == QgsVectorFileWriter.NoError:
-            raise Exception(f"Error adding layer to GeoPackage {gpkg_path}: {error_message}")
-
-
+            raise Exception(
+                f"Error adding layer to GeoPackage {gpkg_path}: {error_message}"
+            )
