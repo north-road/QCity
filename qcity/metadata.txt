@@ -17,8 +17,8 @@ email=
 
 about=
 
-tracker=
-repository=
+tracker=https://github.com/north-road/QCity/issues
+repository=https://github.com/north-road/QCity
 # End of mandatory metadata
 
 # Recommended items:
