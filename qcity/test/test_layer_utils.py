@@ -57,7 +57,7 @@ class TestLayerUtils(unittest.TestCase):
             f_3 = project_area_layer.getFeature(f_id)
             self.assertEqual(f_3["car_parking_3_bedroom"], 33)
 
-    def create_test_layer(self, layer_name="test_layer"):
+    def create_layer(self, layer_name="test_layer"):
         """
         Helper function to create an in-memory point vector layer.
         """
@@ -75,7 +75,7 @@ class TestLayerUtils(unittest.TestCase):
         # --- Scenario 1: Input layer has QgsRuleBasedRenderer ---
 
         # Case 1.1: rule_count > 1 (more than one rule)
-        layer1_1 = self.create_test_layer("layer1_1")
+        layer1_1 = self.create_layer("layer1_1")
         rule1 = QgsRuleBasedRenderer.Rule(
             QgsSymbol.defaultSymbol(layer1_1.geometryType()), filterExp="cat = 1"
         )
@@ -104,7 +104,7 @@ class TestLayerUtils(unittest.TestCase):
         )
 
         # Case 1.2: rule_count == 1 and filter_string is provided
-        layer1_2 = self.create_test_layer("layer1_2")
+        layer1_2 = self.create_layer("layer1_2")
         initial_symbol_1_2 = QgsSymbol.defaultSymbol(layer1_2.geometryType())
         initial_symbol_1_2.setColor(QColor(120, 0, 0))
         rule_1_2 = QgsRuleBasedRenderer.Rule(
@@ -134,7 +134,7 @@ class TestLayerUtils(unittest.TestCase):
         self.assertEqual(updated_rule.symbol().color(), QColor(120, 0, 0))
 
         # Case 1.3: rule_count == 1 and filter_string is None (downgrade to SingleSymbol)
-        layer1_3 = self.create_test_layer("layer1_3")
+        layer1_3 = self.create_layer("layer1_3")
         initial_symbol_1_3 = QgsSymbol.defaultSymbol(layer1_3.geometryType())
         initial_symbol_1_3.setColor(QColor(0, 120, 0))
         rule_1_3 = QgsRuleBasedRenderer.Rule(
@@ -155,7 +155,7 @@ class TestLayerUtils(unittest.TestCase):
         self.assertEqual(layer1_3.renderer().symbol().color(), QColor(0, 120, 0))
 
         # Case 1.3b: rule_count == 1 and filter_string is empty "" (downgrade to SingleSymbol)
-        layer1_3b = self.create_test_layer("layer1_3b")
+        layer1_3b = self.create_layer("layer1_3b")
         initial_symbol_1_3b = QgsSymbol.defaultSymbol(layer1_3b.geometryType())
         initial_symbol_1_3b.setColor(QColor(0, 0, 120))
         rule_1_3b = QgsRuleBasedRenderer.Rule(
@@ -178,7 +178,7 @@ class TestLayerUtils(unittest.TestCase):
         # --- Scenario 2: Input layer has QgsSingleSymbolRenderer ---
 
         # Case 2.1: filter_string is None (no change)
-        layer2_1 = self.create_test_layer("layer2_1")
+        layer2_1 = self.create_layer("layer2_1")
         initial_symbol_2_1 = QgsSymbol.defaultSymbol(layer2_1.geometryType())
         initial_symbol_2_1.setColor(QColor(120, 120, 0))
         renderer2_1 = QgsSingleSymbolRenderer(initial_symbol_2_1.clone())
@@ -194,7 +194,7 @@ class TestLayerUtils(unittest.TestCase):
         self.assertEqual(layer2_1.renderer().symbol().color(), QColor(120, 120, 0))
 
         # Case 2.1b: filter_string is empty "" (no change)
-        layer2_1b = self.create_test_layer("layer2_1b")
+        layer2_1b = self.create_layer("layer2_1b")
         initial_symbol_2_1b = QgsSymbol.defaultSymbol(layer2_1b.geometryType())
         initial_symbol_2_1b.setColor(QColor(0, 120, 120))
         renderer2_1b = QgsSingleSymbolRenderer(initial_symbol_2_1b.clone())
@@ -212,7 +212,7 @@ class TestLayerUtils(unittest.TestCase):
         self.assertEqual(layer2_1b.renderer().symbol().color(), QColor(0, 120, 120))
 
         # Case 2.2: filter_string is provided (upgrade to RuleBased)
-        layer2_2 = self.create_test_layer("layer2_2")
+        layer2_2 = self.create_layer("layer2_2")
         initial_symbol_2_2 = QgsSymbol.defaultSymbol(layer2_2.geometryType())
         initial_symbol_2_2.setColor(QColor(120, 123, 14))
         renderer2_2 = QgsSingleSymbolRenderer(initial_symbol_2_2.clone())
@@ -238,7 +238,7 @@ class TestLayerUtils(unittest.TestCase):
         self.assertEqual(active_rule.symbol().color(), QColor(120, 123, 14))
 
         # --- Scenario 3: Input layer has other renderer type ---
-        layer3_1 = self.create_test_layer("layer3_1")
+        layer3_1 = self.create_layer("layer3_1")
         renderer3_1 = QgsCategorizedSymbolRenderer(
             "cat"
         )  # Example: Categorized renderer
@@ -256,7 +256,7 @@ class TestLayerUtils(unittest.TestCase):
         )
 
         # --- Scenario 4: Edge Cases for QgsRuleBasedRenderer (0 rules) ---
-        layer4_1 = self.create_test_layer("layer4_1")
+        layer4_1 = self.create_layer("layer4_1")
         root_rule_4_1 = QgsRuleBasedRenderer.Rule(
             None
         )  # Empty root rule (0 child rules)
