@@ -11,7 +11,7 @@
 name=QCity
 qgisMinimumVersion=3.34
 description=Urban planning tools
-version=0.2
+version=0.3
 author=North Road
 email=
 
