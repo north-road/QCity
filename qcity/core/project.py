@@ -1448,6 +1448,7 @@ class ProjectController(QObject):
             "count_2_bedroom_dwellings": 0,
             "count_3_bedroom_dwellings": 0,
             "count_4_bedroom_dwellings": 0,
+            "total_dwellings": 0,
             "commercial_car_bays": 0,
             "office_car_bays": 0,
             "residential_car_bays": 0,
@@ -1474,7 +1475,17 @@ class ProjectController(QObject):
         all_keys = list(totals.keys())
         for f in development_site_layer.getFeatures(request):
             for field in all_keys:
-                totals[field] += f[field]
+                try:
+                    totals[field] += f[field]
+                except KeyError:
+                    pass
+
+        totals["total_dwellings"] = (
+            totals["count_1_bedroom_dwellings"]
+            + totals["count_2_bedroom_dwellings"]
+            + totals["count_3_bedroom_dwellings"]
+            + totals["count_4_bedroom_dwellings"]
+        )
 
         return totals
 

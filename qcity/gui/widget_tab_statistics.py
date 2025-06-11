@@ -16,6 +16,7 @@ class WidgetUtilsStatistics(QObject):
         "count_2_bedroom_dwellings": "label_statistics_dev_stats_2_bedroom_dwellings",
         "count_3_bedroom_dwellings": "label_statistics_dev_stats_3_bedroom_dwellings",
         "count_4_bedroom_dwellings": "label_statistics_dev_stats_4_bedroom_dwellings",
+        "total_dwellings": "label_statistics_dev_stats_total_dwellings",
         "commercial_car_bays": "label_statistics_car_parking_stats_commercial_car_parks",
         "office_car_bays": "label_statistics_car_parking_stats_office_car_bays",
         "residential_car_bays": "label_statistics_car_parking_stats_residential_car_bays",
