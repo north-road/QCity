@@ -12,7 +12,7 @@ class wrapped_edits:
     def __init__(self, layer):
         self.layer = layer
         self._was_editable = False
-        self._error_occurred = False
+        self.error_occurred = False
 
     def __enter__(self):
         self._was_editable = self.layer.isEditable()
@@ -22,7 +22,7 @@ class wrapped_edits:
 
     def __exit__(self, ex_type, ex_value, traceback):
         if ex_type is None:
-            if not self._was_editable and not self._error_occurred:
+            if not self._was_editable and not self.error_occurred:
                 assert self.layer.commitChanges()
             return True
         else:
@@ -30,25 +30,31 @@ class wrapped_edits:
 
     def changeAttributeValue(self, *args, **kwargs):
         if not self.layer.changeAttributeValue(*args, **kwargs):
-            self._error_occurred = True
+            self.error_occurred = True
             return False
         return True
 
     def changeAttributeValues(self, *args, **kwargs):
         if not self.layer.changeAttributeValues(*args, **kwargs):
-            self._error_occurred = True
+            self.error_occurred = True
             return False
         return True
 
     def addFeature(self, *args, **kwargs):
         if not self.layer.addFeature(*args, **kwargs):
-            self._error_occurred = True
+            self.error_occurred = True
             return False
         return True
 
     def deleteFeature(self, *args, **kwargs):
         if not self.layer.deleteFeature(*args, **kwargs):
-            self._error_occurred = True
+            self.error_occurred = True
+            return False
+        return True
+
+    def deleteFeatures(self, *args, **kwargs):
+        if not self.layer.deleteFeatures(*args, **kwargs):
+            self.error_occurred = True
             return False
         return True
 
