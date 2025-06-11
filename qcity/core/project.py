@@ -522,12 +522,18 @@ class ProjectController(QObject):
 
         prev_insertion_method = None
         if Qgis.QGIS_VERSION_INT >= 33000:
-            prev_insertion_method = project.layerTreeRegistryBridge().layerInsertionMethod()
-            project.layerTreeRegistryBridge().setLayerInsertionMethod(Qgis.LayerTreeInsertionMethod.TopOfTree)
+            prev_insertion_method = (
+                project.layerTreeRegistryBridge().layerInsertionMethod()
+            )
+            project.layerTreeRegistryBridge().setLayerInsertionMethod(
+                Qgis.LayerTreeInsertionMethod.TopOfTree
+            )
 
         project.addMapLayers([building_level_layer, development_site_layer, area_layer])
         if Qgis.QGIS_VERSION_INT >= 33000:
-            project.layerTreeRegistryBridge().setLayerInsertionMethod(prev_insertion_method)
+            project.layerTreeRegistryBridge().setLayerInsertionMethod(
+                prev_insertion_method
+            )
 
     def get_project_area_layer(self) -> Optional[QgsVectorLayer]:
         """
