@@ -1493,6 +1493,20 @@
                  <string>TextLabel</string>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_13">
+                 <item row="3" column="0">
+                  <widget class="QLabel" name="label_37">
+                   <property name="text">
+                    <string> Number of 1 bedroom dwellings</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="0">
+                  <widget class="QLabel" name="label_38">
+                   <property name="text">
+                    <string> Number of 2 bedroom dwellings</string>
+                   </property>
+                  </widget>
+                 </item>
                  <item row="6" column="0">
                   <widget class="QLabel" name="label_40">
                    <property name="text">
@@ -1500,37 +1514,10 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="6" column="1">
-                  <widget class="QLabel" name="label_statistics_dev_stats_4_bedroom_dwellings">
+                 <item row="5" column="0">
+                  <widget class="QLabel" name="label_39">
                    <property name="text">
-                    <string>0</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="label_35">
-                   <property name="text">
-                    <string>Oﬃce ﬂoorspace</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="label_34">
-                   <property name="text">
-                    <string>Commercial ﬂoorspace</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="1">
-                  <widget class="QLabel" name="label_statistics_dev_stats_residential_floorspace">
-                   <property name="text">
-                    <string>0</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                    <string> Number of 3 bedroom dwellings</string>
                    </property>
                   </widget>
                  </item>
@@ -1541,6 +1528,19 @@
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="2">
+                  <widget class="QLabel" name="label_49">
+                   <property name="maximumSize">
+                    <size>
+                     <width>20</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>m²</string>
                    </property>
                   </widget>
                  </item>
@@ -1557,8 +1557,8 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="4" column="1">
-                  <widget class="QLabel" name="label_statistics_dev_stats_2_bedroom_dwellings">
+                 <item row="6" column="1">
+                  <widget class="QLabel" name="label_statistics_dev_stats_4_bedroom_dwellings">
                    <property name="text">
                     <string>0</string>
                    </property>
@@ -1567,20 +1567,37 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="5" column="0">
-                  <widget class="QLabel" name="label_39">
-                   <property name="text">
-                    <string> Number of 3 bedroom dwellings</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QLabel" name="label_statistics_dev_stats_office_floorspace">
+                 <item row="0" column="1">
+                  <widget class="QLabel" name="label_statistics_dev_stats_commercial_floorspace">
                    <property name="text">
                     <string>0</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="1">
+                  <widget class="QLabel" name="label_statistics_dev_stats_1_bedroom_dwellings">
+                   <property name="text">
+                    <string>0</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_34">
+                   <property name="text">
+                    <string>Commercial ﬂoorspace</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_35">
+                   <property name="text">
+                    <string>Oﬃce ﬂoorspace</string>
                    </property>
                   </widget>
                  </item>
@@ -1591,15 +1608,18 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="4" column="0">
-                  <widget class="QLabel" name="label_38">
+                 <item row="2" column="1">
+                  <widget class="QLabel" name="label_statistics_dev_stats_residential_floorspace">
                    <property name="text">
-                    <string> Number of 2 bedroom dwellings</string>
+                    <string>0</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="1">
-                  <widget class="QLabel" name="label_statistics_dev_stats_1_bedroom_dwellings">
+                 <item row="1" column="1">
+                  <widget class="QLabel" name="label_statistics_dev_stats_office_floorspace">
                    <property name="text">
                     <string>0</string>
                    </property>
@@ -1621,8 +1641,8 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="0" column="1">
-                  <widget class="QLabel" name="label_statistics_dev_stats_commercial_floorspace">
+                 <item row="4" column="1">
+                  <widget class="QLabel" name="label_statistics_dev_stats_2_bedroom_dwellings">
                    <property name="text">
                     <string>0</string>
                    </property>
@@ -1631,23 +1651,20 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="0">
-                  <widget class="QLabel" name="label_37">
+                 <item row="7" column="0">
+                  <widget class="QLabel" name="label_50">
                    <property name="text">
-                    <string> Number of 1 bedroom dwellings</string>
+                    <string>Total number of dwellings</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="2" column="2">
-                  <widget class="QLabel" name="label_49">
-                   <property name="maximumSize">
-                    <size>
-                     <width>20</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
+                 <item row="7" column="1">
+                  <widget class="QLabel" name="label_statistics_dev_stats_total_dwellings">
                    <property name="text">
-                    <string>m²</string>
+                    <string>0</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                   </widget>
                  </item>
