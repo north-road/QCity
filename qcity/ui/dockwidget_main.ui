@@ -944,9 +944,9 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>0</y>
+             <y>-247</y>
              <width>371</width>
-             <height>800</height>
+             <height>824</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -1323,27 +1323,52 @@
             <item>
              <widget class="QGroupBox" name="groupBox_2">
               <property name="title">
-               <string>Unallocated Floorspace</string>
+               <string>Unallocated Residential Floorspace</string>
               </property>
-              <layout class="QGridLayout" name="gridLayout_10" columnstretch="1,1,0">
-               <item row="2" column="1">
-                <widget class="QLabel" name="label_3bed_unallocated">
+              <layout class="QGridLayout" name="gridLayout_10" columnstretch="0,1,0,0,1,0">
+               <item row="4" column="2">
+                <widget class="QLabel" name="label_94">
                  <property name="text">
-                  <string/>
-                 </property>
-                 <property name="textInteractionFlags">
-                  <set>Qt::TextBrowserInteraction</set>
+                  <string>m²</string>
                  </property>
                 </widget>
                </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="label_3bed_dwellings">
+               <item row="3" column="2">
+                <widget class="QLabel" name="label_93">
                  <property name="text">
-                  <string>3 bedroom dwellings</string>
+                  <string>m²</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0">
+                <widget class="QLabel" name="label_4bed_dwellings">
+                 <property name="text">
+                  <string>4+ bedroom</string>
                  </property>
                 </widget>
                </item>
                <item row="0" column="1">
+                <widget class="QLabel" name="label_88">
+                 <property name="text">
+                  <string>Size</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="2">
+                <widget class="QLabel" name="label_92">
+                 <property name="text">
+                  <string>m²</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="3">
+                <widget class="QLabel" name="label_89">
+                 <property name="text">
+                  <string>Yield</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="4">
                 <widget class="QLabel" name="label_1bed_unallocated">
                  <property name="text">
                   <string/>
@@ -1353,50 +1378,50 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0">
+               <item row="3" column="0">
+                <widget class="QLabel" name="label_3bed_dwellings">
+                 <property name="text">
+                  <string>3 bedroom</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
                 <widget class="QLabel" name="label_2bed_dwellings">
                  <property name="text">
-                  <string>2 bedroom dwellings</string>
+                  <string>2 bedroom</string>
                  </property>
                 </widget>
                </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="label_4bed_dwellings">
+               <item row="0" column="4">
+                <widget class="QLabel" name="label_90">
                  <property name="text">
-                  <string>4+ bedroom dwellings</string>
+                  <string>Unallocated</string>
                  </property>
                 </widget>
                </item>
-               <item row="0" column="2">
+               <item row="5" column="0">
+                <widget class="QLabel" name="label_95">
+                 <property name="text">
+                  <string>Total</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2">
                 <widget class="QLabel" name="label_91">
                  <property name="text">
                   <string>m²</string>
                  </property>
                 </widget>
                </item>
-               <item row="0" column="0">
+               <item row="1" column="0">
                 <widget class="QLabel" name="label_1bed_dwellings">
                  <property name="text">
-                  <string>1 bedroom dwellings</string>
+                  <string>1 bedroom</string>
                  </property>
                 </widget>
                </item>
-               <item row="2" column="2">
-                <widget class="QLabel" name="label_93">
-                 <property name="text">
-                  <string>m²</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="2">
-                <widget class="QLabel" name="label_92">
-                 <property name="text">
-                  <string>m²</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="1">
-                <widget class="QLabel" name="label_4bed_unallocated">
+               <item row="3" column="4">
+                <widget class="QLabel" name="label_3bed_unallocated">
                  <property name="text">
                   <string/>
                  </property>
@@ -1405,14 +1430,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="3" column="2">
-                <widget class="QLabel" name="label_94">
-                 <property name="text">
-                  <string>m²</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
+               <item row="2" column="4">
                 <widget class="QLabel" name="label_2bed_unallocated">
                  <property name="text">
                   <string/>
@@ -1422,14 +1440,52 @@
                  </property>
                 </widget>
                </item>
-               <item row="4" column="0">
-                <widget class="QLabel" name="label_95">
+               <item row="4" column="4">
+                <widget class="QLabel" name="label_4bed_unallocated">
                  <property name="text">
-                  <string>Total residential</string>
+                  <string/>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::TextBrowserInteraction</set>
                  </property>
                 </widget>
                </item>
-               <item row="4" column="1">
+               <item row="1" column="5">
+                <widget class="QLabel" name="label_97">
+                 <property name="text">
+                  <string>m²</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="5">
+                <widget class="QLabel" name="label_98">
+                 <property name="text">
+                  <string>m²</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="5">
+                <widget class="QLabel" name="label_99">
+                 <property name="text">
+                  <string>m²</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="5">
+                <widget class="QLabel" name="label_100">
+                 <property name="text">
+                  <string>m²</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="5">
+                <widget class="QLabel" name="label_96">
+                 <property name="text">
+                  <string>m²</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="4">
                 <widget class="QLabel" name="label_residential_unallocated">
                  <property name="text">
                   <string/>
@@ -1439,10 +1495,93 @@
                  </property>
                 </widget>
                </item>
-               <item row="4" column="2">
-                <widget class="QLabel" name="label_96">
+               <item row="1" column="3">
+                <widget class="QLabel" name="label_1bed_yield">
                  <property name="text">
-                  <string>m²</string>
+                  <string/>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::TextBrowserInteraction</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="3">
+                <widget class="QLabel" name="label_2bed_yield">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::TextBrowserInteraction</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="3">
+                <widget class="QLabel" name="label_3bed_yield">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::TextBrowserInteraction</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="3">
+                <widget class="QLabel" name="label_4bed_yield">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::TextBrowserInteraction</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="3">
+                <widget class="QLabel" name="label_residential_yield">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::TextBrowserInteraction</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLabel" name="label_1bed_size">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::TextBrowserInteraction</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLabel" name="label_2bed_size">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::TextBrowserInteraction</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QLabel" name="label_3bed_size">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::TextBrowserInteraction</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QLabel" name="label_4bed_size">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::TextBrowserInteraction</set>
                  </property>
                 </widget>
                </item>
