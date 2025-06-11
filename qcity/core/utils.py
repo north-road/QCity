@@ -3,6 +3,31 @@ import math
 from qgis.core import Qgis, QgsRasterLayer, QgsUnitTypes
 
 
+class wrapped_edits:
+    """
+    Context manager which wraps a set of edits to a layer,
+    only committing changes if the layer wasn't originally editable
+    """
+
+    def __init__(self, layer):
+        self.layer = layer
+        self._was_editable = False
+
+    def __enter__(self):
+        self._was_editable = self.layer.isEditable()
+        if not self._was_editable:
+            self.layer.startEditing()
+        return self.layer
+
+    def __exit__(self, ex_type, ex_value, traceback):
+        if ex_type is None:
+            if not self._was_editable:
+                assert self.layer.commitChanges()
+            return True
+        else:
+            return False
+
+
 class Utils:
     @staticmethod
     def guess_raster_vert_units(raster_layer: QgsRasterLayer) -> Qgis.DistanceUnit:

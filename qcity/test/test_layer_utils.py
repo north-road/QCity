@@ -11,17 +11,45 @@ from qgis.core import (
     QgsVectorLayer,
     QgsSingleSymbolRenderer,
     QgsCategorizedSymbolRenderer,
+    QgsFeature,
 )
 
 from qcity.core import LayerType
 from qcity.core.database import DatabaseUtils
 from qcity.core.layer import LayerUtils
 from qcity.core.project import PROJECT_CONTROLLER
+from qcity.core.utils import wrapped_edits
 
 test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
 
 
 class TestLayerUtils(unittest.TestCase):
+    def test_wrapped_edits(self):
+        """
+        Test wrapped edits context manager
+        """
+        uri = f"Point?crs=epsg:4326&field=cat:integer&field=name:string&uid=x"
+        layer = QgsVectorLayer(uri, "x", "memory")
+        self.assertTrue(layer.isValid())
+
+        # layer not originally editable
+        with wrapped_edits(layer):
+            self.assertTrue(layer.isEditable())
+            self.assertTrue(layer.addFeature(QgsFeature(layer.fields())))
+        self.assertFalse(layer.isEditable())
+
+        self.assertEqual(layer.featureCount(), 1)
+
+        # layer is originally editable
+        layer.startEditing()
+        with wrapped_edits(layer):
+            self.assertTrue(layer.isEditable())
+            self.assertTrue(layer.addFeature(QgsFeature(layer.fields())))
+        # should still be editable
+        self.assertTrue(layer.isEditable())
+
+        self.assertEqual(layer.featureCount(), 2)
+
     def test_change_attributes(self) -> None:
         """
         Test changing attributes in a layer
