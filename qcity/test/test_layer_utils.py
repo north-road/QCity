@@ -33,21 +33,36 @@ class TestLayerUtils(unittest.TestCase):
         self.assertTrue(layer.isValid())
 
         # layer not originally editable
-        with wrapped_edits(layer):
+        with wrapped_edits(layer) as edits:
+            self.assertEqual(edits.layer, layer)
+            self.assertFalse(edits._was_editable)
             self.assertTrue(layer.isEditable())
-            self.assertTrue(layer.addFeature(QgsFeature(layer.fields())))
+            self.assertTrue(edits.addFeature(QgsFeature(layer.fields())))
         self.assertFalse(layer.isEditable())
 
         self.assertEqual(layer.featureCount(), 1)
 
         # layer is originally editable
         layer.startEditing()
-        with wrapped_edits(layer):
+        with wrapped_edits(layer) as edits:
+            self.assertEqual(edits.layer, layer)
+            self.assertTrue(edits._was_editable)
             self.assertTrue(layer.isEditable())
-            self.assertTrue(layer.addFeature(QgsFeature(layer.fields())))
+            self.assertTrue(edits.addFeature(QgsFeature(layer.fields())))
         # should still be editable
         self.assertTrue(layer.isEditable())
 
+        self.assertEqual(layer.featureCount(), 2)
+
+        # fail the feature addition
+        layer.commitChanges()
+        with wrapped_edits(layer) as edits:
+            self.assertEqual(edits.layer, layer)
+            self.assertFalse(edits._was_editable)
+            self.assertTrue(layer.isEditable())
+            self.assertFalse(edits.addFeature(QgsFeature()))
+        # should stay editable, so user can fix error
+        self.assertTrue(layer.isEditable())
         self.assertEqual(layer.featureCount(), 2)
 
     def test_change_attributes(self) -> None:

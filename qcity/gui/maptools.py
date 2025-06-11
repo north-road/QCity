@@ -35,6 +35,7 @@ from qgis.gui import (
 )
 
 from qcity.core import LayerType, PROJECT_CONTROLLER, DatabaseUtils
+from qcity.core.utils import wrapped_edits
 
 
 class DrawPolygonToolOld(QgsMapToolDigitizeFeature):
@@ -188,9 +189,8 @@ class DrawPolygonToolOld(QgsMapToolDigitizeFeature):
             self._layer_type, feature_name, polygon, initial_attributes
         )
 
-        layer.startEditing()
-        layer.addFeature(feature)
-        layer.commitChanges()
+        with wrapped_edits(layer) as edits:
+            edits.addFeature(feature)
 
     def cleanup(self):
         """Run after digitization is finished, cleans up the maptool"""
@@ -291,9 +291,8 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
             self._layer_type, feature_name, polygon, initial_attributes
         )
 
-        layer.startEditing()
-        layer.addFeature(feature)
-        layer.commitChanges()
+        with wrapped_edits(layer) as edits:
+            edits.addFeature(feature)
 
 
 class MapToolHandler(QgsAbstractMapToolHandler):
