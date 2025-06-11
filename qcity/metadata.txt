@@ -9,7 +9,7 @@
 
 [general]
 name=QCity
-qgisMinimumVersion=3.34
+qgisMinimumVersion=3.43
 description=Urban planning tools
 version=0.3
 author=North Road
