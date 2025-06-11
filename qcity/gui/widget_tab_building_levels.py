@@ -149,10 +149,7 @@ class BuildingLevelsPageController(PageController):
                 self.og_widget.label_4bed_size,
             ]
         ):
-            label.setText(
-                str(round(dwelling_sizes[bedroom], 2))
-            )
-
+            label.setText(str(round(dwelling_sizes[bedroom], 2)))
 
         for bedroom, label in enumerate(
             [
@@ -175,7 +172,9 @@ class BuildingLevelsPageController(PageController):
                 self.og_widget.label_4bed_yield,
             ]
         ):
-            bedroom_yield = int(total_bedroom_area[label_index] // dwelling_sizes[label_index])
+            bedroom_yield = int(
+                total_bedroom_area[label_index] // dwelling_sizes[label_index]
+            )
             total_yield += bedroom_yield
             label.setText(str(bedroom_yield))
         self.og_widget.label_residential_yield.setText(str(total_yield))
