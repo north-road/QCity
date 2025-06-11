@@ -138,7 +138,7 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         if not file_name:
             file_name, selected_filter = QFileDialog.getSaveFileName(
                 self,
-                self.tr("Choose Project Database Path"),
+                self.tr("New QCity Package"),
                 SETTINGS_MANAGER.last_used_database_folder(),
                 "GeoPackage (*.gpkg)",
             )
@@ -179,7 +179,7 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         if not file_name:
             file_name, selected_filter = QFileDialog.getOpenFileName(
                 self,
-                self.tr("Choose Project Database Path"),
+                self.tr("Load QCity Package"),
                 SETTINGS_MANAGER.last_used_database_folder(),
                 "GeoPackage (*.gpkg)",
             )

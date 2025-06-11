@@ -52,14 +52,14 @@
           <item>
            <widget class="QPushButton" name="pushButton_create_database">
             <property name="text">
-             <string>Create New Database</string>
+             <string>New QCity Package</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_load_database">
             <property name="text">
-             <string>Load Database</string>
+             <string>Load QCity Package</string>
             </property>
            </widget>
           </item>
