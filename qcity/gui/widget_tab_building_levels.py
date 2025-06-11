@@ -153,7 +153,7 @@ class BuildingLevelsPageController(PageController):
                 str(round(total_bedroom_area[bedroom] % dwelling_sizes[bedroom], 2))
             )
 
-        for bedroom, label in enumerate(
+        for label_index, label in enumerate(
             [
                 self.og_widget.label_1bed_dwellings,
                 self.og_widget.label_2bed_dwellings,
@@ -161,9 +161,10 @@ class BuildingLevelsPageController(PageController):
                 self.og_widget.label_4bed_dwellings,
             ]
         ):
-            label_text = str(bedroom) if bedroom < 4 else "4+"
+            bedrooms = label_index + 1
+            label_text = str(bedrooms) if bedrooms < 4 else "4+"
             label.setText(
-                f"{label_text} bedroom dwellings ({int(total_bedroom_area[bedroom] // dwelling_sizes[bedroom])})"
+                f"{label_text} bedroom dwellings ({int(total_bedroom_area[label_index] // dwelling_sizes[label_index])})"
             )
 
         total_leftover_residential = sum(
