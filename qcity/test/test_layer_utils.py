@@ -12,6 +12,8 @@ from qgis.core import (
     QgsSingleSymbolRenderer,
     QgsCategorizedSymbolRenderer,
     QgsFeature,
+    QgsGeometry,
+    QgsCoordinateReferenceSystem,
 )
 
 from qcity.core import LayerType
@@ -24,6 +26,10 @@ test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
 
 
 class TestLayerUtils(unittest.TestCase):
+    """
+    LayerUtils tests
+    """
+
     def test_wrapped_edits(self):
         """
         Test wrapped edits context manager
@@ -306,6 +312,66 @@ class TestLayerUtils(unittest.TestCase):
         renderer4_1 = QgsRuleBasedRenderer(root_rule_4_1)
         layer4_1.setRenderer(renderer4_1)
         self.assertEqual(len(layer4_1.renderer().rootRule().children()), 0)
+
+    def test_geometry_contained(self):
+        """
+        Test geometry is contained
+        """
+        uri = f"Polygon?crs=epsg:4326&field=cat:integer&field=name:string&uid=x"
+        layer = QgsVectorLayer(uri, "x", "memory")
+
+        f = QgsFeature(layer.fields())
+        f.setGeometry(
+            QgsGeometry.fromWkt(
+                "Polygon ((115.77015585961420641 -32.35088737586444552, 115.77816764710125597 -32.3508301793402353, 115.77963459410594282 -32.357312221855274, 115.7750080689373533 -32.35963801796953732, 115.76918541774958271 -32.35876108547626728, 115.76796672331489901 -32.35454787818560618, 115.77015585961420641 -32.35088737586444552))"
+            )
+        )
+        self.assertTrue(layer.dataProvider().addFeature(f))
+        f_id = next(layer.getFeatures()).id()
+
+        self.assertTrue(
+            LayerUtils.test_geometry_within(
+                layer,
+                f_id,
+                QgsGeometry.fromWkt(
+                    "Polygon ((115.7730897536235517 -32.35208849451819191, 115.77069750158516115 -32.3535183768812189, 115.771961332850708 -32.35715970854480616, 115.77638474228018595 -32.35641620247291428, 115.7730897536235517 -32.35208849451819191))"
+                ),
+                QgsCoordinateReferenceSystem("EPSG:4326"),
+            )
+        )
+
+        self.assertFalse(
+            LayerUtils.test_geometry_within(
+                layer,
+                f_id,
+                QgsGeometry.fromWkt(
+                    "Polygon ((115.7827038986080197 -32.35189784182853145, 115.77681354217388332 -32.3529273615785371, 115.77814507868582439 -32.35466226649604948, 115.78153034100428442 -32.35471946059701764, 115.7827038986080197 -32.35189784182853145))"
+                ),
+                QgsCoordinateReferenceSystem("EPSG:4326"),
+            )
+        )
+
+        self.assertFalse(
+            LayerUtils.test_geometry_within(
+                layer,
+                f_id,
+                QgsGeometry.fromWkt(
+                    "Polygon ((115.78092099378694968 -32.34825629831935601, 115.77954432044411703 -32.34974343850880985, 115.78295215117803707 -32.3505441961767346, 115.78092099378694968 -32.34825629831935601))"
+                ),
+                QgsCoordinateReferenceSystem("EPSG:4326"),
+            )
+        )
+
+        self.assertTrue(
+            LayerUtils.test_geometry_within(
+                layer,
+                f_id,
+                QgsGeometry.fromWkt(
+                    "Polygon ((12887932.03877219744026661 -3809790.31659317249432206, 12887650.66066633351147175 -3810149.57613905007019639, 12887962.18642639555037022 -3810335.48667328059673309, 12887932.03877219744026661 -3809790.31659317249432206))"
+                ),
+                QgsCoordinateReferenceSystem("EPSG:3857"),
+            )
+        )
 
 
 if __name__ == "__main__":

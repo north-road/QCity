@@ -1,6 +1,14 @@
 from typing import Optional, Union
 
-from qgis.core import QgsVectorLayer, QgsRuleBasedRenderer, QgsSingleSymbolRenderer
+from qgis.core import (
+    QgsVectorLayer,
+    QgsRuleBasedRenderer,
+    QgsSingleSymbolRenderer,
+    QgsGeometry,
+    QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
+    QgsCsException,
+)
 from .enums import LayerType
 from .project import PROJECT_CONTROLLER
 from .utils import wrapped_edits
@@ -78,3 +86,24 @@ class LayerUtils:
             return True
 
         return False
+
+    @staticmethod
+    def test_geometry_within(
+        layer: QgsVectorLayer,
+        feature_id: int,
+        geometry: QgsGeometry,
+        geometry_crs: QgsCoordinateReferenceSystem,
+    ) -> bool:
+        """
+        Tests whether a geometry is completely contained within a feature from a layer
+        """
+        feature_geometry = layer.getFeature(feature_id).geometry()
+
+        ct = QgsCoordinateTransform(geometry_crs, layer.crs(), layer.transformContext())
+        reference_geometry = QgsGeometry(geometry)
+        try:
+            reference_geometry.transform(ct)
+        except QgsCsException:
+            return False
+
+        return feature_geometry.contains(reference_geometry)
