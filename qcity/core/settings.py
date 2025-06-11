@@ -50,16 +50,46 @@ class SettingsManager(QObject):
 
         self.project = QgsProject().instance()
 
+        if not self.user_base_projects_folder():
+            # create the setting so that it shows up in the advanced setting editor
+            QgsSettings().setValue(
+                f"{self.SETTINGS_KEY}/base_project_folder",
+                "",
+                section=QgsSettings.Plugins,
+            )
+
     def get_base_layers_items(self) -> List[str]:
         """Returns a list of all project files in plugin project directory."""
         project_paths = list()
-        project_folder = os.path.join(self.plugin_path, "..", "data", "projects")
 
-        for path in os.listdir(project_folder):
+        # include projects embedded within the plugin
+        plugin_project_folder = os.path.join(self.plugin_path, "..", "data", "projects")
+
+        for path in os.listdir(plugin_project_folder):
             if path.lower().endswith(".qgz") or path.lower().endswith(".qgs"):
-                project_paths.append(project_folder + "/" + path)
+                project_paths.append(plugin_project_folder + "/" + path)
+
+        # also add projects from the user/admin-settable template folder
+        user_path = self.user_base_projects_folder()
+        if user_path:
+            for path in os.listdir(user_path):
+                if path.lower().endswith(".qgz") or path.lower().endswith(".qgs"):
+                    project_paths.append(user_path + "/" + path)
 
         return project_paths
+
+    def user_base_projects_folder(self) -> Optional[str]:
+        """
+        Returns the user's base projects folder
+        """
+        return (
+            QgsSettings().value(
+                f"{self.SETTINGS_KEY}/base_project_folder",
+                "",
+                section=QgsSettings.Plugins,
+            )
+            or None
+        )
 
     def set_last_used_database_folder(self, folder: str):
         """
