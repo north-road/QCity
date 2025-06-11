@@ -1048,29 +1048,33 @@ class ProjectController(QObject):
         building_level_layer = self.get_building_levels_layer()
         building_level_features = [f for f in building_level_layer.getFeatures(request)]
 
-        if not building_level_layer.startEditing():
-            return False
-        if not building_level_layer.deleteFeatures(
-            [f.id() for f in building_level_features]
+        with (
+            wrapped_edits(building_level_layer) as building_level_edits,
+            wrapped_edits(development_site_layer) as development_site_edits,
+            wrapped_edits(project_area_layer) as project_area_edits,
         ):
-            return False
+            if (
+                not building_level_layer.isEditable()
+                or not development_site_layer.isEditable()
+                or not project_area_layer.isEditable()
+            ):
+                return False
 
-        if not development_site_layer.startEditing():
-            return False
-        if not development_site_layer.deleteFeatures(
-            [f.id() for f in development_site_features]
-        ):
-            return False
+            # only commit if ALL layer edits were successful
+            if (
+                not building_level_edits.deleteFeatures(
+                    [f.id() for f in building_level_features]
+                )
+                or not development_site_edits.deleteFeatures(
+                    [f.id() for f in development_site_features]
+                )
+                or not project_area_edits.deleteFeature(project_area_fid)
+            ):
+                building_level_edits.error_occurred = True
+                development_site_edits.error_occurred = True
+                project_area_edits.error_occurred = True
+                return False
 
-        if not project_area_layer.startEditing():
-            return False
-        if not project_area_layer.deleteFeature(project_area_fid):
-            return False
-
-        # only commit if ALL layer edits were successful
-        building_level_layer.commitChanges()
-        development_site_layer.commitChanges()
-        project_area_layer.commitChanges()
         return True
 
     def delete_development_site(self, development_site_fid: int) -> bool:
@@ -1101,21 +1105,24 @@ class ProjectController(QObject):
         building_level_layer = self.get_building_levels_layer()
         building_level_features = [f for f in building_level_layer.getFeatures(request)]
 
-        if not building_level_layer.startEditing():
-            return False
-        if not building_level_layer.deleteFeatures(
-            [f.id() for f in building_level_features]
+        with (
+            wrapped_edits(building_level_layer) as building_level_edits,
+            wrapped_edits(development_site_layer) as development_site_edits,
         ):
-            return False
+            if (
+                not building_level_layer.isEditable()
+                or not development_site_layer.isEditable()
+            ):
+                return False
 
-        if not development_site_layer.startEditing():
-            return False
-        if not development_site_layer.deleteFeature(development_site_fid):
-            return False
+            # only commit if ALL layer edits were successful
+            if not building_level_edits.deleteFeatures(
+                [f.id() for f in building_level_features]
+            ) or not development_site_edits.deleteFeature(development_site_fid):
+                building_level_edits.error_occurred = True
+                development_site_edits.error_occurred = True
+                return False
 
-        # only commit if ALL layer edits were successful
-        building_level_layer.commitChanges()
-        development_site_layer.commitChanges()
         return True
 
     def delete_building_level(self, building_level_fid: int) -> bool:
