@@ -579,6 +579,23 @@ class ProjectController(QObject):
             return self.get_building_levels_layer()
         return None
 
+    def get_feature_by_pk(self, layer: LayerType, pk) -> Optional[QgsFeature]:
+        """
+        Retrieves a feature by primary key
+        """
+        vector_layer = self.get_layer(layer)
+        if vector_layer is None:
+            return None
+
+        pk_field = DatabaseUtils.primary_key_for_layer(layer)
+        request = QgsFeatureRequest().setFilterExpression(
+            QgsExpression.createFieldEqualityExpression(pk_field, pk)
+        )
+        for f in vector_layer.getFeatures(request):
+            return f
+
+        return None
+
     def get_unique_names(
         self, layer: LayerType, parent_key: Optional[int] = None
     ) -> List[str]:

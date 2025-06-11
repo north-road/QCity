@@ -12,7 +12,7 @@ from typing import List, Union, Optional
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QInputDialog
+from qgis.PyQt.QtWidgets import QInputDialog, QMessageBox
 from qgis.core import (
     NULL,
     QgsGeometry,
@@ -34,7 +34,7 @@ from qgis.gui import (
     QgsSnapIndicator,
 )
 
-from qcity.core import LayerType, PROJECT_CONTROLLER, DatabaseUtils
+from qcity.core import LayerType, PROJECT_CONTROLLER, DatabaseUtils, LayerUtils
 from qcity.core.utils import wrapped_edits
 
 
@@ -125,6 +125,45 @@ class DrawPolygonToolOld(QgsMapToolDigitizeFeature):
             if len(self.points) < 3:
                 self.cleanup()
                 return
+
+            parent_layer_type = None
+            if self._layer_type == LayerType.DevelopmentSites:
+                parent_layer_type = LayerType.ProjectAreas
+            elif self._layer_type == LayerType.BuildingLevels:
+                parent_layer_type = LayerType.DevelopmentSites
+
+            if parent_layer_type is not None:
+                parent_feature = PROJECT_CONTROLLER.get_feature_by_pk(
+                    parent_layer_type, self._parent_pk
+                )
+                if parent_feature is not None:
+                    polygon = QgsGeometry.fromPolygonXY(
+                        [[QgsPointXY(x, y) for x, y in self.points]]
+                    )
+                    if not LayerUtils.test_geometry_within(
+                        PROJECT_CONTROLLER.get_layer(parent_layer_type),
+                        parent_feature.id(),
+                        polygon,
+                        self.layer.crs(),
+                    ):
+                        if (
+                            QMessageBox.warning(
+                                self.canvas().window(),
+                                self.tr("Create {}").format(
+                                    self._layer_type.as_title_case(plural=False)
+                                ),
+                                self.tr(
+                                    "The digitized feature is not contained within the {}. Are you sure you want to continue?"
+                                ).format(
+                                    parent_layer_type.as_sentence_case(plural=False)
+                                ),
+                                QMessageBox.Yes | QMessageBox.No,
+                                QMessageBox.NoButton,
+                            )
+                            == QMessageBox.No
+                        ):
+                            self.cleanup()
+                            return
 
             feature_name, ok = QInputDialog.getText(
                 self.canvas(),
@@ -239,6 +278,39 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
     def layerGeometryCaptured(self, polygon: QgsGeometry) -> None:
         if polygon.constGet().exteriorRing().numPoints() < 3:
             return
+
+        parent_layer_type = None
+        if self._layer_type == LayerType.DevelopmentSites:
+            parent_layer_type = LayerType.ProjectAreas
+        elif self._layer_type == LayerType.BuildingLevels:
+            parent_layer_type = LayerType.DevelopmentSites
+
+        if parent_layer_type is not None:
+            parent_feature = PROJECT_CONTROLLER.get_feature_by_pk(
+                parent_layer_type, self._parent_pk
+            )
+            if parent_feature is not None:
+                if not LayerUtils.test_geometry_within(
+                    PROJECT_CONTROLLER.get_layer(parent_layer_type),
+                    parent_feature.id(),
+                    polygon,
+                    self.layer().crs(),
+                ):
+                    if (
+                        QMessageBox.warning(
+                            self.canvas().window(),
+                            self.tr("Create {}").format(
+                                self._layer_type.as_title_case(plural=False)
+                            ),
+                            self.tr(
+                                "The digitized feature is not contained within the {}. Are you sure you want to continue?"
+                            ).format(parent_layer_type.as_sentence_case(plural=False)),
+                            QMessageBox.Yes | QMessageBox.No,
+                            QMessageBox.NoButton,
+                        )
+                        == QMessageBox.No
+                    ):
+                        return
 
         feature_name, ok = QInputDialog.getText(
             self.canvas(),
