@@ -12,20 +12,45 @@ class wrapped_edits:
     def __init__(self, layer):
         self.layer = layer
         self._was_editable = False
+        self._error_occurred = False
 
     def __enter__(self):
         self._was_editable = self.layer.isEditable()
         if not self._was_editable:
             self.layer.startEditing()
-        return self.layer
+        return self
 
     def __exit__(self, ex_type, ex_value, traceback):
         if ex_type is None:
-            if not self._was_editable:
+            if not self._was_editable and not self._error_occurred:
                 assert self.layer.commitChanges()
             return True
         else:
             return False
+
+    def changeAttributeValue(self, *args, **kwargs):
+        if not self.layer.changeAttributeValue(*args, **kwargs):
+            self._error_occurred = True
+            return False
+        return True
+
+    def changeAttributeValues(self, *args, **kwargs):
+        if not self.layer.changeAttributeValues(*args, **kwargs):
+            self._error_occurred = True
+            return False
+        return True
+
+    def addFeature(self, *args, **kwargs):
+        if not self.layer.addFeature(*args, **kwargs):
+            self._error_occurred = True
+            return False
+        return True
+
+    def deleteFeature(self, *args, **kwargs):
+        if not self.layer.deleteFeature(*args, **kwargs):
+            self._error_occurred = True
+            return False
+        return True
 
 
 class Utils:

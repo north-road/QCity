@@ -3,6 +3,7 @@ from typing import Optional, Union
 from qgis.core import QgsVectorLayer, QgsRuleBasedRenderer, QgsSingleSymbolRenderer
 from .enums import LayerType
 from .project import PROJECT_CONTROLLER
+from .utils import wrapped_edits
 
 
 class LayerUtils:
@@ -28,12 +29,9 @@ class LayerUtils:
         if field_index < 0:
             return False
 
-        if not layer.isEditable() and not layer.startEditing():
-            return False
-        if not layer.changeAttributeValue(feature_id, field_index, value):
-            return False
-        if not layer.commitChanges():
-            return False
+        with wrapped_edits(layer) as edits:
+            if not edits.changeAttributeValue(feature_id, field_index, value):
+                return False
 
         return True
 

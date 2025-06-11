@@ -30,6 +30,7 @@ from qgis._3d import (
 from .database import DatabaseUtils
 from .enums import LayerType
 from .settings import SETTINGS_MANAGER
+from .utils import wrapped_edits
 
 
 class ProjectController(QObject):
@@ -366,12 +367,11 @@ class ProjectController(QObject):
                 "count_4_bedroom_dwellings",
             )
         ):
-            layer.startEditing()
-            layer.changeAttributeValues(
-                feature_id,
-                {layer.fields().lookupField("auto_calculate_floorspace"): False},
-            )
-            layer.commitChanges()
+            with wrapped_edits(layer) as edits:
+                edits.changeAttributeValues(
+                    feature_id,
+                    {layer.fields().lookupField("auto_calculate_floorspace"): False},
+                )
 
         if (
             not self._block_ds_auto_updates
@@ -379,12 +379,11 @@ class ProjectController(QObject):
             and field_name
             in ("commercial_car_bays", "residential_car_bays", "office_car_bays")
         ):
-            layer.startEditing()
-            layer.changeAttributeValues(
-                feature_id,
-                {layer.fields().lookupField("auto_calculate_car_parking"): False},
-            )
-            layer.commitChanges()
+            with wrapped_edits(layer) as edits:
+                edits.changeAttributeValues(
+                    feature_id,
+                    {layer.fields().lookupField("auto_calculate_car_parking"): False},
+                )
 
         if (
             not self._block_ds_auto_updates
@@ -396,12 +395,15 @@ class ProjectController(QObject):
                 "residential_bicycle_bays",
             )
         ):
-            layer.startEditing()
-            layer.changeAttributeValues(
-                feature_id,
-                {layer.fields().lookupField("auto_calculate_bicycle_parking"): False},
-            )
-            layer.commitChanges()
+            with wrapped_edits(layer) as edits:
+                edits.changeAttributeValues(
+                    feature_id,
+                    {
+                        layer.fields().lookupField(
+                            "auto_calculate_bicycle_parking"
+                        ): False
+                    },
+                )
 
         if field_name in (
             "commercial_floorspace",
@@ -735,39 +737,31 @@ class ProjectController(QObject):
         moved_item = all_levels_in_site_data.pop(original_list_idx)
         all_levels_in_site_data.insert(new_list_idx, moved_item)
 
-        was_editable = building_level_layer.isEditable()
-        if not was_editable:
-            if not building_level_layer.startEditing():
-                return False
+        with wrapped_edits(building_level_layer) as edits:
+            fields = building_level_layer.fields()
+            level_index_fidx = fields.lookupField(level_index_field_name)
+            base_height_fidx = fields.lookupField(base_height_field_name)
 
-        fields = building_level_layer.fields()
-        level_index_fidx = fields.lookupField(level_index_field_name)
-        base_height_fidx = fields.lookupField(base_height_field_name)
+            current_cumulative_height = 0.0
 
-        current_cumulative_height = 0.0
+            self._block_floor_height_updates += 1
+            for i, level_data in enumerate(all_levels_in_site_data):
+                new_level_index_val = i + 1
+                new_base_height_val = current_cumulative_height
 
-        self._block_floor_height_updates += 1
-        for i, level_data in enumerate(all_levels_in_site_data):
-            new_level_index_val = i + 1
-            new_base_height_val = current_cumulative_height
+                attrs_to_update = {
+                    level_index_fidx: new_level_index_val,
+                    base_height_fidx: new_base_height_val,
+                }
 
-            attrs_to_update = {
-                level_index_fidx: new_level_index_val,
-                base_height_fidx: new_base_height_val,
-            }
+                if not edits.changeAttributeValues(level_data["fid"], attrs_to_update):
+                    return False
 
-            if not building_level_layer.changeAttributeValues(
-                level_data["fid"], attrs_to_update
-            ):
-                return False
+                current_cumulative_height += level_data[
+                    "height"
+                ]  # Use pre-fetched height
 
-            current_cumulative_height += level_data["height"]  # Use pre-fetched height
-
-        self._block_floor_height_updates -= 1
-
-        if not was_editable:
-            if not building_level_layer.commitChanges():
-                return False
+            self._block_floor_height_updates -= 1
 
         return True
 
@@ -819,43 +813,35 @@ class ProjectController(QObject):
             )
         all_levels_in_site_data.sort(key=lambda x: x["current_index"])
 
-        was_editable = building_level_layer.isEditable()
-        if not was_editable:
-            if not building_level_layer.startEditing():
-                return False
+        with wrapped_edits(building_level_layer) as edits:
+            fields = building_level_layer.fields()
+            level_index_fidx = fields.lookupField(level_index_field_name)
+            base_height_fidx = fields.lookupField(base_height_field_name)
 
-        fields = building_level_layer.fields()
-        level_index_fidx = fields.lookupField(level_index_field_name)
-        base_height_fidx = fields.lookupField(base_height_field_name)
+            current_cumulative_height = 0.0
 
-        current_cumulative_height = 0.0
+            self._block_floor_height_updates += 1
+            for i, level_data in enumerate(all_levels_in_site_data):
+                new_level_index_val = i + 1
+                new_base_height_val = current_cumulative_height
 
-        self._block_floor_height_updates += 1
-        for i, level_data in enumerate(all_levels_in_site_data):
-            new_level_index_val = i + 1
-            new_base_height_val = current_cumulative_height
-
-            if (
-                level_data["current_index"] != new_level_index_val
-                or level_data["base_height"] != new_base_height_val
-            ):
-                attrs_to_update = {
-                    level_index_fidx: new_level_index_val,
-                    base_height_fidx: new_base_height_val,
-                }
-
-                if not building_level_layer.changeAttributeValues(
-                    level_data["fid"], attrs_to_update
+                if (
+                    level_data["current_index"] != new_level_index_val
+                    or level_data["base_height"] != new_base_height_val
                 ):
-                    return False
+                    attrs_to_update = {
+                        level_index_fidx: new_level_index_val,
+                        base_height_fidx: new_base_height_val,
+                    }
 
-            current_cumulative_height += level_data["height"] or 0
+                    if not edits.changeAttributeValues(
+                        level_data["fid"], attrs_to_update
+                    ):
+                        return False
 
-        self._block_floor_height_updates -= 1
+                current_cumulative_height += level_data["height"] or 0
 
-        if not was_editable:
-            if not building_level_layer.commitChanges():
-                return False
+            self._block_floor_height_updates -= 1
 
         return True
 
@@ -1144,11 +1130,9 @@ class ProjectController(QObject):
         if not building_level_feature.isValid():
             return False
 
-        if not building_level_layer.startEditing():
-            return False
-        if not building_level_layer.deleteFeature(building_level_fid):
-            return False
-        building_level_layer.commitChanges()
+        with wrapped_edits(building_level_layer) as edits:
+            if not edits.deleteFeature(building_level_fid):
+                return False
         return True
 
     def auto_calculate_development_site_floorspace(
@@ -1245,37 +1229,34 @@ class ProjectController(QObject):
             count_4_bedroom += math.floor(floor_4_bedroom / dwelling_size_4_bedroom)
 
         self._block_ds_auto_updates += 1
-        was_editable = development_site_layer.isEditable()
-        if not was_editable:
-            development_site_layer.startEditing()
-        development_site_layer.changeAttributeValues(
-            development_site_fid,
-            {
-                development_site_layer.fields().lookupField(
-                    "commercial_floorspace"
-                ): total_commercial,
-                development_site_layer.fields().lookupField(
-                    "office_floorspace"
-                ): total_office,
-                development_site_layer.fields().lookupField(
-                    "residential_floorspace"
-                ): total_residential,
-                development_site_layer.fields().lookupField(
-                    "count_1_bedroom_dwellings"
-                ): count_1_bedroom,
-                development_site_layer.fields().lookupField(
-                    "count_2_bedroom_dwellings"
-                ): count_2_bedroom,
-                development_site_layer.fields().lookupField(
-                    "count_3_bedroom_dwellings"
-                ): count_3_bedroom,
-                development_site_layer.fields().lookupField(
-                    "count_4_bedroom_dwellings"
-                ): count_4_bedroom,
-            },
-        )
-        if not was_editable:
-            development_site_layer.commitChanges()
+        with wrapped_edits(development_site_layer) as edits:
+            edits.changeAttributeValues(
+                development_site_fid,
+                {
+                    development_site_layer.fields().lookupField(
+                        "commercial_floorspace"
+                    ): total_commercial,
+                    development_site_layer.fields().lookupField(
+                        "office_floorspace"
+                    ): total_office,
+                    development_site_layer.fields().lookupField(
+                        "residential_floorspace"
+                    ): total_residential,
+                    development_site_layer.fields().lookupField(
+                        "count_1_bedroom_dwellings"
+                    ): count_1_bedroom,
+                    development_site_layer.fields().lookupField(
+                        "count_2_bedroom_dwellings"
+                    ): count_2_bedroom,
+                    development_site_layer.fields().lookupField(
+                        "count_3_bedroom_dwellings"
+                    ): count_3_bedroom,
+                    development_site_layer.fields().lookupField(
+                        "count_4_bedroom_dwellings"
+                    ): count_4_bedroom,
+                },
+            )
+
         self._block_ds_auto_updates -= 1
         return True
 
@@ -1339,28 +1320,24 @@ class ProjectController(QObject):
         )
 
         self._block_ds_auto_updates += 1
-        was_editable = development_site_layer.isEditable()
-        if not was_editable:
-            development_site_layer.startEditing()
-        development_site_layer.changeAttributeValues(
-            development_site_fid,
-            {
-                development_site_layer.fields().lookupField(
-                    "residential_car_bays"
-                ): car_parks_1_bedroom
-                + car_parks_2_bedroom
-                + car_parks_3_bedroom
-                + car_parks_4_bedroom,
-                development_site_layer.fields().lookupField(
-                    "commercial_car_bays"
-                ): commercial_car_parks,
-                development_site_layer.fields().lookupField(
-                    "office_car_bays"
-                ): office_car_parks,
-            },
-        )
-        if not was_editable:
-            development_site_layer.commitChanges()
+        with wrapped_edits(development_site_layer) as edits:
+            edits.changeAttributeValues(
+                development_site_fid,
+                {
+                    development_site_layer.fields().lookupField(
+                        "residential_car_bays"
+                    ): car_parks_1_bedroom
+                    + car_parks_2_bedroom
+                    + car_parks_3_bedroom
+                    + car_parks_4_bedroom,
+                    development_site_layer.fields().lookupField(
+                        "commercial_car_bays"
+                    ): commercial_car_parks,
+                    development_site_layer.fields().lookupField(
+                        "office_car_bays"
+                    ): office_car_parks,
+                },
+            )
         self._block_ds_auto_updates -= 1
         return True
 
@@ -1424,28 +1401,24 @@ class ProjectController(QObject):
         )
 
         self._block_ds_auto_updates += 1
-        was_editable = development_site_layer.isEditable()
-        if not was_editable:
-            development_site_layer.startEditing()
-        development_site_layer.changeAttributeValues(
-            development_site_fid,
-            {
-                development_site_layer.fields().lookupField(
-                    "residential_bicycle_bays"
-                ): bicycle_parks_1_bedroom
-                + bicycle_parks_2_bedroom
-                + bicycle_parks_3_bedroom
-                + bicycle_parks_4_bedroom,
-                development_site_layer.fields().lookupField(
-                    "commercial_bicycle_bays"
-                ): commercial_bicycle_parks,
-                development_site_layer.fields().lookupField(
-                    "office_bicycle_bays"
-                ): office_bicycle_parks,
-            },
-        )
-        if not was_editable:
-            development_site_layer.commitChanges()
+        with wrapped_edits(development_site_layer) as edits:
+            edits.changeAttributeValues(
+                development_site_fid,
+                {
+                    development_site_layer.fields().lookupField(
+                        "residential_bicycle_bays"
+                    ): bicycle_parks_1_bedroom
+                    + bicycle_parks_2_bedroom
+                    + bicycle_parks_3_bedroom
+                    + bicycle_parks_4_bedroom,
+                    development_site_layer.fields().lookupField(
+                        "commercial_bicycle_bays"
+                    ): commercial_bicycle_parks,
+                    development_site_layer.fields().lookupField(
+                        "office_bicycle_bays"
+                    ): office_bicycle_parks,
+                },
+            )
         self._block_ds_auto_updates -= 1
         return True
 

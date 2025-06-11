@@ -20,6 +20,7 @@ from qgis.gui import QgsNewNameDialog, QgsSpinBox, QgsDoubleSpinBox
 
 from .canvas_utils import CanvasUtils
 from ..core import LayerUtils, LayerType, PROJECT_CONTROLLER, DatabaseUtils
+from ..core.utils import wrapped_edits
 
 
 class PageController(QObject):
@@ -302,15 +303,14 @@ class PageController(QObject):
             self.current_item_label.setText(new_feat_name)
 
         layer = self.get_layer()
-        layer.startEditing()
-        layer.changeAttributeValue(
-            feature_id,
-            layer.fields().lookupField(
-                DatabaseUtils.name_field_for_layer(self.layer_type)
-            ),
-            new_feat_name,
-        )
-        layer.commitChanges()
+        with wrapped_edits(layer) as edits:
+            edits.changeAttributeValue(
+                feature_id,
+                layer.fields().lookupField(
+                    DatabaseUtils.name_field_for_layer(self.layer_type)
+                ),
+                new_feat_name,
+            )
 
     def zoom_to_feature(self, feature: QgsFeature):
         """
