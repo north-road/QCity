@@ -8,7 +8,7 @@
     },
     "level_height": {
         "type": "double",
-        "default": 6
+        "default": 3
     },
     "base_height": {
         "type": "double",
