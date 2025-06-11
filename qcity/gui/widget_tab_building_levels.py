@@ -143,6 +143,19 @@ class BuildingLevelsPageController(PageController):
 
         for bedroom, label in enumerate(
             [
+                self.og_widget.label_1bed_size,
+                self.og_widget.label_2bed_size,
+                self.og_widget.label_3bed_size,
+                self.og_widget.label_4bed_size,
+            ]
+        ):
+            label.setText(
+                str(round(dwelling_sizes[bedroom], 2))
+            )
+
+
+        for bedroom, label in enumerate(
+            [
                 self.og_widget.label_1bed_unallocated,
                 self.og_widget.label_2bed_unallocated,
                 self.og_widget.label_3bed_unallocated,
@@ -153,19 +166,19 @@ class BuildingLevelsPageController(PageController):
                 str(round(total_bedroom_area[bedroom] % dwelling_sizes[bedroom], 2))
             )
 
+        total_yield = 0
         for label_index, label in enumerate(
             [
-                self.og_widget.label_1bed_dwellings,
-                self.og_widget.label_2bed_dwellings,
-                self.og_widget.label_3bed_dwellings,
-                self.og_widget.label_4bed_dwellings,
+                self.og_widget.label_1bed_yield,
+                self.og_widget.label_2bed_yield,
+                self.og_widget.label_3bed_yield,
+                self.og_widget.label_4bed_yield,
             ]
         ):
-            bedrooms = label_index + 1
-            label_text = str(bedrooms) if bedrooms < 4 else "4+"
-            label.setText(
-                f"{label_text} bedroom dwellings ({int(total_bedroom_area[label_index] // dwelling_sizes[label_index])})"
-            )
+            bedroom_yield = int(total_bedroom_area[label_index] // dwelling_sizes[label_index])
+            total_yield += bedroom_yield
+            label.setText(str(bedroom_yield))
+        self.og_widget.label_residential_yield.setText(str(total_yield))
 
         total_leftover_residential = sum(
             total_bedroom_area[bedroom] % dwelling_sizes[bedroom]
