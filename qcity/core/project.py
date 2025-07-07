@@ -61,6 +61,8 @@ class ProjectController(QObject):
     building_level_deleted = pyqtSignal(int)
     # final two arguments are project area and development site feature ids
     building_level_attribute_changed = pyqtSignal(int, str, object, int, int)
+    # final argument is development site feature id
+    building_level_geometry_changed = pyqtSignal(int, int)
 
     plugin_data_path = Path(os.path.dirname(os.path.realpath(__file__))) / ".." / "data"
 
@@ -187,6 +189,9 @@ class ProjectController(QObject):
             self._current_building_levels_layer.attributeValueChanged.disconnect(
                 self._building_level_attribute_changed
             )
+            self._current_building_levels_layer.geometryChanged.disconnect(
+                self._building_level_geometry_changed
+            )
 
         if (
             not disconnect
@@ -197,6 +202,9 @@ class ProjectController(QObject):
             building_levels_layer.featureDeleted.connect(self._building_level_deleted)
             building_levels_layer.attributeValueChanged.connect(
                 self._building_level_attribute_changed
+            )
+            building_levels_layer.geometryChanged.connect(
+                self._building_level_geometry_changed
             )
 
             elevation_props = building_levels_layer.elevationProperties()
@@ -474,6 +482,36 @@ class ProjectController(QObject):
         if field_name in ("level_index", "level_height"):
             if not self._block_floor_height_updates:
                 self.update_floor_heights(development_site_feature.id())
+
+    def _building_level_geometry_changed(self, feature_id: int, geometry: QgsGeometry):
+        """
+        Called when a building level geometry is changed
+        """
+        if feature_id < 0:
+            # ignore uncommitted features
+            return
+
+        layer = self.get_building_levels_layer()
+
+        original_feature = layer.getFeature(feature_id)
+        development_site_key = original_feature[
+            DatabaseUtils.foreign_key_for_layer(LayerType.BuildingLevels)
+        ]
+        request = QgsFeatureRequest().setFilterExpression(
+            QgsExpression.createFieldEqualityExpression(
+                DatabaseUtils.primary_key_for_layer(LayerType.DevelopmentSites),
+                development_site_key,
+            )
+        )
+        development_site_layer = self.get_development_sites_layer()
+        development_site_features = [
+            f for f in development_site_layer.getFeatures(request)
+        ]
+        development_site_feature = development_site_features[0]
+
+        self.auto_calculate_development_site_floorspace(development_site_feature.id())
+
+        self.building_level_geometry_changed.emit(feature_id, development_site_key)
 
     def _building_level_added(self, building_level_fid: int):
         """
