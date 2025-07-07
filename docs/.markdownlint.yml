@@ -1,0 +1,17 @@
+# Default state for all rules
+default: true
+
+# MD003/heading-style/header-style - Heading style
+MD003:
+  # Heading style
+  style: "atx"
+
+# MD004/ul-style - Unordered list style
+MD004:
+  # List style
+  style: "dash"
+
+# MD013/line-length - Line length
+MD013:
+  # Disable line-length checks
+  line_length: -1
