@@ -31,6 +31,9 @@ class BuildingLevelsPageController(PageController):
         PROJECT_CONTROLLER.project_area_attribute_changed.connect(
             self._update_residential_space_total
         )
+        PROJECT_CONTROLLER.building_level_geometry_changed.connect(
+            self._update_residential_space_total
+        )
 
         self.og_widget.toolButton_building_level_add.clicked.connect(
             self.add_feature_clicked
@@ -233,6 +236,7 @@ class BuildingLevelsPageController(PageController):
     def set_feature(self, feature: QgsFeature):
         super().set_feature(feature)
         PROJECT_CONTROLLER.set_current_building_level(feature.id())
+        self._update_residential_space_total()
 
     def delete_feature_and_child_objects(self, feature_id: int) -> bool:
         return PROJECT_CONTROLLER.delete_building_level(feature_id)
