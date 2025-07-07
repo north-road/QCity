@@ -1,6 +1,6 @@
 # About QCity
 
-QCity is a plugin to QGIS for modelling existing and potential urban development. QCity models developments on a building level basis and aggregates the data from the building levels across a project area. This enables the calculation of:
+QCity is a plugin to QGIS for modeling existing and potential urban development. QCity models developments on a building level basis and aggregates the data from the building levels across a project area. This enables the calculation of:
 
 1. Dwelling yield
 2. Commercial floorspace yield
