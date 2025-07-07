@@ -49,10 +49,6 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
         self._layer_type = LayerType.ProjectAreas
         self._parent_pk = NULL
 
-    def deactivate(self):
-        super().deactivate()
-        self.stopCapturing()
-
     def layer(self):
         return self._temp_layer
 
