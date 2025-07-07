@@ -189,7 +189,7 @@
       </symbol>
     </profileMarkerSymbol>
   </elevation>
-  <renderer-v2 attr="level_index" forceraster="0" enableorderby="0" referencescale="-1" type="categorizedSymbol" symbollevels="0">
+  <renderer-v2 attr="level_index" forceraster="0" enableorderby="1" referencescale="-1" type="categorizedSymbol" symbollevels="0">
     <categories>
       <category label="1" uuid="{85c8e030-223f-4436-aabd-0ddb70d5d8c6}" symbol="0" value="1" type="long" render="true"/>
       <category label="2" uuid="{49d1f7b8-ac46-46a9-9048-d862e1bf7e96}" symbol="1" value="2" type="long" render="true"/>
@@ -1228,6 +1228,9 @@
         <Option value="collection" name="type" type="QString"/>
       </Option>
     </data-defined-properties>
+    <orderby>
+      <orderByClause asc="1" nullsFirst="1">"level_index"</orderByClause>
+    </orderby>
   </renderer-v2>
   <selection mode="Default">
     <selectionColor invalid="1"/>
@@ -1284,7 +1287,7 @@
   </geometryOptions>
   <legend showLabelLegend="0" type="default-vector"/>
   <referencedLayers>
-    <relation strength="Association" layerId="development_sites_483b9f26_a9de_46c5_806a_dd19d060e2b0" referencedLayer="development_sites_483b9f26_a9de_46c5_806a_dd19d060e2b0" layerName="development_sites" dataSource="../../Temporary/QCity/perth.gpkg|layername=development_sites" referencingLayer="building_levels_33863393_4f5b_4fc1_8485_85a58b3f5831" providerKey="ogr" id="development_sites_to_building_levels" name="development_sites_to_building_levels">
+    <relation strength="Association" layerId="development_sites_f2f809d0_24be_4d44_8962_243e3046f862" referencedLayer="development_sites_f2f809d0_24be_4d44_8962_243e3046f862" layerName="development_sites" dataSource="/home/nyall/Temporary/QCity/perth.gpkg|layername=development_sites" referencingLayer="building_levels_a067e034_5a0d_4b9c_8207_69e70a26336f" providerKey="ogr" id="development_sites_to_building_levels" name="development_sites_to_building_levels">
       <fieldRef referencedField="fid" referencingField="development_site_pk"/>
     </relation>
   </referencedLayers>
