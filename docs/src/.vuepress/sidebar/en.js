@@ -14,10 +14,6 @@ module.exports = {
             collapsable: false,
             sidebarDepth: 0,
             children: [
-                 '/user_guide/faq',
-                 '/user_guide/troubleshooting',
-                 '/user_guide/limitations',
-                 '/user_guide/changelog',
                  '/user_guide/about',
             ]
         }
