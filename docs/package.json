@@ -1,0 +1,19 @@
+{
+  "name": "QCity",
+  "version": "0.0.1",
+  "description": "QCity plugin",
+  "main": "index.js",
+  "authors": {
+    "name": "North Road Consulting",
+    "email": "info@north-road.com"
+  },
+  "repository": "https://github.com/north-road/QCity",
+  "scripts": {
+    "dev": "vuepress dev src",
+    "build": "vuepress build src"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "vuepress": "^1.5.3"
+  }
+}

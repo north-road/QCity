@@ -1,0 +1,38 @@
+name: Check documentation
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - '.github/workflows/check_docs.yml'
+
+jobs:
+
+  markdownlint:
+    name: Validate markdown
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Lint
+        uses: DavidAnson/markdownlint-cli2-action@v20
+        with:
+          globs: '**/*.md'
+          config: ./docs/.markdownlint.yml
+
+  spellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: spellcheck
+        uses: reviewdog/action-misspell@v1
+        with:
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review
+          fail_level: any
+          locale: "US"
+          path: ./docs/src/
+          pattern: "*.md"
+          filter_mode: nofilter
