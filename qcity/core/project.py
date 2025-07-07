@@ -1,4 +1,6 @@
 import math
+import os
+from pathlib import Path
 from typing import List, Optional, Dict
 
 from qgis.PyQt import sip
@@ -20,6 +22,7 @@ from qgis.core import (
     QgsDistanceArea,
     QgsMapLayerElevationProperties,
     QgsProperty,
+    QgsMapLayer,
 )
 from qgis._3d import (
     QgsVectorLayer3DRenderer,
@@ -58,6 +61,8 @@ class ProjectController(QObject):
     building_level_deleted = pyqtSignal(int)
     # final two arguments are project area and development site feature ids
     building_level_attribute_changed = pyqtSignal(int, str, object, int, int)
+
+    plugin_data_path = Path(os.path.dirname(os.path.realpath(__file__))) / ".." / "data"
 
     def __init__(self, project: QgsProject):
         super().__init__()
@@ -493,6 +498,15 @@ class ProjectController(QObject):
         self.building_level_deleted.emit(building_level_fid)
 
     @staticmethod
+    def load_qml_if_exists(layer: QgsMapLayer, qml_path: str):
+        """
+        Loads and applies a QML file from the data folder
+        """
+        full_path = ProjectController.plugin_data_path / qml_path
+        if full_path.exists():
+            layer.loadNamedStyle(full_path.as_posix())
+
+    @staticmethod
     def add_database_layers_to_project(project: QgsProject, database_path: str) -> None:
         """Adds the layers from the gpkg to the canvas"""
         for _, layer in project.mapLayers().items():
@@ -504,6 +518,11 @@ class ProjectController(QObject):
             "ogr",
         )
         assert area_layer.isValid()
+
+        ProjectController.load_qml_if_exists(
+            area_layer, "default_project_areas_style.qml"
+        )
+
         area_layer.setCustomProperty("_qcity_role", "project_areas")
 
         development_site_layer = QgsVectorLayer(
@@ -512,6 +531,10 @@ class ProjectController(QObject):
             "ogr",
         )
         assert development_site_layer.isValid()
+
+        ProjectController.load_qml_if_exists(
+            development_site_layer, "default_development_sites_style.qml"
+        )
         development_site_layer.setCustomProperty("_qcity_role", "development_sites")
 
         building_level_layer = QgsVectorLayer(
@@ -520,6 +543,9 @@ class ProjectController(QObject):
             "ogr",
         )
         assert building_level_layer.isValid()
+        ProjectController.load_qml_if_exists(
+            building_level_layer, "default_building_levels_style.qml"
+        )
         building_level_layer.setCustomProperty("_qcity_role", "building_levels")
 
         prev_insertion_method = None
