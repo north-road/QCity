@@ -112,6 +112,8 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         self.restore_saved_database_path()
         self.project.readProject.connect(self.restore_saved_database_path)
 
+        PROJECT_CONTROLLER.has_all_layers_changed.connect(self._check_layers)
+
     def restore_saved_database_path(self) -> None:
         path = PROJECT_CONTROLLER.associated_database_path()
         if path:
@@ -308,3 +310,9 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         elif layer_type == LayerType.BuildingLevels:
             parent_pk = self.development_site_controller.current_feature_id
         self.add_feature_clicked.emit(layer_type, parent_pk)
+
+    def _check_layers(self, is_valid: bool):
+        """
+        Checks whether all required layers are present, and updates UI accordingly
+        """
+        self.set_widgets_enabled(is_valid)

@@ -44,6 +44,7 @@ class ProjectController(QObject):
     project_area_layer_changed = pyqtSignal()
     development_site_layer_changed = pyqtSignal()
     building_level_layer_changed = pyqtSignal()
+    has_all_layers_changed = pyqtSignal(bool)
 
     project_area_changed = pyqtSignal(int)
     development_site_changed = pyqtSignal(int)
@@ -243,6 +244,14 @@ class ProjectController(QObject):
             self.development_site_layer_changed.emit()
         if building_level_layer_changed:
             self.building_level_layer_changed.emit()
+
+        self.has_all_layers_changed.emit(
+            bool(
+                self._current_project_area_layer
+                and self._current_development_sites_layer
+                and self._current_building_levels_layer
+            )
+        )
 
     def _project_area_added(self, project_area_fid: int):
         """
