@@ -2,6 +2,7 @@ const { description } = require('../../package')
 
 module.exports = {
   title: 'QCity Documentation',
+  base: '/QCity/',
   description: 'User Documentation for QCity',
 
   /**
