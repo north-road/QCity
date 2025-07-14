@@ -43,5 +43,4 @@ To update your version:
 4. On the lower right, click on `Upgrade Plugin`. Once upgraded, click on `Close`.
 
 > If you receive an error after the plugin updates, try restarting QGIS.
-> If you still encounter an error, please [email us](mailto:info@north-road.com)
-> for support.
+> If you still encounter an error, please raise an issue on the [QCity GitHub page](https://github.com/north-road/QCity/issues).
