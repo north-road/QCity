@@ -26,7 +26,7 @@ Click on the QCity icon to show the QCity panel. The QCity panel can also be hid
 
 > The QCity panel can be dragged over other panels such as the Layer Styling panel to maximize the QCity panel and present it in a tabbed interface as shown above.
 
-# Updating QCity
+## Updating QCity
 
 Updates to **QCity** are available through the QGIS Plugin Manager and QGIS will let you know when a new version of QCity is available.
 
