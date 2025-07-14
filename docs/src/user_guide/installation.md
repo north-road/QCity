@@ -24,7 +24,7 @@ Click on the QCity icon to show the QCity panel. The QCity panel can also be hid
 
 ![QCity_Panel_Empty](https://github.com/user-attachments/assets/b666b38d-4d79-4064-965d-b36e781c66ce)
 
-> The QCity panel can be dragged over other panels such as the Layer Styling panel to maximise the QCity panel and present it in a tabbed interface as shown above.
+> The QCity panel can be dragged over other panels such as the Layer Styling panel to maximize the QCity panel and present it in a tabbed interface as shown above.
 
 # Updating QCity
 
@@ -38,15 +38,10 @@ To update your version:
 
 2. In the left panel, click on `Upgradeable`.
 
-3. In the centre panel, click on `QCity`. If `QCity` is not listed, then you're already running the latest release.
+3. In the middle panel, click on `QCity`. If `QCity` is not listed, then you're already running the latest release.
 
 4. On the lower right, click on `Upgrade Plugin`. Once upgraded, click on `Close`.
 
 > If you receive an error after the plugin updates, try restarting QGIS.
 > If you still encounter an error, please [email us](mailto:info@north-road.com)
 > for support.
-
-
-
-
-
