@@ -18,7 +18,7 @@ When first opening QCity, there are two options available:
 1. `New QCity Package`.
 2. `Load QCity Package`.
 
-<img width="455" height="168" alt="QCity_Project_Setup_Packages" src="https://github.com/user-attachments/assets/9f13a0ac-96ed-4ef9-90a6-a5960e6b8e4f" />
+![QCity_Project_Setup_Packages](https://github.com/user-attachments/assets/9f13a0ac-96ed-4ef9-90a6-a5960e6b8e4f)
 
 Clicking on `New QCity Package` will open the native save dialog from the operating system. Browse to the location where you would like to save the QCity data, name the QCity GeoPackage and click `Save`.
 
@@ -34,7 +34,7 @@ When a new QCity GeoPackage is created, three layers are automatically created. 
 
 These layers have relationships preconfigured so that the development sites layer can aggregate data from the building levels layer and the project area layer can aggregate data from the development sites.
 
-<img width="1984" height="1403" alt="QCity_Layer_Data_Structure" src="https://github.com/user-attachments/assets/12613a92-d3ae-4187-b14c-5e9889ba579b" />
+![QCity_Layer_Data_Structure](https://github.com/user-attachments/assets/12613a92-d3ae-4187-b14c-5e9889ba579b)
 
 ### Project Settings
 
@@ -46,25 +46,25 @@ Each project area has the following settings that can be configured:
 
 The dwelling sizes and parking ratios configured in the project settings will apply to all developments linked to that project area. These settings can be changed at any time by simply changing the values in each section. Changing these settings will recalculate the dwelling and parking statistics for that project area.
 
-<img width="417" height="792" alt="Project_Settings" src="https://github.com/user-attachments/assets/b71b5510-d5cb-4cf5-b3cb-346cf89abb6f" />
+![Project_Settings](https://github.com/user-attachments/assets/b71b5510-d5cb-4cf5-b3cb-346cf89abb6f)
 
 ### Creating A Project Area
 
 To create a new project area, left click on the green + button on the right hand side of the project areas panel.
 
-<img width="455" height="333" alt="Project_Settings_Add_Project_Area" src="https://github.com/user-attachments/assets/0ff09fe1-8f49-4360-9635-27d424ebfb92" />
+![Project_Settings_Add_Project_Area](https://github.com/user-attachments/assets/0ff09fe1-8f49-4360-9635-27d424ebfb92)
 
 Then left click on the map area to start creating a polygon. Keep left clicking to create more points in the polygon and then right click to finish digitizing the polygon.
 
 Once digitizing the polygon has been completed, a window will appear require a project area name to be provided.
 
-<img width="199" height="119" alt="Project_Settings_Add_Project_Name" src="https://github.com/user-attachments/assets/841e7051-0750-4c85-a3d9-abc3728f3aa6" />
+![Project_Settings_Add_Project_Name](https://github.com/user-attachments/assets/841e7051-0750-4c85-a3d9-abc3728f3aa6)
 
 ### Deleting a Project Area
 
 A project area can be deleted by left clicking on the project area in the Project Setup panel and left clicking on the red minus button on the right hand side of the project areas panel.
 
-<img width="454" height="337" alt="Project_Settings_Remove_Project_Area" src="https://github.com/user-attachments/assets/3b469dd4-cc16-4f15-99ea-09bf160e7908" />
+![Project_Settings_Remove_Project_Area](https://github.com/user-attachments/assets/3b469dd4-cc16-4f15-99ea-09bf160e7908)
 
 **Caution: Deleting a project area will also delete any associated development sites and building levels.**
 
@@ -72,4 +72,4 @@ A project area can be deleted by left clicking on the project area in the Projec
 
 A project area can be renamed by left clicking on the project area in the Project Setup panel and left clicking on the pencil and paper button on the right hand side of the project areas panel.
 
-<img width="454" height="337" alt="Project_Settings_Rename_Project_Area" src="https://github.com/user-attachments/assets/4ea00ba2-a6e5-499e-9432-a9999ac81cb0" />
+![Project_Settings_Rename_Project_Area](https://github.com/user-attachments/assets/4ea00ba2-a6e5-499e-9432-a9999ac81cb0)
