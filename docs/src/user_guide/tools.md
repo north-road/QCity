@@ -123,7 +123,7 @@ Once snapping has been enabled, when created a new development site, you will se
 
 ![Snapping_Indicator](https://github.com/user-attachments/assets/0120e5af-4b45-4a2a-b97c-1e9487a403f5)
 
-> For more information on using snapping within QGIS, please see the QGIS ![documentation](https://docs.qgis.org/3.40/en/docs/user_manual/working_with_vector/editing_geometry_attributes.html#snapping-and-digitizing-options). 
+> For more information on using snapping within QGIS, please see the QGIS ![documentation](https://docs.qgis.org/3.40/en/docs/user_manual/working_with_vector/editing_geometry_attributes.html#snapping-and-digitizing-options).
 
 ### General Details
 
@@ -155,7 +155,7 @@ The car parking statistics are set to automatically calculate the number of car 
 
 ### Bike Parking Statistics
 
-The bike parking statistics are set to automatically calculate the number of bike parking bays for the development site by default. The values are calculated from the commercial and office floorspace and number of dwellings from the building levels and the parking ratios set in the [project settings](#Project-Settings). Should you wish to model an already constructed or approved building, untick the `Automatically calculate bicycle parking` check box and input the number of commercial, office and residential bays for the development site manually.
+The bike parking statistics are set to automatically calculate the number of bike parking bays for the development site by default. The values are calculated from the commercial and office floorspace and number of dwellings from the building levels and the parking ratios set in the [project settings](#project-settings). Should you wish to model an already constructed or approved building, untick the `Automatically calculate bicycle parking` check box and input the number of commercial, office and residential bays for the development site manually.
 
 ![Bike_Parking_Statistics_Manual_Configuration](https://github.com/user-attachments/assets/9733a83f-502f-4af6-887e-17a949dbb772)
 
