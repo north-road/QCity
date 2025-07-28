@@ -134,8 +134,8 @@ The general details section of the developent sites tab allows you to input the 
     1. `Constructed` for modeling of development sites already constructed
     2. `Proposed` for development sites where an approval has been issued but no construction has commenced
     3. `Modelled` for development sites which are hypothetical developments yet to occur
-4.  Year - The year of construction, approval or anticipated construction date
-5.  Owner - Owner of the development site
+3. Year - The year of construction, approval or anticipated construction date
+4. Owner - Owner of the development site
 
 ### Development Statistics
 
@@ -147,7 +147,7 @@ The development statistics are set to automatically calculate floorspace and dwe
 
 ### Car Parking Statistics
 
-The car parking statistics are set to automatically calculate the number of car parking bays for the development site by default. The values are calculated from the commercial and office floorspace and number of dwellings from the building levels and the parking ratios set in the [project settings](#Project-Settings). Should you wish to model an already constructed or approved building, untick the `Automatically calculate car parking` check box and input the number of commercial, office and residential bays for the development site manually.
+The car parking statistics are set to automatically calculate the number of car parking bays for the development site by default. The values are calculated from the commercial and office floorspace and number of dwellings from the building levels and the parking ratios set in the [project settings](#project-settings). Should you wish to model an already constructed or approved building, untick the `Automatically calculate car parking` check box and input the number of commercial, office and residential bays for the development site manually.
 
 ![Car_Parking_Statistics_Manual_Configuration](https://github.com/user-attachments/assets/f4d335ef-3e08-4f67-9fd8-b68b419fdf00)
 
@@ -186,5 +186,4 @@ Once the development sites layer is selected, right click on the development sit
 
 With the attribute table you can view the statistics for all the development sites across **all** project areas within the QCity Package.
 
-> If you would like to export the statistics for the development sites from the QGIS attribute table into a spreadsheet, you can do this by left clicking in the top left hand corner of the attribute table next to the field *fid* and using the keyboard shortcut Ctrl + C and pasting into the spreadsheet using Ctrl + V
-
+> If you would like to export the statistics for the development sites from the QGIS attribute table into a spreadsheet, you can do this by left clicking in the top left hand corner of the attribute table next to the field *fid* and using the keyboard shortcut Ctrl + C and pasting into the spreadsheet using Ctrl + V.
