@@ -85,7 +85,7 @@ Each development site has the following settings that can be configured:
 
 ### Relation to Project Area
 
-The development sites tab includes the name of the project area which it is associated with under the development sites heading. This provides you with an indication which project area you are creating the development site within.
+The `Development Sites` tab includes the name of the project area which it is associated with under the development sites heading. This provides you with an indication which project area you are creating the development site within.
 
 ![Development_Sites_Heading](https://github.com/user-attachments/assets/c0f7d230-d567-4109-a28d-bedaa6c459db)
 
@@ -99,7 +99,7 @@ Should you digitize a development site outside of the project area boundary, QCi
 
 When creating new development sites, often the boundaries correspond to existing cadastral boundaries. In order to digitize a development site to the boundaries of cadastral lots or other features, snapping needs to be enabled.
 
-Snapping options are available in the Snapping toolbar.
+Snapping options are available in the QGIS Snapping toolbar.
 
 ![Snapping_Toolbar](https://github.com/user-attachments/assets/24dde987-79de-4d38-9ad8-174b0d5a77a6)
 
@@ -123,7 +123,7 @@ Once snapping has been enabled, when created a new development site, you will se
 
 ![Snapping_Indicator](https://github.com/user-attachments/assets/0120e5af-4b45-4a2a-b97c-1e9487a403f5)
 
-> For more information on using snapping within QGIS, please see the QGIS ![documentation](https://docs.qgis.org/3.40/en/docs/user_manual/working_with_vector/editing_geometry_attributes.html#snapping-and-digitizing-options).
+> For more information on using snapping within QGIS, please see the QGIS ![documentation](https://docs.qgis.org/latest/en/docs/user_manual/working_with_vector/editing_geometry_attributes.html#snapping-and-digitizing-options).
 
 ### General Details
 
@@ -133,7 +133,7 @@ The general details section of the developent sites tab allows you to input the 
 2. Status - Drop down list including:
     1. `Constructed` for modeling of development sites already constructed
     2. `Proposed` for development sites where an approval has been issued but no construction has commenced
-    3. `Modelled` for development sites which are hypothetical developments yet to occur
+    3. `Modeled` for development sites which are hypothetical developments yet to occur
 3. Year - The year of construction, approval or anticipated construction date
 4. Owner - Owner of the development site
 
