@@ -6,7 +6,7 @@ The QCity panel is separated into 4 vertical tabs:
 
 1. Project areas - digitizing project areas and configuring settings for each project area.
 2. Development sites - digitizing development sites and setting automatic or manual calculation of development statistics.
-3. Building levels - digitizing building leveles and setting floor level composition.
+3. Building levels - digitizing building levels and setting floor level composition.
 4. Statistics - viewing statistics for each project area and exporting statistics to csv files.
 
 ## Project Areas
