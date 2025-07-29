@@ -56,7 +56,7 @@ To create a new project area, left click on the green + button on the right hand
 
 Then left click on the map area to start creating a polygon. Keep left clicking to create more points in the polygon and then right click to finish digitizing the polygon.
 
-Once digitizing the polygon has been completed, a window will appear require a project area name to be provided.
+Once digitizing the polygon has been completed, a window will appear requiring a project area name to be provided.
 
 ![Project_Settings_Add_Project_Name](https://github.com/user-attachments/assets/841e7051-0750-4c85-a3d9-abc3728f3aa6)
 
@@ -73,6 +73,12 @@ A project area can be deleted by left clicking on the project area in the Projec
 A project area can be renamed by left clicking on the project area in the Project Setup panel and left clicking on the pencil and paper button on the right hand side of the project areas panel.
 
 ![Project_Settings_Rename_Project_Area](https://github.com/user-attachments/assets/4ea00ba2-a6e5-499e-9432-a9999ac81cb0)
+
+A new window will open which will allow you to rename the project area.
+
+![Project_Area_Rename_Window](https://github.com/user-attachments/assets/111caf57-77cd-4d12-8048-fbc733dde0bb)
+
+> Should a name already be used, QCity will warn you that the name already exists and will not allow you to use that name.
 
 ## Development Sites
 
@@ -95,7 +101,19 @@ Should you digitize a development site outside of the project area boundary, QCi
 
 > The development site is linked to the project area that is selected in the projects tab. When working with multiple project areas, always ensure you check the header of the development sites tab to see which project area it is associated with.
 
-### Digitizing Development Sites - Snapping
+### Creating a Development Site
+
+To create a new development site, left click on the green + button on the right hand side of the development sites panel.
+
+![Development_Site_Create](https://github.com/user-attachments/assets/aa1c15d7-6148-49d9-8924-24eb75726415)
+
+Then left click on the map area to start creating a polygon. Keep left clicking to create more points in the polygon and then right click to finish digitizing the polygon.
+
+Once digitizing the polygon has been completed, a window will appear requiring a development site name to be provided.
+
+![Development_Site_Name](https://github.com/user-attachments/assets/96f33afe-954c-4a3b-9c54-c84804c5e79b)
+
+### Creating a Development Site - Snapping
 
 When creating new development sites, often the boundaries correspond to existing cadastral boundaries. In order to digitize a development site to the boundaries of cadastral lots or other features, snapping needs to be enabled.
 
@@ -107,7 +125,7 @@ If the Snapping toolbar is not visible, left click on `View`, hover the cursor o
 
 ![Snapping_Toolbar_Checkbox](https://github.com/user-attachments/assets/02a301ef-8b03-4026-bdcf-c4fefc95e0dd)
 
-To enable snapping, left click on the `Enable Snapping` button on the Snapping Toolbar which appears as a red magnet
+To enable snapping, left click on the `Enable Snapping` button on the Snapping Toolbar which appears as a red magnet.
 
 ![Enable_Snapping](https://github.com/user-attachments/assets/ecf75a98-b8c5-46ba-8391-d4113eae3c6c)
 
@@ -123,7 +141,27 @@ Once snapping has been enabled, when created a new development site, you will se
 
 ![Snapping_Indicator](https://github.com/user-attachments/assets/0120e5af-4b45-4a2a-b97c-1e9487a403f5)
 
-> For more information on using snapping within QGIS, please see the QGIS ![documentation](https://docs.qgis.org/latest/en/docs/user_manual/working_with_vector/editing_geometry_attributes.html#snapping-and-digitizing-options).
+> For more information on using snapping within QGIS, please see the [QGIS documentation](https://docs.qgis.org/latest/en/docs/user_manual/working_with_vector/editing_geometry_attributes.html#snapping-and-digitizing-options).
+
+### Deleting a Development Site
+
+A development site can be deleted by left clicking on the development site you want to delete in the development sites panel and left clicking on the red minus button on the right hand side of the development sites panel.
+
+![Development_Sites_Delete](https://github.com/user-attachments/assets/7ce818b2-044e-4bec-9104-ed6bfb2aac63)
+
+**Caution: Deleting a development site will also delete any associated building levels.**
+
+### Renaming a Development Site
+
+A development site can be renamed by left clicking on the development site you want to rename in the development sites panel and left clicking on the pencil and paper button on the right hand side of the development sites panel.
+
+![Development_Site_Rename](https://github.com/user-attachments/assets/40c66d57-053c-4df0-8b29-2821c7e5b572)
+
+A new window will open which will allow you to rename the development site.
+
+![Development_Site_Rename_Window](https://github.com/user-attachments/assets/5139b1b6-111b-4e1f-b125-628ceaed7e66)
+
+> Should a name already be used, QCity will warn you that the name already exists and will not allow you to use that name.
 
 ### General Details
 
@@ -187,3 +225,98 @@ Once the development sites layer is selected, right click on the development sit
 With the attribute table you can view the statistics for all the development sites across **all** project areas within the QCity Package.
 
 > If you would like to export the statistics for the development sites from the QGIS attribute table into a spreadsheet, you can do this by left clicking in the top left hand corner of the attribute table next to the field *fid* and using the keyboard shortcut Ctrl + C and pasting into the spreadsheet using Ctrl + V.
+
+## Building Levels
+
+### Relation to Development Sites
+
+The `Building Levels` tab includes the name of the development site which it is associated with under the building levels heading. This provides you with an indication which development site you are creating the building levels within.
+
+![Building_Levels_Heading](https://github.com/user-attachments/assets/0d2dc5cf-4044-4ec6-b265-497e85e6fb4d)
+
+Should you digitize a building level outside of the development site boundary, QCity will present a warning that the building level is outside the spatial extent of the development site.
+
+![Building_Levels_Warning_Spatial_Extent](https://github.com/user-attachments/assets/a6ceaf19-e5c2-4ffc-82d4-f9b86aee479c)
+
+> The building levels are linked to the development site that is selected in the development sites tab. When working with multiple development sites, always ensure you check the header of the building levels tab to see which development site it is associated with.
+
+### Creating a new Building Level
+
+To create a new building level, left click on the green + button on the right hand side of the building levels panel.
+
+![Building_Levels_Create](https://github.com/user-attachments/assets/a95d5cca-67f1-43b2-8b6c-e69bde612a68)
+
+Then left click on the map area to start creating a polygon. Keep left clicking to create more points in the polygon and then right click to finish digitizing the polygon.
+
+Once digitizing the polygon has been completed, a window will appear requiring a building level name to be provided.
+
+![Building_Level_Name](https://github.com/user-attachments/assets/76cc54ca-fff8-4e16-a912-4b3520eeeaa3)
+
+### Creating a new Building Level - Snapping
+
+When creating new building levels, often the boundaries correspond to the boundaries of existing features such as cadastral boundaries or development site boundaries. In order to digitize a building level to the boundaries of cadastral lots or other features, snapping needs to be enabled.
+
+Snapping options are available in the QGIS Snapping toolbar.
+
+![Snapping_Toolbar](https://github.com/user-attachments/assets/24dde987-79de-4d38-9ad8-174b0d5a77a6)
+
+If the Snapping toolbar is not visible, left click on `View`, hover the cursor over `Toolbars` and left click on `Snapping Toolbar` to enable the Snapping Toolbar.
+
+![Snapping_Toolbar_Checkbox](https://github.com/user-attachments/assets/02a301ef-8b03-4026-bdcf-c4fefc95e0dd)
+
+To enable snapping, left click on the `Enable Snapping` button on the Snapping Toolbar which appears as a red magnet.
+
+![Enable_Snapping](https://github.com/user-attachments/assets/ecf75a98-b8c5-46ba-8391-d4113eae3c6c)
+
+To enable snapping to a specific layer, left click on the snapping options dropdown icon situated to the right of the `Enable Snapping` button. Left click on the `Advanced Configuration`.
+
+![Snapping_Options_Menu](https://github.com/user-attachments/assets/e338b263-3f79-45c7-8ca7-0677c1e5617e)
+
+Once the Snapping toolbar is set to advanced configuration, left click on the `Edit Advanced Configuration` button which appears as an eye icon. Left click on the checkbox next to the layer you would like to snap to and from the `Type` dropdown, select whether you would like to snap to vertices, segments etc.
+
+![Snapping_Advanced_Configuration](https://github.com/user-attachments/assets/b10886f2-1eab-4a1c-a6d3-26c94ad44430)
+
+Once snapping has been enabled, when created a new building level, you will see a purple indicator on the map canvas to snap to the desired features.
+
+![Snapping_Indicator](https://github.com/user-attachments/assets/0120e5af-4b45-4a2a-b97c-1e9487a403f5)
+
+> For more information on using snapping within QGIS, please see the [QGIS documentation](https://docs.qgis.org/latest/en/docs/user_manual/working_with_vector/editing_geometry_attributes.html#snapping-and-digitizing-options).
+
+### Creating a new Building Level - Advanced Digitizing
+
+When digitizing building levels you may wish to digitize with specific measurements and angles in order to create polygons with accurate setbacks and lengths. In order to digitize with this level of accuracy, you will need to use the QGIS Advanced Digitizing Tools.
+
+> **Note: QGIS Advanced Digitizing tools only work with QCity in QGIS 3.44 or newer. In older QGIS releases, the Advanced Digitizing tools will not work when attempting to digitize project areas, development sites or building levels from within QCity.**
+
+#### Enabling Advanced Digitizing Tools
+
+To enable the Advanced Digitizing Tools, left click on `View` in the top left corner of the QGIS window, hover the cursor over `Panels` menu entry and left click on `Advanced Digitizing` to enable the Advanced Digitizing panel.
+
+![Advanced_Digitizing_Checkbox](https://github.com/user-attachments/assets/ab843c0c-7497-490f-94b0-cc32712e3335)
+
+Once enabled, the Advanced Digitizing panel will usually open on the left hand side of the QGIS window.
+
+![Advanced_Digitizing_Panel](https://github.com/user-attachments/assets/e515aab7-8829-43f9-b5dc-8f091819fd4c)
+
+#### Using Advanced Digitizing Tools
+
+To enable the Advanced Digitizing tools, left click on the green + button on the right hand side of the building levels panel to start digitizing a new building level polygon. Then before left clicking on the map area to create the first point in the polygon, left click on the `Enable Advanced Digitizing Tools` button in the Advanced Digitizing Tools panel which appears as a ruler and triangle icon.
+
+![Advanced_Digitizing_Enable](https://github.com/user-attachments/assets/6d330d6c-a04f-4b65-8316-8f097d3fc008)
+
+Once the Advanced Digitizing tools are enabled, you will notice that the cursor changes. Before creating the first point of the polygon, consider enabling construction mode to create a series of guides with the appropriate setbacks and wall lengths for the building level. Construction mode can be enabled by left clicking on the `Construction mode` button on the Advanced Digitizing panel which appears as a floor plan and hammer icon.
+
+![Advanced_Digitizing_Construction_Mode](https://github.com/user-attachments/assets/8b4a0844-887c-415d-9563-8eb4e6f8c22d)
+
+A drop down menu in the `Construction mode` button allows you to:
+
+1. Record the construction guides
+2. Show or hide the construction guides
+3. Snap to the visible construction guides
+4. Clear the construction guides completely
+
+> The construction mode can be enable and disabled with the keyboard shortcut `c` when using the Advanced Digitizing tools
+
+Begin creating a new building level polygon by left clicking on the map area. With the Advanced Digitizing tools enabled, you can input the distance and angle you would like to create the first length of the polygon.
+
+![Advanced_Digitizing_Distance_and_Angle](https://github.com/user-attachments/assets/e3a1d9c5-46d7-45d5-a473-7c3f6d3ce7ec)
