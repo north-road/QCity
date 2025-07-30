@@ -354,5 +354,3 @@ The order of building levels in the building levels panel can be changed by left
 Reordering the building levels in the building levels panel will also change their position in the 3D map. In the below image the ground level has been moved to the top of the list and now is at the top of the building when viewed in 3D.
 
 ![Building_Levels_Reorder_3D](https://github.com/user-attachments/assets/79634037-b665-4cf2-9cd2-1086495c4b1f)
-
-
