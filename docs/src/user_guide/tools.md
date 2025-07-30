@@ -252,6 +252,8 @@ Once digitizing the polygon has been completed, a window will appear requiring a
 
 ![Building_Level_Name](https://github.com/user-attachments/assets/76cc54ca-fff8-4e16-a912-4b3520eeeaa3)
 
+Left click on `OK` and the building level will be created.
+
 ### Creating a new Building Level - Snapping
 
 When creating new building levels, often the boundaries correspond to the boundaries of existing features such as cadastral boundaries or development site boundaries. In order to digitize a building level to the boundaries of cadastral lots or other features, snapping needs to be enabled.
@@ -315,8 +317,42 @@ A drop down menu in the `Construction mode` button allows you to:
 3. Snap to the visible construction guides
 4. Clear the construction guides completely
 
-> The construction mode can be enable and disabled with the keyboard shortcut `c` when using the Advanced Digitizing tools
+> The construction mode can also be enable and disabled with the keyboard shortcut `c` when using the Advanced Digitizing tools.
 
 Begin creating a new building level polygon by left clicking on the map area. With the Advanced Digitizing tools enabled, you can input the distance and angle you would like to create the first length of the polygon.
 
 ![Advanced_Digitizing_Distance_and_Angle](https://github.com/user-attachments/assets/e3a1d9c5-46d7-45d5-a473-7c3f6d3ce7ec)
+
+Once you had created the first point of the polygon, enter the distance and angle and left click again to create the next point. Repeat this process and right click to finish the polygon. Once you complete the building level polygon, a window will appear asking for a name of the building level polygon as outlined in [Creating a Building Level](#creating-a-new-building-level).
+
+> For more information on the QGIS Advanced Digitizing tools, please see the [QGIS Documentation](https://docs.qgis.org/latest/en/docs/user_manual/working_with_vector/editing_geometry_attributes.html#the-advanced-digitizing-panel)
+
+### Deleting a Building Level
+
+A building level can be deleted by left clicking on the building level you want to delete in the building levels panel and left clicking on the red minus button on the right hand side of the building levels panel.
+
+![Building_Levels_Delete](https://github.com/user-attachments/assets/ce491c6e-06ab-4b2f-ab2b-57f62fb7ec5d)
+
+### Renaming a Building Level
+
+A building level can be renamed by left clicking on the building level you want to rename in the building level panel and left clicking on the pencil and paper button on the right hand side of the building level panel.
+
+![Building_Levels_Rename](https://github.com/user-attachments/assets/9ef4b78b-435b-463a-ab98-c4caa03acc2a)
+
+A new window will open which will allow you to rename the building level.
+
+![Building_Levels_Rename_Window](https://github.com/user-attachments/assets/19041748-6279-4691-a72a-d2edc6a3a549)
+
+> Should a name already be used, QCity will warn you that the name already exists and will not allow you to use that name.
+
+### Changing the order of Building Levels
+
+The order of building levels in the building levels panel can be changed by left clicking on the up and down arrow buttons on the right hand side of the building levels panel.
+
+![Building_Levels_Reorder](https://github.com/user-attachments/assets/ad252a6c-95cf-440e-b771-a78ee6c4f790)
+
+Reordering the building levels in the building levels panel will also change their position in the 3D map. In the below image the ground level has been moved to the top of the list and now is at the top of the building when viewed in 3D.
+
+![Building_Levels_Reorder_3D](https://github.com/user-attachments/assets/79634037-b665-4cf2-9cd2-1086495c4b1f)
+
+
