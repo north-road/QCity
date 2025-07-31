@@ -78,7 +78,7 @@ A new window will open which will allow you to rename the project area.
 
 ![Project_Area_Rename_Window](https://github.com/user-attachments/assets/111caf57-77cd-4d12-8048-fbc733dde0bb)
 
-> Should a name already be used, QCity will warn you that the name already exists and will not allow you to use that name.
+> Should a name already be used, QCity will warn you that the name already exists and will not allow you to reuse it.
 
 ## Development Sites
 
@@ -145,7 +145,7 @@ Once snapping has been enabled, when created a new development site, you will se
 
 ### Deleting a Development Site
 
-A development site can be deleted by left clicking on the development site you want to delete in the development sites panel and left clicking on the red minus button on the right hand side of the development sites panel.
+A development site can be deleted by selecting the development site you want to delete in the development sites panel and left clicking on the red minus button on the right hand side of the development sites panel.
 
 ![Development_Sites_Delete](https://github.com/user-attachments/assets/7ce818b2-044e-4bec-9104-ed6bfb2aac63)
 
@@ -153,7 +153,7 @@ A development site can be deleted by left clicking on the development site you w
 
 ### Renaming a Development Site
 
-A development site can be renamed by left clicking on the development site you want to rename in the development sites panel and left clicking on the pencil and paper button on the right hand side of the development sites panel.
+A development site can be renamed by selecting the development site you want to rename in the development sites panel and left clicking on the pencil and paper button on the right hand side of the development sites panel.
 
 ![Development_Site_Rename](https://github.com/user-attachments/assets/40c66d57-053c-4df0-8b29-2821c7e5b572)
 
@@ -161,7 +161,7 @@ A new window will open which will allow you to rename the development site.
 
 ![Development_Site_Rename_Window](https://github.com/user-attachments/assets/5139b1b6-111b-4e1f-b125-628ceaed7e66)
 
-> Should a name already be used, QCity will warn you that the name already exists and will not allow you to use that name.
+> Should a name already be used, QCity will warn you that the name already exists and will not allow you to reuse it.
 
 ### General Details
 
@@ -288,8 +288,6 @@ Once snapping has been enabled, when created a new building level, you will see 
 
 When digitizing building levels you may wish to digitize with specific measurements and angles in order to create polygons with accurate setbacks and lengths. In order to digitize with this level of accuracy, you will need to use the QGIS Advanced Digitizing Tools.
 
-> **Note: QGIS Advanced Digitizing tools only work with QCity in QGIS 3.44 or newer. In older QGIS releases, the Advanced Digitizing tools will not work when attempting to digitize project areas, development sites or building levels from within QCity.**
-
 #### Enabling Advanced Digitizing Tools
 
 To enable the Advanced Digitizing Tools, left click on `View` in the top left corner of the QGIS window, hover the cursor over `Panels` menu entry and left click on `Advanced Digitizing` to enable the Advanced Digitizing panel.
@@ -329,13 +327,13 @@ Once you had created the first point of the polygon, enter the distance and angl
 
 ### Deleting a Building Level
 
-A building level can be deleted by left clicking on the building level you want to delete in the building levels panel and left clicking on the red minus button on the right hand side of the building levels panel.
+A building level can be deleted by selecting the building level you want to delete in the building levels panel and left clicking on the red minus button on the right hand side of the building levels panel.
 
 ![Building_Levels_Delete](https://github.com/user-attachments/assets/ce491c6e-06ab-4b2f-ab2b-57f62fb7ec5d)
 
 ### Renaming a Building Level
 
-A building level can be renamed by left clicking on the building level you want to rename in the building level panel and left clicking on the pencil and paper button on the right hand side of the building level panel.
+A building level can be renamed by selecting the building level you want to rename in the building level panel and left clicking on the pencil and paper button on the right hand side of the building level panel.
 
 ![Building_Levels_Rename](https://github.com/user-attachments/assets/9ef4b78b-435b-463a-ab98-c4caa03acc2a)
 
@@ -343,7 +341,7 @@ A new window will open which will allow you to rename the building level.
 
 ![Building_Levels_Rename_Window](https://github.com/user-attachments/assets/19041748-6279-4691-a72a-d2edc6a3a549)
 
-> Should a name already be used, QCity will warn you that the name already exists and will not allow you to use that name.
+> Should a name already be used, QCity will warn you that the name already exists and will not allow you to reuse it.
 
 ### Changing the order of Building Levels
 
