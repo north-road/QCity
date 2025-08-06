@@ -352,3 +352,46 @@ The order of building levels in the building levels panel can be changed by left
 Reordering the building levels in the building levels panel will also change their position in the 3D map. In the below image the ground level has been moved to the top of the list and now is at the top of the building when viewed in 3D.
 
 ![Building_Levels_Reorder_3D](https://github.com/user-attachments/assets/79634037-b665-4cf2-9cd2-1086495c4b1f)
+
+### Level Composition
+
+For each building level there is a Level Composition section of the panel which allows you to specify the percentage of commercial, office and residential floor space for that building level. Each building level can have a different level composition. For the residential floorspace, this is further broken down into the percentage of the **residential floorspace** that is used for 1 bedroom, 2 bedroom, 3 bedroom and 4+ bedroom dwellings. A total percentage figure is provided which will turn red if the percentage exceeds 100%.
+
+If the `Automatically calculate floorspace`, `Automatically calculate car parking` and `Automatically calculate bicycle parking` are enabled for the development site, changes to the level composition will automatically recalculate the floorspace, dwelling yield and parking numbers. This will use the dwelling sizes and parking rates specified in the ![Project Settings](#project-settings).
+
+The level composition section of the building levels panel also includes the following:
+
+1. Floor number - This represents the building level when viewed in 3D with floor number 1 being the lowest floor in the 3D building. Moving the building level up and down will automatically change this value.
+2. Floor level - This represents the floor level of the building level which is dependent on the floor heights and levels of the building levels beneath it.
+3. Floor height - This represents the height of the building level in 3D and will impact the floor level of the building levels above it. Changing the floor height will change the floor level of building levels above.
+
+![Building_Levels_composition](https://github.com/user-attachments/assets/8501c1f7-0520-4a64-aeb8-9af5aae640c6)
+
+### Unallocated Residential Floorspace
+
+At the bottom of the building levels panel is the Unallocated Residential Floorspace table. Often when modeling dwellings in a building the calculations will result in some left over area. The Unallocated Residential Floorspce table shows the following information:
+
+1. Dwelling size specified in the ![Project Settings](#project-settings).
+2. Yield for each dwelling type from the allocated floorspace in the building level.
+3. Unallocated area for each dwelling type and a total unallocated area for the building level. If the unallocated area is more than the size of certain dwelling types (1 bedroom, 2 bedroom etc) you may want to consider adjusting the percentage allocated to each dwelling type in the Level Composition to get a more optimal dwelling yield.
+
+![Building_Levels_Unallocated_Residential_Floorspace](https://github.com/user-attachments/assets/97a16d7c-ef78-4f9f-919b-d8929f37c472)
+
+## Statistics
+
+The 4th tab in QCity is the Statistics tab. This tab shows the development statistics for each project area and lets you export the data to view in an application such as a spreadsheet.
+
+At the top of the Statistics tab is a drop down menu which lists all the project areas in the QCity package. Left click on the project area you want to see the statistics for.
+
+![Statistics_Project_Drop_Down](https://github.com/user-attachments/assets/5a74fed1-a4ed-4018-97bd-91dfb57589d3)
+
+Below this drop down menu are two buttons as follows:
+
+1. `Update` - updates the statistics for the project area. This button will change to a red font `Requires update` when the data in the Statistics tab is out of date with changes to the data. Left clicking on the `Requires Update` button will update the statistics for the project area.
+2. `Export` - Exports the data for the project area to a csv format which can then be imported into an application such as a spreadsheet. Left click on the `Export` button to export the data. This will open the operating system save dialog which will enable you to save the csv to the desired location.
+
+![Statistics_Requires_Update](https://github.com/user-attachments/assets/12b6c2ee-ba42-4510-886f-1bc6bb7a6502)
+
+Below the `Update` and `Export` buttons are the development statistics, car parking statistics and bike parking statistics. These statistics are generated from the project area, development sites and building levels data and will be automatically updated when the `Update` button is left clicked.
+
+![Statistics](https://github.com/user-attachments/assets/01382af4-b278-4690-a5b0-abbe199916ff)
