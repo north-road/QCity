@@ -6,8 +6,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QCoreApplication, Qt, pyqtSignal
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import (
-    QFileDialog,
-    QGraphicsOpacityEffect,
+    QFileDialog
 )
 from qgis.core import (
     QgsProject,
@@ -60,8 +59,6 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         self.project = project
         self.iface = iface
         self.set_base_layer_items()
-
-        self.opacity_effect = QGraphicsOpacityEffect()
 
         self.set_widgets_enabled(False)
 
