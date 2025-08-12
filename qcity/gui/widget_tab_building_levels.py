@@ -21,6 +21,8 @@ class BuildingLevelsPageController(PageController):
         super().__init__(LayerType.BuildingLevels, og_widget, tab_widget, list_widget)
         self.skip_fields_for_widgets = ["fid", "name", "development_site_pk"]
 
+        self.og_widget.base_height.setProperty("decimals", 2)
+
         PROJECT_CONTROLLER.development_site_changed.connect(
             self.on_development_site_changed
         )
