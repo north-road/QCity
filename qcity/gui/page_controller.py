@@ -56,7 +56,7 @@ class PageController(QObject):
 
         if self.tab_widget is not None:
             for spin_box in self.tab_widget.findChildren((QSpinBox, QDoubleSpinBox)):
-                spin_box.valueChanged.connect(self.save_widget_value_to_feature)
+                spin_box.editingFinished.connect(self.widget_edit_finished)
 
             for spin_box in self.tab_widget.findChildren(
                 (QgsSpinBox, QgsDoubleSpinBox)
@@ -72,7 +72,7 @@ class PageController(QObject):
                         break
                     p = p.parent()
                 if not is_child_of_spinbox:
-                    line_edit.textChanged.connect(self.save_widget_value_to_feature)
+                    line_edit.editingFinished.connect(self.widget_edit_finished)
 
             for checkbox in self.tab_widget.findChildren(QCheckBox):
                 checkbox.toggled.connect(self.save_widget_value_to_feature)
@@ -149,6 +149,18 @@ class PageController(QObject):
         Returns True if the deletion was successful
         """
         return False
+
+    def widget_edit_finished(self):
+        """
+        Triggered when a widget editing has finished
+        """
+        widget = self.sender()
+        if isinstance(widget, QLineEdit):
+            self.save_widget_value_to_feature(widget.text())
+        elif isinstance(widget, (QSpinBox, QDoubleSpinBox)):
+            self.save_widget_value_to_feature(widget.value())
+        else:
+            assert False, f"Not handled widget type: {widget}"
 
     def save_widget_value_to_feature(self, value):
         """
