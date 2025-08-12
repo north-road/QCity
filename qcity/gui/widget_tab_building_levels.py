@@ -232,8 +232,32 @@ class BuildingLevelsPageController(PageController):
             )
         )
 
+        self.clear_feature()
+
         for feat in level_layer.getFeatures(request):
             self.add_feature_to_list(feat, set_current=False)
+
+    def clear_feature(self):
+        super().clear_feature()
+
+        self.og_widget.floorspace_sum.clear()
+        self.og_widget.residential_sum.clear()
+        self.og_widget.level_index.clear()
+        self.og_widget.base_height.clear()
+        self.og_widget.label_1bed_size.clear()
+        self.og_widget.label_2bed_size.clear()
+        self.og_widget.label_3bed_size.clear()
+        self.og_widget.label_4bed_size.clear()
+        self.og_widget.label_1bed_yield.clear()
+        self.og_widget.label_2bed_yield.clear()
+        self.og_widget.label_3bed_yield.clear()
+        self.og_widget.label_4bed_yield.clear()
+        self.og_widget.label_residential_yield.clear()
+        self.og_widget.label_1bed_unallocated.clear()
+        self.og_widget.label_2bed_unallocated.clear()
+        self.og_widget.label_3bed_unallocated.clear()
+        self.og_widget.label_4bed_unallocated.clear()
+        self.og_widget.label_residential_unallocated.clear()
 
     def set_feature(self, feature: QgsFeature):
         super().set_feature(feature)

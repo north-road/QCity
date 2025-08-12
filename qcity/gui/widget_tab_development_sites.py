@@ -100,6 +100,8 @@ class DevelopmentSitesPageController(PageController):
         request = QgsFeatureRequest()
         request.setFilterExpression(filter_expression)
 
+        self.clear_feature()
+
         for feat in site_layer.getFeatures(request):
             self.add_feature_to_list(feat, set_current=False)
 

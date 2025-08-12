@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from qgis.PyQt.QtCore import Qt, QObject, pyqtSignal
 from qgis.PyQt.QtGui import QFontMetrics
@@ -48,6 +48,7 @@ class PageController(QObject):
         self._block_feature_updates = False
 
         self.current_feature_id: Optional[int] = None
+        self.clearable_widgets: List[QWidget] = []
 
         if self.list_widget is not None:
             fm = QFontMetrics(self.list_widget.font())
@@ -57,6 +58,7 @@ class PageController(QObject):
         if self.tab_widget is not None:
             for spin_box in self.tab_widget.findChildren((QSpinBox, QDoubleSpinBox)):
                 spin_box.editingFinished.connect(self.widget_edit_finished)
+                self.clearable_widgets.append(spin_box)
 
             for spin_box in self.tab_widget.findChildren(
                 (QgsSpinBox, QgsDoubleSpinBox)
@@ -73,9 +75,11 @@ class PageController(QObject):
                     p = p.parent()
                 if not is_child_of_spinbox:
                     line_edit.editingFinished.connect(self.widget_edit_finished)
+                    self.clearable_widgets.append(line_edit)
 
             for checkbox in self.tab_widget.findChildren(QCheckBox):
                 checkbox.toggled.connect(self.save_widget_value_to_feature)
+                self.clearable_widgets.append(checkbox)
 
             for combo in self.tab_widget.findChildren(QComboBox):
                 field_config = DatabaseUtils.get_field_config(
@@ -86,6 +90,7 @@ class PageController(QObject):
                         combo.addItem(value, code)
 
                 combo.currentIndexChanged.connect(self.save_widget_value_to_feature)
+                self.clearable_widgets.append(combo)
 
         if self.list_widget is not None:
             self.list_widget.currentRowChanged.connect(
@@ -119,8 +124,7 @@ class PageController(QObject):
         """
         current_item = self.list_widget.item(row)
         if not current_item:
-            if self.current_item_label is not None:
-                self.current_item_label.clear()
+            self.clear_feature()
             return
 
         self.current_feature_id = current_item.data(Qt.UserRole)
@@ -182,6 +186,19 @@ class PageController(QObject):
         LayerUtils.store_value(
             self.layer_type, self.current_feature_id, field_name, value
         )
+
+    def clear_feature(self):
+        """
+        Clears the current feature from the page
+        """
+        if self.current_item_label is not None:
+            self.current_item_label.clear()
+
+        for widget in self.clearable_widgets:
+            if isinstance(widget, QLineEdit):
+                widget.clear()
+            elif isinstance(widget, (QSpinBox, QDoubleSpinBox)):
+                widget.setValue(0)
 
     def set_feature(self, feature: QgsFeature):
         """
