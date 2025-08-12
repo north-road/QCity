@@ -60,6 +60,7 @@ class BuildingLevelsPageController(PageController):
             w.valueChanged.connect(self._update_floorspace_total)
 
         for w in (
+            self.og_widget.percent_residential_floorspace,
             self.og_widget.percent_1_bedroom_floorspace,
             self.og_widget.percent_2_bedroom_floorspace,
             self.og_widget.percent_3_bedroom_floorspace,
