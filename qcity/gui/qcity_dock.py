@@ -3,11 +3,9 @@ from pathlib import Path
 from typing import Optional
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import QCoreApplication, Qt, pyqtSignal
+from qgis.PyQt.QtCore import QCoreApplication, Qt, pyqtSignal, QStringListModel
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import (
-    QFileDialog
-)
+from qgis.PyQt.QtWidgets import QFileDialog
 from qgis.core import (
     QgsProject,
     Qgis,
@@ -27,6 +25,14 @@ from ..core import SETTINGS_MANAGER
 from ..gui.gui_utils import GuiUtils
 
 DOCK_WIDGET, _ = uic.loadUiType(GuiUtils.get_ui_file_path("dockwidget_main.ui"))
+
+
+class DisabledStringListModel(QStringListModel):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def flags(self, index):
+        return Qt.NoItemFlags
 
 
 class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
@@ -128,6 +134,16 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         for project in base_projects:
             project_base_name = Path(project).stem
             self.comboBox_base_layers.addItem(project_base_name, project)
+        if not base_projects:
+            model = DisabledStringListModel(self.comboBox_base_layers)
+            model.setStringList(
+                [self.tr("Add base layers"), self.tr("No base layers configured")]
+            )
+            self.comboBox_base_layers.setModel(model)
+            self.comboBox_base_layers.setCurrentIndex(0)
+            self.comboBox_base_layers.setToolTip(
+                self.tr("Please see QCity documentation")
+            )
 
     def create_new_project_database(
         self, file_name: Optional[str] = None, selected_filter: str = ".gpkg"
