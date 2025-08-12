@@ -199,6 +199,10 @@ class PageController(QObject):
                 widget.clear()
             elif isinstance(widget, (QSpinBox, QDoubleSpinBox)):
                 widget.setValue(0)
+            elif isinstance(widget, QCheckBox):
+                widget.setChecked(False)
+            elif isinstance(widget, QComboBox):
+                widget.setCurrentIndex(-1)
 
     def set_feature(self, feature: QgsFeature):
         """
