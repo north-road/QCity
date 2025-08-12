@@ -93,9 +93,13 @@ class LayerUtils:
         feature_id: int,
         geometry: QgsGeometry,
         geometry_crs: QgsCoordinateReferenceSystem,
+        tolerance_percent: Optional[float] = None,
     ) -> bool:
         """
-        Tests whether a geometry is completely contained within a feature from a layer
+        Tests whether a geometry is completely contained within a feature from a layer.
+
+        tolerance_percent can be used to specify a tolerance (eg 0.05 = 5%) of the geometry
+        which is allowed to fall outside the feature.
         """
         feature_geometry = layer.getFeature(feature_id).geometry()
 
@@ -106,4 +110,10 @@ class LayerUtils:
         except QgsCsException:
             return False
 
-        return feature_geometry.contains(reference_geometry)
+        if tolerance_percent is None:
+            return feature_geometry.contains(reference_geometry)
+
+        intersection = feature_geometry.intersection(reference_geometry)
+        area_geometry = reference_geometry.area()
+        intersection_area = intersection.area()
+        return intersection_area >= (area_geometry * (1 - tolerance_percent))

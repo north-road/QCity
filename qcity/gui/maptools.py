@@ -83,6 +83,7 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
                     parent_feature.id(),
                     polygon,
                     self.layer().crs(),
+                    tolerance_percent=0.05,
                 ):
                     if (
                         QMessageBox.warning(
