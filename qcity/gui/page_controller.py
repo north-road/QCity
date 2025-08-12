@@ -216,7 +216,11 @@ class PageController(QObject):
                 else:
                     widget.setCurrentIndex(-1)
             elif isinstance(widget, QLabel):
-                widget.setText(str(value))
+                decimals = widget.property("decimals")
+                if decimals is not None:
+                    widget.setText("%.*f" % (decimals, value))
+                else:
+                    widget.setText(str(value))
 
     def remove_current_selection(self) -> None:
         """
