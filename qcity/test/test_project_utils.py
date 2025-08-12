@@ -5,7 +5,7 @@ import tempfile
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis.PyQt.QtTest import QSignalSpy
 
-from qgis.core import QgsProject, QgsVectorLayer, QgsVectorLayerUtils, QgsSettings
+from qgis.core import QgsProject, QgsVectorLayer, QgsVectorLayerUtils, QgsSettings, NULL
 
 from qcity.core.project import ProjectController
 
@@ -756,6 +756,10 @@ class TestProjectUtils(unittest.TestCase):
 
             self.assertEqual(
                 controller.get_unique_names(LayerType.ProjectAreas),
+                ["a3", "Feature 1 Name", "feature 2"],
+            )
+            self.assertEqual(
+                controller.get_unique_names(LayerType.ProjectAreas, NULL),
                 ["a3", "Feature 1 Name", "feature 2"],
             )
 
