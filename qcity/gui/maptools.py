@@ -10,7 +10,8 @@
 # ---------------------------------------------------------------------
 from typing import List, Union
 
-from qgis.PyQt.QtWidgets import QInputDialog, QMessageBox
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QInputDialog, QMessageBox, QDialog
 from qgis.core import (
     NULL,
     QgsGeometry,
@@ -25,6 +26,7 @@ from qgis.gui import (
     QgsMapToolCapture,
     QgsAbstractMapToolHandler,
     QgsMapToolCaptureLayerGeometry,
+    QgsNewNameDialog,
 )
 
 from qcity.core import LayerType, PROJECT_CONTROLLER, DatabaseUtils, LayerUtils
@@ -98,15 +100,38 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
                     ):
                         return
 
-        feature_name, ok = QInputDialog.getText(
-            self.canvas(),
-            self.tr("Create {}").format(self._layer_type.as_title_case(plural=False)),
-            self.tr("Input {} name").format(
-                self._layer_type.as_sentence_case(plural=False)
-            ),
+        existing_names = PROJECT_CONTROLLER.get_unique_names(
+            self._layer_type, self._parent_pk
         )
 
-        if not ok:
+        dialog = QgsNewNameDialog(
+            initial="",
+            existing=existing_names,
+            cs=Qt.CaseSensitivity.CaseSensitive,
+            parent=self.canvas(),
+        )
+
+        dialog.setWindowTitle(
+            self.tr("Create {}").format(self._layer_type.as_title_case(plural=False))
+        )
+        dialog.setAllowEmptyName(False)
+        dialog.setOverwriteEnabled(False)
+        dialog.setHintString(
+            self.tr("Input {} name").format(
+                self._layer_type.as_sentence_case(plural=False)
+            )
+        )
+        dialog.setConflictingNameWarning(
+            self.tr("A {} with this name already exists").format(
+                self._layer_type.as_sentence_case(plural=False)
+            )
+        )
+
+        if dialog.exec_() != QDialog.DialogCode.Accepted:
+            return
+
+        feature_name = dialog.name()
+        if not feature_name:
             return
 
         self.create_feature(feature_name, polygon)
@@ -116,17 +141,6 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
         Called when the new feature should be created
         """
         layer = PROJECT_CONTROLLER.get_layer(self._layer_type)
-
-        existing_names = PROJECT_CONTROLLER.get_unique_names(
-            self._layer_type, self._parent_pk
-        )
-        feature_name_exists = feature_name in existing_names
-
-        if not feature_name or feature_name_exists:
-            if feature_name_exists:
-                # TODO: Message bar here instead.
-                print("Table name already exists.")
-            return
 
         if not layer.isValid():
             raise Exception("Layer is not valid!")

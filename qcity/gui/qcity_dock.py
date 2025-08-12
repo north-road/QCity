@@ -35,7 +35,7 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
     Main dock widget.
     """
 
-    add_feature_clicked = pyqtSignal(LayerType, int)
+    add_feature_clicked = pyqtSignal(LayerType, object)
 
     def __init__(self, project, iface) -> None:
         super(QCityDockWidget, self).__init__()
