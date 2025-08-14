@@ -36,6 +36,38 @@ These layers have relationships preconfigured so that the development sites laye
 
 ![QCity_Layer_Data_Structure](https://github.com/user-attachments/assets/12613a92-d3ae-4187-b14c-5e9889ba579b)
 
+### Base Layers
+
+The project tab in QCity includes an `Add base layers` dropdown menu situated below the `Load QCity Package` button. Once configured, this `Add base layers` dropdown allows you to quickly add spatial data to your QGIS project. In order to populate this menu a QGIS project is required to be configured in a folder for each menu entry. 
+
+![Base_Layers_Diagram](https://github.com/user-attachments/assets/430892ec-8beb-4b81-ad95-0f885f72cabb)
+
+Each entry in the `Add base layers` dropdown corresponds to a separate QGIS project in the base layers folder. It is advised to store the QGIS projects and spatial data in a central location with adequate privileges to allow multiple users to access the base layers.
+
+![Base_Layers_Folder](https://github.com/user-attachments/assets/d3fe4c08-f929-4005-a706-3aa35fab2995)
+
+> Note: The creation of the QGIS projects and folder in a central location will need to be completed by a person with adequate permissions such as a GIS analyst.
+
+Once the QGIS projects are created with the spatial data, you need to point QCity to the locaton of the folder. To do this left click on `Settings` and then left click on `Options` in the menu.
+
+![Base_Layers_Settings_Menu](https://github.com/user-attachments/assets/bc0520be-1695-4c13-b138-d080b59ca1c3)
+
+Left click on `Advanced` in the left hand panel. Disable the check box `Use new settings tree widget (some settings will be missing)` by left clicking on the checkbox. Then left click on `I will be careful, I promise!`.
+
+![Base_Layers_Settings_Advanced](https://github.com/user-attachments/assets/9d241e97-ac10-4bf7-b7a1-d17bf4336740)
+
+Scroll down to `plugins` and expand the list by left clicking on the triangle to the left of the `plugins` entry. Expand the `qcity` entry by left clicking on the triangle to the left of the `qcity` entry. Add the full path to the folder which contains the QGIS base layers projects.
+
+![Base_Layers_Folder_Path](https://github.com/user-attachments/assets/2885566d-0621-4c9c-bf48-a18dcf277f25)
+
+Left click on `Ok` and restart QGIS. Once QGIS is restarted the `Add base layers` dropdown will be populated.
+
+![Base_Layers_Dropdown](https://github.com/user-attachments/assets/ddb7188d-819c-42b1-880e-d582bff4d7f8)
+
+Left click on the base layer you want to add to your project and then left click on the `Load selected base layers` button to the right hand side of the `Add base layers` dropdown. This will then add the layers configured in the QGIS project in the base layers folder to your project.
+
+![Base_Layers_Add_Layers_Button](https://github.com/user-attachments/assets/1734ddcf-1cdf-4a36-af8d-f9d38e341efe)
+
 ### Project Settings
 
 Each project area has the following settings that can be configured:
