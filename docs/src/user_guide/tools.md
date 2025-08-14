@@ -38,7 +38,7 @@ These layers have relationships preconfigured so that the development sites laye
 
 ### Base Layers
 
-The project tab in QCity includes an `Add base layers` dropdown menu situated below the `Load QCity Package` button. Once configured, this `Add base layers` dropdown allows you to quickly add spatial data to your QGIS project. In order to populate this menu a QGIS project is required to be configured in a folder for each menu entry. 
+The project tab in QCity includes an `Add base layers` dropdown menu situated below the `Load QCity Package` button. Once configured, this `Add base layers` dropdown allows you to quickly add spatial data to your QGIS project. In order to populate this menu a QGIS project is required to be configured in a folder for each menu entry.
 
 ![Base_Layers_Diagram](https://github.com/user-attachments/assets/430892ec-8beb-4b81-ad95-0f885f72cabb)
 
