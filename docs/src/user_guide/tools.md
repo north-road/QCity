@@ -407,7 +407,7 @@ At the bottom of the building levels panel is the Unallocated Residential Floors
 2. Yield for each dwelling type from the allocated floorspace in the building level.
 3. Unallocated area for each dwelling type and a total unallocated area for the building level. If the unallocated area is more than the size of certain dwelling types (1 bedroom, 2 bedroom etc) you may want to consider adjusting the percentage allocated to each dwelling type in the Level Composition to get a more optimal dwelling yield.
 
-![Building_Levels_Unallocated_Residential_Floorspace](https://github.com/user-attachments/assets/97a16d7c-ef78-4f9f-919b-d8929f37c472)
+![Building_Levels_Unallocated_Residential_Floorspace](https://github.com/user-attachments/assets/ff5c147c-8adf-4171-8049-62127e41da02)
 
 ## Statistics
 
