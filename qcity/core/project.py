@@ -1226,10 +1226,27 @@ class ProjectController(QObject):
         building_level_feature = building_level_layer.getFeature(building_level_fid)
         if not building_level_feature.isValid():
             return False
+        foreign_key = DatabaseUtils.foreign_key_for_layer(LayerType.BuildingLevels)
+        development_site_key = building_level_feature[foreign_key]
+        request = QgsFeatureRequest().setFilterExpression(
+            QgsExpression.createFieldEqualityExpression(
+                DatabaseUtils.primary_key_for_layer(
+                    LayerType.DevelopmentSites),
+                development_site_key,
+            )
+        )
+        development_site_layer = self.get_development_sites_layer()
+        development_site_features = [
+            f for f in development_site_layer.getFeatures(request)
+        ]
+        development_site_feature = development_site_features[0]
 
         with wrapped_edits(building_level_layer) as edits:
             if not edits.deleteFeature(building_level_fid):
                 return False
+
+            self.update_floor_heights(development_site_feature.id())
+
         return True
 
     def auto_calculate_development_site_floorspace(
