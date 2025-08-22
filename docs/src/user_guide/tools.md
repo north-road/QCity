@@ -68,6 +68,9 @@ Left click on the base layer you want to add to your project and then left click
 
 ![Base_Layers_Add_Layers_Button](https://github.com/user-attachments/assets/1734ddcf-1cdf-4a36-af8d-f9d38e341efe)
 
+> For system admininstrators, the base layers configuration can be automated (e.g. for use in QGIS deployment scripts) via a Python command:
+> `QgsSettings().setValue('plugins/qcity/base_project_folder', 'c:/path/to/project/folder')`
+
 ### Project Settings
 
 Each project area has the following settings that can be configured:
