@@ -162,6 +162,12 @@ class PageController(QObject):
         if isinstance(widget, QLineEdit):
             self.save_widget_value_to_feature(widget.text())
         elif isinstance(widget, (QSpinBox, QDoubleSpinBox)):
+            value = widget.value()
+            if widget.property("stored_value") is not None and value == widget.property(
+                "stored_value"
+            ):
+                # no change
+                return
             self.save_widget_value_to_feature(widget.value())
         else:
             assert False, f"Not handled widget type: {widget}"
@@ -182,6 +188,9 @@ class PageController(QObject):
             value = widget.currentData()
         elif isinstance(widget, QCheckBox):
             value = widget.isChecked()
+        elif isinstance(widget, (QSpinBox, QDoubleSpinBox)):
+            value = widget.value()
+            widget.setProperty("stored_value", value)
 
         LayerUtils.store_value(
             self.layer_type, self.current_feature_id, field_name, value
@@ -230,11 +239,13 @@ class PageController(QObject):
                     continue
 
                 widget.setValue(int(value))
+                widget.setProperty("stored_value", int(value))
             elif isinstance(widget, QDoubleSpinBox):
                 if value == NULL:
                     continue
 
                 widget.setValue(float(value))
+                widget.setProperty("stored_value", float(value))
             elif isinstance(widget, QLineEdit):
                 if value == NULL:
                     widget.clear()
