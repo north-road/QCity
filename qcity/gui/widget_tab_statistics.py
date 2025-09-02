@@ -60,6 +60,11 @@ class WidgetUtilsStatistics(QObject):
             self._invalidate_stats
         )
 
+        self._label_widget_map = {}
+        for _, widget_name in WidgetUtilsStatistics.STATS_MAPPING.items():
+            label = self.og_widget.findChild(QLabel, widget_name)
+            self._label_widget_map[widget_name] = label
+
         self._invalidate_stats()
 
         self.populate_project_area_combo_box()
@@ -77,7 +82,7 @@ class WidgetUtilsStatistics(QObject):
             return
 
         for stat, widget_name in WidgetUtilsStatistics.STATS_MAPPING.items():
-            label = self.og_widget.findChild(QLabel, widget_name)
+            label = self._label_widget_map[widget_name]
             if label:
                 label.setText(str(round(totals[stat], 2)))
 
@@ -138,7 +143,7 @@ class WidgetUtilsStatistics(QObject):
         Invalidates current stats when anything changes
         """
         for _, widget_name in WidgetUtilsStatistics.STATS_MAPPING.items():
-            label = self.og_widget.findChild(QLabel, widget_name)
+            label = self._label_widget_map[widget_name]
             if label:
                 label.setText("-")
         self.og_widget.button_update_stats.setStyleSheet("color: red")
