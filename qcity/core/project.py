@@ -1231,8 +1231,7 @@ class ProjectController(QObject):
         development_site_key = building_level_feature[foreign_key]
         request = QgsFeatureRequest().setFilterExpression(
             QgsExpression.createFieldEqualityExpression(
-                DatabaseUtils.primary_key_for_layer(
-                    LayerType.DevelopmentSites),
+                DatabaseUtils.primary_key_for_layer(LayerType.DevelopmentSites),
                 development_site_key,
             )
         )
@@ -1343,36 +1342,42 @@ class ProjectController(QObject):
             count_3_bedroom += math.floor(floor_3_bedroom / dwelling_size_3_bedroom)
             count_4_bedroom += math.floor(floor_4_bedroom / dwelling_size_4_bedroom)
 
-        self._block_ds_auto_updates += 1
-        with wrapped_edits(development_site_layer) as edits:
-            edits.changeAttributeValues(
-                development_site_fid,
-                {
-                    development_site_layer.fields().lookupField(
-                        "commercial_floorspace"
-                    ): total_commercial,
-                    development_site_layer.fields().lookupField(
-                        "office_floorspace"
-                    ): total_office,
-                    development_site_layer.fields().lookupField(
-                        "residential_floorspace"
-                    ): total_residential,
-                    development_site_layer.fields().lookupField(
-                        "count_1_bedroom_dwellings"
-                    ): count_1_bedroom,
-                    development_site_layer.fields().lookupField(
-                        "count_2_bedroom_dwellings"
-                    ): count_2_bedroom,
-                    development_site_layer.fields().lookupField(
-                        "count_3_bedroom_dwellings"
-                    ): count_3_bedroom,
-                    development_site_layer.fields().lookupField(
-                        "count_4_bedroom_dwellings"
-                    ): count_4_bedroom,
-                },
-            )
+        updates = {}
+        if development_site_feature["commercial_floorspace"] != total_commercial:
+            updates[
+                development_site_layer.fields().lookupField("commercial_floorspace")
+            ] = total_commercial
+        if development_site_feature["office_floorspace"] != total_office:
+            updates[
+                development_site_layer.fields().lookupField("office_floorspace")
+            ] = total_office
+        if development_site_feature["residential_floorspace"] != total_residential:
+            updates[
+                development_site_layer.fields().lookupField("residential_floorspace")
+            ] = total_residential
+        if development_site_feature["count_1_bedroom_dwellings"] != count_1_bedroom:
+            updates[
+                development_site_layer.fields().lookupField("count_1_bedroom_dwellings")
+            ] = count_1_bedroom
+        if development_site_feature["count_2_bedroom_dwellings"] != count_2_bedroom:
+            updates[
+                development_site_layer.fields().lookupField("count_2_bedroom_dwellings")
+            ] = count_2_bedroom
+        if development_site_feature["count_3_bedroom_dwellings"] != count_3_bedroom:
+            updates[
+                development_site_layer.fields().lookupField("count_3_bedroom_dwellings")
+            ] = count_3_bedroom
+        if development_site_feature["count_4_bedroom_dwellings"] != count_4_bedroom:
+            updates[
+                development_site_layer.fields().lookupField("count_4_bedroom_dwellings")
+            ] = count_4_bedroom
 
-        self._block_ds_auto_updates -= 1
+        if updates:
+            self._block_ds_auto_updates += 1
+            with wrapped_edits(development_site_layer) as edits:
+                edits.changeAttributeValues(development_site_fid, updates)
+
+            self._block_ds_auto_updates -= 1
         return True
 
     def auto_calculate_development_site_car_parking(
@@ -1434,26 +1439,34 @@ class ProjectController(QObject):
             / project_area_feature["car_parking_office_bays_area"]
         )
 
-        self._block_ds_auto_updates += 1
-        with wrapped_edits(development_site_layer) as edits:
-            edits.changeAttributeValues(
-                development_site_fid,
-                {
-                    development_site_layer.fields().lookupField(
-                        "residential_car_bays"
-                    ): car_parks_1_bedroom
-                    + car_parks_2_bedroom
-                    + car_parks_3_bedroom
-                    + car_parks_4_bedroom,
-                    development_site_layer.fields().lookupField(
-                        "commercial_car_bays"
-                    ): commercial_car_parks,
-                    development_site_layer.fields().lookupField(
-                        "office_car_bays"
-                    ): office_car_parks,
-                },
+        updates = {}
+        residential_car_bays = (
+            car_parks_1_bedroom
+            + car_parks_2_bedroom
+            + car_parks_3_bedroom
+            + car_parks_4_bedroom
+        )
+        if development_site_feature["residential_car_bays"] != residential_car_bays:
+            updates[
+                development_site_layer.fields().lookupField("residential_car_bays")
+            ] = residential_car_bays
+        if development_site_feature["commercial_car_bays"] != commercial_car_parks:
+            updates[
+                development_site_layer.fields().lookupField("commercial_car_bays")
+            ] = commercial_car_parks
+        if development_site_feature["office_car_bays"] != office_car_parks:
+            updates[development_site_layer.fields().lookupField("office_car_bays")] = (
+                office_car_parks
             )
-        self._block_ds_auto_updates -= 1
+
+        if updates:
+            self._block_ds_auto_updates += 1
+            with wrapped_edits(development_site_layer) as edits:
+                edits.changeAttributeValues(
+                    development_site_fid,
+                    updates,
+                )
+            self._block_ds_auto_updates -= 1
         return True
 
     def auto_calculate_development_site_bicycle_parking(
@@ -1515,26 +1528,40 @@ class ProjectController(QObject):
             / project_area_feature["bicycle_parking_office_bays_area"]
         )
 
-        self._block_ds_auto_updates += 1
-        with wrapped_edits(development_site_layer) as edits:
-            edits.changeAttributeValues(
-                development_site_fid,
-                {
-                    development_site_layer.fields().lookupField(
-                        "residential_bicycle_bays"
-                    ): bicycle_parks_1_bedroom
-                    + bicycle_parks_2_bedroom
-                    + bicycle_parks_3_bedroom
-                    + bicycle_parks_4_bedroom,
-                    development_site_layer.fields().lookupField(
-                        "commercial_bicycle_bays"
-                    ): commercial_bicycle_parks,
-                    development_site_layer.fields().lookupField(
-                        "office_bicycle_bays"
-                    ): office_bicycle_parks,
-                },
-            )
-        self._block_ds_auto_updates -= 1
+        updates = {}
+        residential_bicycle_bays = (
+            bicycle_parks_1_bedroom
+            + bicycle_parks_2_bedroom
+            + bicycle_parks_3_bedroom
+            + bicycle_parks_4_bedroom
+        )
+        if (
+            development_site_feature["residential_bicycle_bays"]
+            != residential_bicycle_bays
+        ):
+            updates[
+                development_site_layer.fields().lookupField("residential_bicycle_bays")
+            ] = residential_bicycle_bays
+        if (
+            development_site_feature["commercial_bicycle_bays"]
+            != commercial_bicycle_parks
+        ):
+            updates[
+                development_site_layer.fields().lookupField("commercial_bicycle_bays")
+            ] = commercial_bicycle_parks
+        if development_site_feature["office_bicycle_bays"] != office_bicycle_parks:
+            updates[
+                development_site_layer.fields().lookupField("office_bicycle_bays")
+            ] = office_bicycle_parks
+
+        if updates:
+            self._block_ds_auto_updates += 1
+            with wrapped_edits(development_site_layer) as edits:
+                edits.changeAttributeValues(
+                    development_site_fid,
+                    updates,
+                )
+            self._block_ds_auto_updates -= 1
         return True
 
     def calculate_project_area_stats(self, project_area_fid: int) -> Dict[str, float]:
