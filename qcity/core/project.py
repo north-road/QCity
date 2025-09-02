@@ -326,10 +326,11 @@ class ProjectController(QObject):
                 )
             )
             development_site_layer = self.get_development_sites_layer()
-            for f in development_site_layer.getFeatures(request):
-                self.auto_calculate_development_site_floorspace(f.id())
-                self.auto_calculate_development_site_car_parking(f.id())
-                self.auto_calculate_development_site_bicycle_parking(f.id())
+            with wrapped_edits(development_site_layer):
+                for f in development_site_layer.getFeatures(request):
+                    self.auto_calculate_development_site_floorspace(f.id())
+                    self.auto_calculate_development_site_car_parking(f.id())
+                    self.auto_calculate_development_site_bicycle_parking(f.id())
 
     def _development_site_added(self, development_site_fid: int):
         """
