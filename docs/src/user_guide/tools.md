@@ -279,7 +279,7 @@ Should you digitize a building level outside of the development site boundary, Q
 
 To create a new building level, left click on the green + button on the right hand side of the building levels panel.
 
-![Building_Levels_Create](https://github.com/user-attachments/assets/a95d5cca-67f1-43b2-8b6c-e69bde612a68)
+![Building_Levels_Create](https://github.com/user-attachments/assets/d489d8ad-b209-41d4-87d3-022c3cd4282a)
 
 Then left click on the map area to start creating a polygon. Keep left clicking to create more points in the polygon and then right click to finish digitizing the polygon.
 
@@ -359,6 +359,50 @@ Begin creating a new building level polygon by left clicking on the map area. Wi
 Once you had created the first point of the polygon, enter the distance and angle and left click again to create the next point. Repeat this process and right click to finish the polygon. Once you complete the building level polygon, a window will appear asking for a name of the building level polygon as outlined in [Creating a Building Level](#creating-a-new-building-level).
 
 > For more information on the QGIS Advanced Digitizing tools, please see the [QGIS Documentation](https://docs.qgis.org/latest/en/docs/user_manual/working_with_vector/editing_geometry_attributes.html#the-advanced-digitizing-panel)
+
+### Digitizing multi part building levels
+
+Some development sites have multiple separate dwellings on the same level such as townhouse developments. To digitize multi part building levels, begin by putting the building levels layer into edit mode by right clicking on the building levels layer in the layer panel and left clicking on `Toggle Editing` in the context menu.
+
+![Building_Levels_Multi_Part_Enable_Editing](https://github.com/user-attachments/assets/8a3cdb62-a08c-44ca-af24-62d7efc78b95)
+
+Once the building levels layer is in edit mode, left click on the green + button on the right hand side of the building levels panel.
+
+![Building_Levels_Create](https://github.com/user-attachments/assets/d489d8ad-b209-41d4-87d3-022c3cd4282a)
+
+Then left click on the map area to start creating a polygon. Keep left clicking to create more points in the polygon and then right click to finish digitizing the polygon.
+
+Once digitizing the polygon has been completed, a window will appear requiring a building level name to be provided.
+
+![Building_Level_Name](https://github.com/user-attachments/assets/76cc54ca-fff8-4e16-a912-4b3520eeeaa3)
+
+Left click on `OK` and the building level will be created.
+
+> Note: To digitize with higher accuracy, consider using snapping as documented in [Creating a new Building Level - Snapping](#Creating-a-new-Building-Level-Snapping) and the advanced digitizing tools as documented in [Using Advanced Digitizing Tools](#Using-Advanced-Digitizing-Tools).
+
+Left click on the `Save Layer Edits` button on the Digitizing Toolbar.
+
+![Building_Levels_Multi_Part_Save_Edits](https://github.com/user-attachments/assets/70792b44-a072-44e7-80d9-8e50fc91857b)
+
+The first part of the multi part building level is now created. In order to create other parts, ensure that the first part of the building level is selected and left click on the `Add Part` button in the Advanced Digitizing Toolbar.
+
+![Building_Levels_Multi_Part_Add_Part](https://github.com/user-attachments/assets/354492dd-7e42-4879-b315-5b4494ac1a2e)
+
+>If the Advanced Digitizing Toolbar is not visible, left click on `View` and hover the cursor over `Toolbars` and left click on the `Advanced Digitizing Toolbar` menu entry to enable it.
+
+>![Building_Levels_Multi_Part_Advanced_Digitizing_Toolbar](https://github.com/user-attachments/assets/6cc24c8c-f896-4c5d-b498-f2c031d5a9a9)
+
+Then left click on the map area to start creating a new polygon part. Keep left clicking to create more points in the polygon part and then right click to finish digitizing the polygon part. This will add another part to the first polygon. Repeat this process to add as many parts as required.
+
+Left click on the `Save Layer Edits` button on the Digitizing Toolbar to save the changes.
+
+![Building_Levels_Multi_Part_Save_Edits](https://github.com/user-attachments/assets/70792b44-a072-44e7-80d9-8e50fc91857b)
+
+Toggle the editing mode for the building levels layer to off by right clicking on the building levels layer in the layer panel and left clicking on `Toggle Editing`. A multi part polygon is now created which represents multiple separate dwellings in a development site.
+
+![Building_Levels_Multi_Part_Complete](https://github.com/user-attachments/assets/a5c72369-2de8-49b5-ac72-f0d6932069a9)
+
+>Creating multiple parts to polygons can also be used to digitize development sites and project areas that are not contiguous. 
 
 ### Deleting a Building Level
 
