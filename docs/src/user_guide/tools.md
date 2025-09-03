@@ -378,7 +378,7 @@ Once digitizing the polygon has been completed, a window will appear requiring a
 
 Left click on `OK` and the building level will be created.
 
-> Note: To digitize with higher accuracy, consider using snapping as documented in [Creating a new Building Level - Snapping](#Creating-a-new-Building-Level-Snapping) and the advanced digitizing tools as documented in [Using Advanced Digitizing Tools](#Using-Advanced-Digitizing-Tools).
+> Note: To digitize with higher accuracy, consider using snapping as documented in [Creating a new Building Level - Snapping](#creating-a-new-building-level-snapping) and the advanced digitizing tools as documented in [Using Advanced Digitizing Tools](#using-advanced-digitizing-tools).
 
 Left click on the `Save Layer Edits` button on the Digitizing Toolbar.
 
@@ -389,7 +389,7 @@ The first part of the multi part building level is now created. In order to crea
 ![Building_Levels_Multi_Part_Add_Part](https://github.com/user-attachments/assets/354492dd-7e42-4879-b315-5b4494ac1a2e)
 
 >If the Advanced Digitizing Toolbar is not visible, left click on `View` and hover the cursor over `Toolbars` and left click on the `Advanced Digitizing Toolbar` menu entry to enable it.
-
+>
 >![Building_Levels_Multi_Part_Advanced_Digitizing_Toolbar](https://github.com/user-attachments/assets/6cc24c8c-f896-4c5d-b498-f2c031d5a9a9)
 
 Then left click on the map area to start creating a new polygon part. Keep left clicking to create more points in the polygon part and then right click to finish digitizing the polygon part. This will add another part to the first polygon. Repeat this process to add as many parts as required.
@@ -402,7 +402,7 @@ Toggle the editing mode for the building levels layer to off by right clicking o
 
 ![Building_Levels_Multi_Part_Complete](https://github.com/user-attachments/assets/a5c72369-2de8-49b5-ac72-f0d6932069a9)
 
->Creating multiple parts to polygons can also be used to digitize development sites and project areas that are not contiguous. 
+>Creating multiple parts to polygons can also be used to digitize development sites and project areas that are not contiguous.
 
 ### Deleting a Building Level
 
