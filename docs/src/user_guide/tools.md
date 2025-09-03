@@ -289,7 +289,7 @@ Once digitizing the polygon has been completed, a window will appear requiring a
 
 Left click on `OK` and the building level will be created.
 
-### Creating a new Building Level - Snapping
+### Creating a new Building Level with Snapping
 
 When creating new building levels, often the boundaries correspond to the boundaries of existing features such as cadastral boundaries or development site boundaries. In order to digitize a building level to the boundaries of cadastral lots or other features, snapping needs to be enabled.
 
@@ -319,7 +319,7 @@ Once snapping has been enabled, when created a new building level, you will see 
 
 > For more information on using snapping within QGIS, please see the [QGIS documentation](https://docs.qgis.org/latest/en/docs/user_manual/working_with_vector/editing_geometry_attributes.html#snapping-and-digitizing-options).
 
-### Creating a new Building Level - Advanced Digitizing
+### Creating a new Building Level with Advanced Digitizing
 
 When digitizing building levels you may wish to digitize with specific measurements and angles in order to create polygons with accurate setbacks and lengths. In order to digitize with this level of accuracy, you will need to use the QGIS Advanced Digitizing Tools.
 
@@ -378,7 +378,7 @@ Once digitizing the polygon has been completed, a window will appear requiring a
 
 Left click on `OK` and the building level will be created.
 
-> Note: To digitize with higher accuracy, consider using snapping as documented in [Creating a new Building Level - Snapping](#creating-a-new-building-level-snapping) and the advanced digitizing tools as documented in [Using Advanced Digitizing Tools](#using-advanced-digitizing-tools).
+> Note: To digitize with higher accuracy, consider using snapping as documented in [Creating a new Building Level with Snapping](#creating-a-new-building-level-with-snapping) and the advanced digitizing tools as documented in [Creating a new Building Level with Advanced Digitizing](#creating-a-new-building-level-with-advanced-digitizing).
 
 Left click on the `Save Layer Edits` button on the Digitizing Toolbar.
 
