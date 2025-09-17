@@ -601,15 +601,12 @@
                <string>General Details</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_20" columnstretch="1,2">
-               <item row="0" column="0" colspan="2">
-                <widget class="QLabel" name="label_development_site_address">
+               <item row="3" column="0">
+                <widget class="QLabel" name="label_development_site_year">
                  <property name="text">
-                  <string>Location (Address)</string>
+                  <string>Year</string>
                  </property>
                 </widget>
-               </item>
-               <item row="1" column="0" colspan="2">
-                <widget class="QLineEdit" name="address"/>
                </item>
                <item row="2" column="0">
                 <widget class="QLabel" name="label_development_site_status">
@@ -621,10 +618,26 @@
                <item row="2" column="1">
                 <widget class="QComboBox" name="site_status"/>
                </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="label_development_site_year">
+               <item row="1" column="0" colspan="2">
+                <widget class="QLineEdit" name="address"/>
+               </item>
+               <item row="3" column="1">
+                <widget class="QgsSpinBox" name="year">
+                 <property name="minimum">
+                  <number>1900</number>
+                 </property>
+                 <property name="maximum">
+                  <number>2900</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QLineEdit" name="site_owner"/>
+               </item>
+               <item row="0" column="0" colspan="2">
+                <widget class="QLabel" name="label_development_site_address">
                  <property name="text">
-                  <string>Year</string>
+                  <string>Location (Address)</string>
                  </property>
                 </widget>
                </item>
@@ -635,16 +648,20 @@
                  </property>
                 </widget>
                </item>
-               <item row="4" column="1">
-                <widget class="QLineEdit" name="site_owner"/>
-               </item>
-               <item row="3" column="1">
-                <widget class="QgsSpinBox" name="year">
-                 <property name="minimum">
-                  <number>1900</number>
+               <item row="5" column="0">
+                <widget class="QLabel" name="label_101">
+                 <property name="text">
+                  <string>Area</string>
                  </property>
-                 <property name="maximum">
-                  <number>2900</number>
+                </widget>
+               </item>
+               <item row="5" column="1">
+                <widget class="QLabel" name="label_area">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::TextBrowserInteraction</set>
                  </property>
                 </widget>
                </item>
