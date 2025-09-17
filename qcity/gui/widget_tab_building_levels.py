@@ -271,6 +271,15 @@ class BuildingLevelsPageController(PageController):
     def set_feature(self, feature: QgsFeature):
         super().set_feature(feature)
         PROJECT_CONTROLLER.set_current_building_level(feature.id())
+        if self.current_feature_id is None:
+            self.og_widget.collapsibleGroupBox_building_levels_development_statistics.setTitle(
+                "Level Composition"
+            )
+        else:
+            self.og_widget.collapsibleGroupBox_building_levels_development_statistics.setTitle(
+                "Level Composition ({})".format(self.list_widget.currentItem().text())
+            )
+
         self._update_residential_space_total()
 
     def delete_feature_and_child_objects(self, feature_id: int) -> bool:
