@@ -1,3 +1,4 @@
+import math
 from qgis.PyQt.QtCore import Qt
 from qgis.core import (
     Qgis,
@@ -94,6 +95,9 @@ class BuildingLevelsPageController(PageController):
         """
         Update total residential space label
         """
+        if self.current_feature_id is None:
+            self.clear_feature()
+            return
 
         total = 0
         for w in (
@@ -123,6 +127,10 @@ class BuildingLevelsPageController(PageController):
         floor_area_m2 = da.convertAreaMeasurement(
             da.measureArea(feature.geometry()), Qgis.AreaUnit.SquareMeters
         )
+        if math.isnan(floor_area_m2):
+            self.clear_feature()
+            return
+
         total_residential_area = (
             self.og_widget.percent_residential_floorspace.value() / 100 * floor_area_m2
         )
