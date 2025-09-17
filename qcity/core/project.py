@@ -57,6 +57,7 @@ class ProjectController(QObject):
     development_site_deleted = pyqtSignal(int)
     # final argument is project area feature id
     development_site_attribute_changed = pyqtSignal(int, str, object, int)
+    development_site_geometry_changed = pyqtSignal(int)
 
     building_level_added = pyqtSignal(QgsFeature)
     building_level_deleted = pyqtSignal(int)
@@ -159,6 +160,9 @@ class ProjectController(QObject):
             self._current_development_sites_layer.attributeValueChanged.disconnect(
                 self._development_site_attribute_changed
             )
+            self._current_development_sites_layer.geometryChanged.disconnect(
+                self._development_site_geometry_changed
+            )
 
         if (
             not disconnect
@@ -172,6 +176,10 @@ class ProjectController(QObject):
             development_site_layer.attributeValueChanged.connect(
                 self._development_site_attribute_changed
             )
+            development_site_layer.geometryChanged.connect(
+                self._development_site_geometry_changed
+            )
+
         development_site_layer_changed = (
             self._current_development_sites_layer != development_site_layer
         )
@@ -353,6 +361,14 @@ class ProjectController(QObject):
             return
 
         self.development_site_deleted.emit(development_site_fid)
+
+    def _development_site_geometry_changed(
+        self, feature_id: int, geometry: QgsGeometry
+    ):
+        """
+        Called when a development site geometry is changed
+        """
+        self.development_site_geometry_changed.emit(feature_id)
 
     def _development_site_attribute_changed(
         self, feature_id: int, field_index: int, value

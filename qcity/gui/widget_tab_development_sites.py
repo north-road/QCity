@@ -1,4 +1,11 @@
-from qgis.core import Qgis, QgsFeatureRequest, QgsFeature, QgsExpression
+from qgis.core import (
+    Qgis,
+    QgsFeatureRequest,
+    QgsFeature,
+    QgsExpression,
+    QgsDistanceArea,
+    QgsProject,
+)
 
 from qcity.core import SETTINGS_MANAGER, LayerType, PROJECT_CONTROLLER, DatabaseUtils
 from .page_controller import PageController
@@ -28,6 +35,9 @@ class DevelopmentSitesPageController(PageController):
         )
         PROJECT_CONTROLLER.development_site_attribute_changed.connect(
             self._on_development_site_attribute_changed
+        )
+        PROJECT_CONTROLLER.development_site_geometry_changed.connect(
+            self._on_development_site_geometry_changed
         )
 
         self.og_widget.toolButton_development_site_add.clicked.connect(
@@ -83,6 +93,17 @@ class DevelopmentSitesPageController(PageController):
         self.set_widget_values({field_name: value})
         self._block_feature_updates = False
 
+    def _on_development_site_geometry_changed(self, feature_id: int):
+        """
+        Called when the geometry is changed for a development site
+        """
+        if feature_id != self.current_feature_id:
+            return
+
+        site_layer = self.get_layer()
+        feature = site_layer.getFeature(feature_id)
+        self.update_site_area(feature)
+
     def on_project_area_changed(self, project_area_fid: int):
         """
         Called when the current project area FID is changed
@@ -108,8 +129,28 @@ class DevelopmentSitesPageController(PageController):
     def delete_feature_and_child_objects(self, feature_id: int) -> bool:
         return PROJECT_CONTROLLER.delete_development_site(feature_id)
 
+    def update_site_area(self, feature: QgsFeature):
+        """
+        Updates the site area label, using the specified feature
+        """
+        if feature.hasGeometry():
+            da = QgsDistanceArea()
+            da.setEllipsoid(QgsProject.instance().ellipsoid())
+            da.setSourceCrs(
+                self.get_layer().crs(), QgsProject.instance().transformContext()
+            )
+
+            site_area_m2 = da.convertAreaMeasurement(
+                da.measureArea(feature.geometry()), Qgis.AreaUnit.SquareMeters
+            )
+            self.og_widget.label_area.setText("{} m²".format(round(site_area_m2, 2)))
+        else:
+            self.og_widget.label_area.clear()
+
     def set_feature(self, feature: QgsFeature):
         super().set_feature(feature)
+        self.update_site_area(feature)
+
         PROJECT_CONTROLLER.set_current_development_site(feature.id())
 
     def _auto_calculate_floorspace_toggled(self, active: bool):
