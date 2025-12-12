@@ -128,7 +128,7 @@ Each development site has the following settings that can be configured:
 
 The `Development Sites` tab includes the name of the project area which it is associated with under the development sites heading. This provides you with an indication which project area you are creating the development site within.
 
-![Development_Sites_Heading](https://github.com/user-attachments/assets/c0f7d230-d567-4109-a28d-bedaa6c459db)
+![Development_Sites_Heading](https://github.com/user-attachments/assets/8f7f6a34-c812-4fcc-ac01-05b4f890f1a3)
 
 Should you digitize a development site outside of the project area boundary, QCity will present a warning that the development site is outside of the spatial extent of the project area.
 
@@ -182,7 +182,7 @@ Once snapping has been enabled, when created a new development site, you will se
 
 A development site can be deleted by selecting the development site you want to delete in the development sites panel and left clicking on the red minus button on the right hand side of the development sites panel.
 
-![Development_Sites_Delete](https://github.com/user-attachments/assets/7ce818b2-044e-4bec-9104-ed6bfb2aac63)
+![Development_Sites_Delete](https://github.com/user-attachments/assets/a410c6fa-58c4-4099-bc60-5ed28da75db8)
 
 **Caution: Deleting a development site will also delete any associated building levels.**
 
@@ -190,7 +190,7 @@ A development site can be deleted by selecting the development site you want to 
 
 A development site can be renamed by selecting the development site you want to rename in the development sites panel and left clicking on the pencil and paper button on the right hand side of the development sites panel.
 
-![Development_Site_Rename](https://github.com/user-attachments/assets/40c66d57-053c-4df0-8b29-2821c7e5b572)
+![Development_Sites_Rename](https://github.com/user-attachments/assets/218b3f89-b031-4b8f-8ff9-86fbb9af5cc9)
 
 A new window will open which will allow you to rename the development site.
 
@@ -267,7 +267,7 @@ With the attribute table you can view the statistics for all the development sit
 
 The `Building Levels` tab includes the name of the development site which it is associated with under the building levels heading. This provides you with an indication which development site you are creating the building levels within.
 
-![Building_Levels_Heading](https://github.com/user-attachments/assets/0d2dc5cf-4044-4ec6-b265-497e85e6fb4d)
+![Building_Levels_Heading](https://github.com/user-attachments/assets/4ab21a68-d6fd-448a-bd30-1ce5112d9e04)
 
 Should you digitize a building level outside of the development site boundary, QCity will present a warning that the building level is outside the spatial extent of the development site.
 
