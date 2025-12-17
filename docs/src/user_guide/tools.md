@@ -477,11 +477,11 @@ Below the `Update` and `Export` buttons are the development statistics, car park
 
 ## Styling Building Levels by Development Status
 
-By default the building levels in QCity are styled with the same color for all building levels in the 3D map. In order to style building levels based on the development status (constructed, modeled or proposed), this information will need to be joined from the development sites layer. 
+By default the building levels in QCity are styled with the same color for all building levels in the 3D map. In order to style building levels based on the development status (constructed, modeled or proposed), this information will need to be joined from the development sites layer.
 
 ### Joining the building levels and development sites layers
 
-The building levels layer includes a field `development_site_pk` which corresponds to the `fid` field in the development sites layer. In the below example development Site D has a `fid` value of 5 and the building levels associated with development Site D have a matching `development_site_pk` value of 5. 
+The building levels layer includes a field `development_site_pk` which corresponds to the `fid` field in the development sites layer. In the below example development Site D has a `fid` value of 5 and the building levels associated with development Site D have a matching `development_site_pk` value of 5.
 
 ![3D_Styling_Attribute_Table](https://github.com/user-attachments/assets/1e7eb125-e25e-4c76-9425-28739ad7b110)
 
@@ -525,7 +525,7 @@ Left click on the `Add rule` button at the bottom of the Layer Styling panel rep
 
 ![3D_styling_3d_view_add_rule](https://github.com/user-attachments/assets/929e51d6-a12d-4bab-9427-b18292858ebf)
 
-In the `Filter` entry, enter the text "site_status" = 'C'. 
+In the `Filter` entry, enter the text "site_status" = 'C'.
 
 > This will filter the 3D view to just the constructed building levels.
 
@@ -548,5 +548,3 @@ Left click on the blue back arrow at the top of the `Edit Rule` panel to see the
 In order to create the 3D styling for the proposed and modeled building levels, repeat the steps in ![Styling building levels by site status](#Styling%20building%20levels%20by%20site%20status) and change the `Filter` entry to "site_status" = 'P' for proposed building levels and "site_status" = 'M' for modeled building levels.
 
 ![3D_styling_3D_view_all_rules](https://github.com/user-attachments/assets/d695e61b-56b3-4d8c-bc68-f4de840a37af)
-
-
