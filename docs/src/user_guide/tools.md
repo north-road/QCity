@@ -474,3 +474,79 @@ Below this drop down menu are two buttons as follows:
 Below the `Update` and `Export` buttons are the development statistics, car parking statistics and bike parking statistics. These statistics are generated from the project area, development sites and building levels data and will be automatically updated when the `Update` button is left clicked.
 
 ![Statistics](https://github.com/user-attachments/assets/01382af4-b278-4690-a5b0-abbe199916ff)
+
+## Styling Building Levels by Development Status
+
+By default the building levels in QCity are styled with the same color for all building levels in the 3D map. In order to style building levels based on the development status (constructed, modeled or proposed), this information will need to be joined from the development sites layer. 
+
+### Joining the building levels and development sites layers
+
+The building levels layer includes a field `development_site_pk` which corresponds to the `fid` field in the development sites layer. In the below example development Site D has a `fid` value of 5 and the building levels associated with development Site D have a matching `development_site_pk` value of 5. 
+
+![3D_Styling_Attribute_Table](https://github.com/user-attachments/assets/1e7eb125-e25e-4c76-9425-28739ad7b110)
+
+In order to apply the development status to the building levels, a join by field value will need to be used. Open the Processing Toolbox in QGIS by left clicking on `View` menu, then hover over `Panels` in the menu and left click on the `Processing Toolbox` checkbox to enable the Processing Toolbox. The Processing Toolbox will open as a new panel.
+
+![3D_Styling_Processing_Toolbox](https://github.com/user-attachments/assets/c98522c3-d903-4e7f-976a-71cd52c31624)
+
+Once the Processing Toolbox is open, left click in the `Search` bar at the top of the Processing Toolbox panel and type Join attributes by field value.
+
+This will reduce the list of available processing algorithms. Open the `Join attributes by field value` algorithm by double left clicking on it. A new window will appear.
+
+![3D_Styling_Join_Algorithm](https://github.com/user-attachments/assets/7c4df1b0-3097-4042-9935-d8b91751a543)
+
+Set the `Input layer` to building_levels, set the `Table field` to development_site_pk, set the `Input layer 2` to development_sites and set the `Table field 2` to fid.
+
+Under the `Layer 2 fields to copy` left click on the button to the right with 3 dots.
+
+![3D_Styling_Join_Algorithm_fields_to_copy](https://github.com/user-attachments/assets/faa3093e-60b2-4e0b-bd20-4bb6a02caec8)
+
+Select the site_status field by left clicking on the checkbox to the left of the field.
+
+![3D_Styling_Join_Algorithm_fields_site_status_selected](https://github.com/user-attachments/assets/2de553e8-9ee3-4d88-a746-9f93482a72c4)
+
+Left click on `Run` to run the algorithm. This will create a new temporary layer called Joined layer. This Joined layer is a copy of the building levels layer but with the site_status field taken from the development sites layer.
+
+![3D_styling_joined_layer_attribute_table](https://github.com/user-attachments/assets/da82e29a-303b-4744-ac9f-82d61723a52a)
+
+> Note that the temporary joined layer can be made permanent by right clicking on the layer in the layer panel and left clicking on `Make Permanent...` and saving the layer in the desired location.
+
+### Styling the building levels by site status
+
+Left click on the Joined layer in the layer panel and Open the Layer Styling panel.
+
+> If the Layer Styling panel is not open, left click on `View`, then hover the cursor over `Panels` in the menu and left click on the `Layer Styling` checkbox to enable the Layer Styling panel.
+
+Left click on the `3D view` tab represented by a cube with 3 different colored sides. Set the styling to `Rule-based` from the drop down menu in the `3D view`.
+
+![3D_styling_3D_view](https://github.com/user-attachments/assets/38967597-1489-46cf-a17f-c3e75d3ddc5c)
+
+Left click on the `Add rule` button at the bottom of the Layer Styling panel represented by a green +.
+
+![3D_styling_3d_view_add_rule](https://github.com/user-attachments/assets/929e51d6-a12d-4bab-9427-b18292858ebf)
+
+In the `Filter` entry, enter the text "site_status" = 'C'. 
+
+> This will filter the 3D view to just the constructed building levels.
+
+Left click on the `Data defined override` button next to the `Offset` entry and hover the cursor over the `Field type` menu entry and select `base_height`.
+
+![3D_styling_3D_view_offset](https://github.com/user-attachments/assets/ec0052a5-4cd4-42aa-9dd4-fe6408e3f181)
+
+Left click on the `Data defined override` button next to the `Extrusion` entry and hover the cursor over the `Field type` menu entry and select `level_height`.
+
+![3D_styling_3D_view_extrusion](https://github.com/user-attachments/assets/1662712d-8ba3-4aea-a549-1077218a05f1)
+
+Set the desired color for the 3D building levels in the `Diffuse` and `Ambient` drop downs.
+
+![3D_styling_3D_view_diffuse](https://github.com/user-attachments/assets/5e91683e-ab2d-4159-b526-1fdd734b94fa)
+
+Left click on the blue back arrow at the top of the `Edit Rule` panel to see the list of rules for the Joined layer.
+
+![3D_styling_3D_view_back_arrow](https://github.com/user-attachments/assets/056d192d-0900-4c80-bc6b-c851a2933ff4)
+
+In order to create the 3D styling for the proposed and modeled building levels, repeat the steps in ![Styling building levels by site status](#Styling%20building%20levels%20by%20site%20status) and change the `Filter` entry to "site_status" = 'P' for proposed building levels and "site_status" = 'M' for modeled building levels.
+
+![3D_styling_3D_view_all_rules](https://github.com/user-attachments/assets/d695e61b-56b3-4d8c-bc68-f4de840a37af)
+
+
