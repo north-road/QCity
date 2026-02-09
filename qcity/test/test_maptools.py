@@ -81,8 +81,8 @@ class MapToolsTest(QCityTestBase):
 
             self.assertTrue(widget.listWidget_project_areas.item(0), "test")
 
-            get_project_controller().cleanup()
-            QgsProject.instance().clear()
+            self.delete_qobject(map_tool)
+            self.delete_qobject(widget)
 
     def click_from_middle(
         self, type: str = "left", x: int = 0, y: int = 0
