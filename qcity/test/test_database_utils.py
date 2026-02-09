@@ -8,7 +8,7 @@ from qgis.core import QgsVectorLayer
 
 from qcity.core import DatabaseUtils, LayerType
 
-from .qcity_test_base import QCityTestBase
+from qcity.test.qcity_test_base import QCityTestBase
 
 test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
 

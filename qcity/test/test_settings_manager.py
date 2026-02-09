@@ -10,7 +10,7 @@ from qgis.core import Qgis, QgsSettings, QgsRasterLayer, QgsProject, QgsVectorLa
 from qcity.core import SettingsManager
 from qcity.test.utilities import get_qgis_app
 
-from .qcity_test_base import QCityTestBase
+from qcity.test.qcity_test_base import QCityTestBase
 
 test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
 

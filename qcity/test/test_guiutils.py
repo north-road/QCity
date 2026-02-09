@@ -3,11 +3,11 @@ GUI Utils Test.
 """
 
 import unittest
-from ..gui.gui_utils import GuiUtils
-from .utilities import get_qgis_app
+from qcity.gui.gui_utils import GuiUtils
+from qcity.test.utilities import get_qgis_app
 
 
-from .qcity_test_base import QCityTestBase
+from qcity.test.qcity_test_base import QCityTestBase
 
 QGIS_APP = get_qgis_app()
 

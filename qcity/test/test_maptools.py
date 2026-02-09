@@ -3,15 +3,13 @@ import unittest
 import tempfile
 
 from typing import Union
-from unittest.mock import patch
 
 from qgis.PyQt.QtCore import Qt, QEvent, QPoint, QCoreApplication
 from qgis.core import (
     QgsCoordinateReferenceSystem,
-    QgsPointXY,
     QgsReferencedRectangle,
 )
-from qgis.gui import QgsMapMouseEvent, QgsMapCanvas
+from qgis.gui import QgsMapMouseEvent
 from qgis.core import (
     QgsProject,
     QgsRectangle,
@@ -22,7 +20,7 @@ from qcity.core import DatabaseUtils, get_project_controller
 from qcity.gui.qcity_dock import QCityDockWidget
 from qcity.test.utilities import get_qgis_app
 from qcity.gui.maptools import DrawPolygonTool
-from .qcity_test_base import QCityTestBase
+from qcity.test.qcity_test_base import QCityTestBase
 
 
 class MapToolsTest(QCityTestBase):

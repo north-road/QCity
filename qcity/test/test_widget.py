@@ -6,10 +6,7 @@ from qgis.core import QgsSettings
 
 from qcity.gui.qcity_dock import QCityDockWidget
 from qcity.test.utilities import get_qgis_app, IFACE
-
-
-from .qcity_test_base import QCityTestBase
-from qcity.core import SETTINGS_MANAGER
+from qcity.test.qcity_test_base import QCityTestBase
 
 
 class WidgetTest(QCityTestBase):
