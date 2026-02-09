@@ -39,6 +39,7 @@ class QCityProjectMainWidgetTest(QCityTestBase):
                 os.path.exists(os.path.join(temp_dir, "test_database.gpkg"))
             )
             self.assertEqual(widget.label_current_project_area.text(), "Project")
+        self.delete_qobject(widget)
 
     def test_add_base_layers(self) -> None:
         widget = QCityDockWidget(QgsProject.instance(), self.iface)
@@ -48,6 +49,7 @@ class QCityProjectMainWidgetTest(QCityTestBase):
         layer_name = "test_point_4326"
         layers = QgsProject.instance().mapLayersByName(layer_name)
         self.assertTrue(layers is not None)
+        self.delete_qobject(widget)
 
     def test_load_project(self) -> None:
         path = os.path.join(test_data_path, "filled_test_database.gpkg")
@@ -56,6 +58,7 @@ class QCityProjectMainWidgetTest(QCityTestBase):
 
         # This needs to be updated if the base layers are changed
         self.assertEqual(widget.listWidget_project_areas.item(0).text(), "1")
+        self.delete_qobject(widget)
 
 
 if __name__ == "__main__":
