@@ -17,7 +17,7 @@ version=0.5.1
 author=North Road
 email=
 
-about=QCity is a QGIS plugin that allows for the modeling of constructed, proposed and potential buildings based on approved plans or the urban planning framework. QCity calculates dwelling yield, commercial floorspace yield and parking yield of building levels based the percentage of each floor assigned to different land uses and assumptions provided by the user and then aggregates the dwelling yield, commercial floorspace yield and parking yield for each development site. QCity also aggregates the dwelling yield, commercial floorspace yield and parking yield over a project area incorporating multiple development sites. Modeled buildings can also be visualized in a QGIS 3D map in combination with other spatial data.  
+about=QCity is a QGIS plugin that allows for the modeling of constructed, proposed and potential buildings based on approved plans or the urban planning framework. QCity calculates dwelling yield, commercial floorspace yield and parking yield of building levels based the percentage of each floor assigned to different land uses and assumptions provided by the user and then aggregates the dwelling yield, commercial floorspace yield and parking yield for each development site. QCity also aggregates the dwelling yield, commercial floorspace yield and parking yield over a project area incorporating multiple development sites. Modeled buildings can also be visualized in a QGIS 3D map in combination with other spatial data.
 
 tracker=https://github.com/north-road/QCity/issues
 repository=https://github.com/north-road/QCity
@@ -28,7 +28,7 @@ repository=https://github.com/north-road/QCity
 # Uncomment the following line and add your changelog:
 changelog=changelog
 
-Tags are comma separated with spaces allowed
+# Tags are comma separated with spaces allowed
 tags=urban modeling, urban planning, 3D, dwelling yield, commercial yield, parking
 
 homepage=
