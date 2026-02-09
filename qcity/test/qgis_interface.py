@@ -103,6 +103,12 @@ class QgisInterface(QObject):
         self.vector_layer_tools = MockedVectorLayerTools()
         self.cad_dock_widget = QgsAdvancedDigitizingDockWidget(self.canvas)
 
+    def tear_down(self):
+        self.message_bar.deleteLater()
+        del self.message_bar
+        self.cad_dock_widget.deleteLater()
+        del self.cad_dock_widget
+
     def addLayers(self, layers: List[QgsMapLayer]):
         """Handle layers being added to the registry so they show up in canvas.
 

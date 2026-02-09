@@ -88,6 +88,7 @@ def get_qgis_app(cleanup=True):
                 try:
                     # pylint: disable=used-before-assignment
                     # pylint: disable=redefined-outer-name
+                    IFACE.tear_down()
                     QGISAPP.exitQgis()  # noqa
                     QGISAPP = None  # noqa
                     # pylint: enable=used-before-assignment
