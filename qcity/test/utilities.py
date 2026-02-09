@@ -102,7 +102,8 @@ def get_qgis_app(cleanup=True):
     if CANVAS is None:
         # noinspection PyPep8Naming
         CANVAS = QgsMapCanvas(PARENT)
-        CANVAS.resize(QSize(400, 400))
+        CANVAS.resize(QSize(600, 400))
+        CANVAS.setFrameStyle(0)
 
     if IFACE is None:
         # QgisInterface is a stub implementation of the QGIS plugin interface

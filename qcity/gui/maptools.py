@@ -8,7 +8,7 @@
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
 # ---------------------------------------------------------------------
-from typing import List, Union
+from typing import List, Union, Optional
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QInputDialog, QMessageBox, QDialog
@@ -46,7 +46,6 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
         super().__init__(
             map_canvas, cad_dock_widget, QgsMapToolCapture.CaptureMode.CapturePolygon
         )
-        self.points: List[QgsPointXY] = []
         self._temp_layer: QgsVectorLayer = QgsVectorLayer(
             "Polygon?crs=EPSG:4326", "memory_polygon_layer", "memory"
         )
@@ -105,6 +104,17 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
                     ):
                         return
 
+        feature_name = self.get_new_name()
+        if not feature_name:
+            return
+
+        self.create_feature(feature_name, polygon)
+
+    def get_new_name(self) -> Optional[str]:
+        """
+        Gets the name for the new object
+        """
+        project_controller = get_project_controller()
         existing_names = project_controller.get_unique_names(
             self._layer_type, self._parent_pk
         )
@@ -133,13 +143,9 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
         )
 
         if dialog.exec() != QDialog.DialogCode.Accepted:
-            return
+            return None
 
-        feature_name = dialog.name()
-        if not feature_name:
-            return
-
-        self.create_feature(feature_name, polygon)
+        return dialog.name()
 
     def create_feature(self, feature_name: str, polygon: QgsGeometry) -> None:
         """

@@ -35,7 +35,7 @@ from qgis.core import (
     QgsGeometry,
     QgsFeature,
 )
-from qgis.gui import QgsMapCanvas, QgsMessageBar
+from qgis.gui import QgsMapCanvas, QgsMessageBar, QgsAdvancedDigitizingDockWidget
 
 LOGGER = logging.getLogger("QGIS")
 
@@ -101,6 +101,7 @@ class QgisInterface(QObject):
 
         self.message_bar = QgsMessageBar()
         self.vector_layer_tools = MockedVectorLayerTools()
+        self.cad_dock_widget = QgsAdvancedDigitizingDockWidget(self.canvas)
 
     def addLayers(self, layers: List[QgsMapLayer]):
         """Handle layers being added to the registry so they show up in canvas.
@@ -265,3 +266,6 @@ class QgisInterface(QObject):
 
     def vectorLayerTools(self):
         return self.vector_layer_tools
+
+    def cadDockWidget(self):
+        return self.cad_dock_widget

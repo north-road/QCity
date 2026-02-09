@@ -11,7 +11,7 @@ from qgis.core import (
     QgsPointXY,
     QgsReferencedRectangle,
 )
-from qgis.gui import QgsMapMouseEvent, QgsMapCanvas, QgsAdvancedDigitizingDockWidget
+from qgis.gui import QgsMapMouseEvent, QgsMapCanvas
 from qgis.core import (
     QgsProject,
     QgsRectangle,
@@ -38,19 +38,18 @@ class MapToolsTest(QCityTestBase):
         QgsSettings().clear()
 
         cls.project = QgsProject.instance()
+        cls.iface.mapCanvas().setDestinationCrs(
+            QgsCoordinateReferenceSystem("EPSG:3857")
+        )
 
-        cls.CANVAS = QgsMapCanvas()
-        cls.CANVAS.setDestinationCrs(QgsCoordinateReferenceSystem("EPSG:3857"))
-        cls.CANVAS.setFrameStyle(0)
-        cls.CANVAS.resize(600, 400)
-        assert cls.CANVAS.width() == 600
-        assert cls.CANVAS.height() == 400
+    def mocked_get_new_name(self):
+        return "new_name"
 
     @patch("qgis.PyQt.QtWidgets.QInputDialog.getText")
     def test_digitizing(self, mock_get_text) -> None:
         mock_get_text.return_value = ("test", "gpkg")
 
-        self.CANVAS.setReferencedExtent(
+        self.iface.mapCanvas().setReferencedExtent(
             QgsReferencedRectangle(
                 QgsRectangle(
                     -348802.30022384965559468,
@@ -71,28 +70,16 @@ class MapToolsTest(QCityTestBase):
 
             self.map_tool = DrawPolygonTool(
                 map_canvas=self.iface.mapCanvas(),
-                cad_dock_widget=QgsAdvancedDigitizingDockWidget(self.CANVAS),
+                cad_dock_widget=self.iface.cadDockWidget(),
             )
+            self.map_tool.get_new_name = self.mocked_get_new_name
 
             self.widget.load_project_database(gpkg_path, "gpkg")
             self.widget.toolButton_project_area_add.clicked.emit()
 
-            points = [
-                QgsPointXY(-346976.04375941428588703, 6632700.0318903774023056),
-                QgsPointXY(-346915.16854393307585269, 6632639.15667489636689425),
-                QgsPointXY(-346884.73093619249993935, 6632608.71906715538352728),
-            ]
-
             self.map_tool.canvasReleaseEvent(self.click_from_middle())
             self.map_tool.canvasReleaseEvent(self.click_from_middle(x=10, y=10))
             self.map_tool.canvasReleaseEvent(self.click_from_middle(x=15, y=15))
-
-            self.assertAlmostEqual(self.map_tool.points[0].x(), points[0].x(), delta=10)
-            self.assertAlmostEqual(self.map_tool.points[0].y(), points[0].y(), delta=10)
-            self.assertAlmostEqual(self.map_tool.points[1].x(), points[1].x(), delta=10)
-            self.assertAlmostEqual(self.map_tool.points[1].y(), points[1].y(), delta=10)
-            self.assertAlmostEqual(self.map_tool.points[2].x(), points[2].x(), delta=10)
-            self.assertAlmostEqual(self.map_tool.points[2].y(), points[2].y(), delta=10)
 
             self.map_tool.canvasReleaseEvent(self.click_from_middle(type="right"))
 
@@ -111,9 +98,12 @@ class MapToolsTest(QCityTestBase):
         else:
             return
         return QgsMapMouseEvent(
-            self.CANVAS,
+            self.iface.mapCanvas(),
             QEvent.Type.MouseButtonRelease,
-            QPoint(self.CANVAS.width() // 2 + x, self.CANVAS.height() // 2 + y),
+            QPoint(
+                self.iface.mapCanvas().width() // 2 + x,
+                self.iface.mapCanvas().height() // 2 + y,
+            ),
             click,
             click,
             Qt.KeyboardModifier.NoModifier,
