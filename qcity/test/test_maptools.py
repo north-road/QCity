@@ -104,18 +104,18 @@ class MapToolsTest(unittest.TestCase):
         self, type: str = "left", x: int = 0, y: int = 0
     ) -> Union[QgsMapMouseEvent, None]:
         if type == "left":
-            click = Qt.LeftButton
+            click = Qt.MouseButton.LeftButton
         elif type == "right":
-            click = Qt.RightButton
+            click = Qt.MouseButton.RightButton
         else:
             return
         return QgsMapMouseEvent(
             self.CANVAS,
-            QEvent.MouseButtonRelease,
+            QEvent.Type.MouseButtonRelease,
             QPoint(self.CANVAS.width() // 2 + x, self.CANVAS.height() // 2 + y),
             click,
             click,
-            Qt.NoModifier,
+            Qt.KeyboardModifier.NoModifier,
         )
 
 

@@ -34,7 +34,7 @@ class QCityPlugin:
 
         self.iface.pluginToolBar().addAction(self.action)
 
-        self.iface.addDockWidget(Qt.RightDockWidgetArea, self.widget)
+        self.iface.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.widget)
 
         self.action_maptool = QAction("QCity", self.iface.mainWindow())
 

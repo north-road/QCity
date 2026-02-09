@@ -43,7 +43,9 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
     def __init__(
         self, map_canvas: QgsMapCanvas, cad_dock_widget: QgsAdvancedDigitizingDockWidget
     ) -> None:
-        super().__init__(map_canvas, cad_dock_widget, QgsMapToolCapture.CapturePolygon)
+        super().__init__(
+            map_canvas, cad_dock_widget, QgsMapToolCapture.CaptureMode.CapturePolygon
+        )
         self.points: List[QgsPointXY] = []
         self._temp_layer: QgsVectorLayer = QgsVectorLayer(
             "Polygon?crs=EPSG:4326", "memory_polygon_layer", "memory"
@@ -94,10 +96,11 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
                             self.tr(
                                 "The digitized feature is not contained within the {}. Are you sure you want to continue?"
                             ).format(parent_layer_type.as_sentence_case(plural=False)),
-                            QMessageBox.Yes | QMessageBox.No,
-                            QMessageBox.NoButton,
+                            QMessageBox.StandardButton.Yes
+                            | QMessageBox.StandardButton.No,
+                            QMessageBox.StandardButton.NoButton,
                         )
-                        == QMessageBox.No
+                        == QMessageBox.StandardButton.No
                     ):
                         return
 
@@ -128,7 +131,7 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
             )
         )
 
-        if dialog.exec_() != QDialog.DialogCode.Accepted:
+        if dialog.exec() != QDialog.DialogCode.Accepted:
             return
 
         feature_name = dialog.name()

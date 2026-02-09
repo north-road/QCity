@@ -107,7 +107,7 @@ class PageController(QObject):
 
         item = QListWidgetItem()
         item.setText(feature[DatabaseUtils.name_field_for_layer(self.layer_type)])
-        item.setData(Qt.UserRole, feature.id())
+        item.setData(Qt.ItemDataRole.UserRole, feature.id())
 
         if not add_to_top or self.list_widget.count() == 0:
             self.list_widget.addItem(item)
@@ -127,7 +127,7 @@ class PageController(QObject):
             self.clear_feature()
             return
 
-        self.current_feature_id = current_item.data(Qt.UserRole)
+        self.current_feature_id = current_item.data(Qt.ItemDataRole.UserRole)
         self.set_feature(self.get_feature_by_id(self.current_feature_id))
 
         if self.current_item_label is not None:
@@ -275,7 +275,9 @@ class PageController(QObject):
         if not selected_items:
             return
 
-        feature_ids = {item.data(Qt.UserRole): item for item in selected_items}
+        feature_ids = {
+            item.data(Qt.ItemDataRole.UserRole): item for item in selected_items
+        }
         if len(feature_ids) == 1:
             item_text = next(iter(feature_ids.values())).text()
         else:
@@ -306,7 +308,7 @@ class PageController(QObject):
         """
         for row in range(self.list_widget.count()):
             item = self.list_widget.item(row)
-            if item.data(Qt.UserRole) == feature_id:
+            if item.data(Qt.ItemDataRole.UserRole) == feature_id:
                 self.list_widget.takeItem(row)
                 return
 
@@ -315,7 +317,7 @@ class PageController(QObject):
         Renames the selected object
         """
         selected_item = self.list_widget.selectedItems()[0]
-        feature_id = selected_item.data(Qt.UserRole)
+        feature_id = selected_item.data(Qt.ItemDataRole.UserRole)
 
         existing_names = PROJECT_CONTROLLER.get_unique_names(self.layer_type)
 
@@ -342,7 +344,7 @@ class PageController(QObject):
             )
         )
 
-        if dialog.exec_() != QDialog.DialogCode.Accepted:
+        if dialog.exec() != QDialog.DialogCode.Accepted:
             return
 
         new_feat_name = dialog.name()

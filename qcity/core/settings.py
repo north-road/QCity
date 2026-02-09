@@ -55,7 +55,7 @@ class SettingsManager(QObject):
             QgsSettings().setValue(
                 f"{self.SETTINGS_KEY}/base_project_folder",
                 "",
-                section=QgsSettings.Plugins,
+                section=QgsSettings.Section.Plugins,
             )
 
     def get_base_layers_items(self) -> List[str]:
@@ -86,7 +86,7 @@ class SettingsManager(QObject):
             QgsSettings().value(
                 f"{self.SETTINGS_KEY}/base_project_folder",
                 "",
-                section=QgsSettings.Plugins,
+                section=QgsSettings.Section.Plugins,
             )
             or None
         )
@@ -98,7 +98,7 @@ class SettingsManager(QObject):
         QgsSettings().setValue(
             f"{self.SETTINGS_KEY}/last_used_database_folder",
             folder,
-            section=QgsSettings.Plugins,
+            section=QgsSettings.Section.Plugins,
         )
 
     def last_used_database_folder(self) -> str:
@@ -108,7 +108,7 @@ class SettingsManager(QObject):
         return QgsSettings().value(
             f"{self.SETTINGS_KEY}/last_used_database_folder",
             QDir.homePath(),
-            section=QgsSettings.Plugins,
+            section=QgsSettings.Section.Plugins,
         )
 
     def set_last_used_export_path(self, path: str):
@@ -118,7 +118,7 @@ class SettingsManager(QObject):
         QgsSettings().setValue(
             f"{self.SETTINGS_KEY}/last_used_export_path",
             path,
-            section=QgsSettings.Plugins,
+            section=QgsSettings.Section.Plugins,
         )
 
     def last_used_export_path(self) -> str:
@@ -128,7 +128,7 @@ class SettingsManager(QObject):
         return QgsSettings().value(
             f"{self.SETTINGS_KEY}/last_used_export_path",
             QDir.homePath(),
-            section=QgsSettings.Plugins,
+            section=QgsSettings.Section.Plugins,
         )
 
     def set_database_path(self, database_path: str) -> None:

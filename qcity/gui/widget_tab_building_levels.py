@@ -296,7 +296,7 @@ class BuildingLevelsPageController(PageController):
         if not selected_items:
             return
 
-        feature_id = selected_items[0].data(Qt.UserRole)
+        feature_id = selected_items[0].data(Qt.ItemDataRole.UserRole)
         if PROJECT_CONTROLLER.move_building_level(feature_id, up):
             old_row = self.list_widget.row(selected_items[0])
             item = self.list_widget.takeItem(old_row)
