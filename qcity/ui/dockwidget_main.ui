@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>dockWidget_QCity</class>
- <widget class="QgsDockWidget" name="dockWidget_QCity">
+ <widget class="QDockWidget" name="dockWidget_QCity">
   <property name="geometry">
    <rect>
     <x>0</x>
