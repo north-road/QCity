@@ -5,9 +5,9 @@ Safe Translations Test.
 import unittest
 import os
 from qgis.PyQt.QtCore import QCoreApplication, QTranslator
-from .utilities import get_qgis_app
+from qcity.test.utilities import get_qgis_app
 
-from .qcity_test_base import QCityTestBase
+from qcity.test.qcity_test_base import QCityTestBase
 
 QGIS_APP = get_qgis_app()
 
