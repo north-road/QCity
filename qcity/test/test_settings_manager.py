@@ -43,6 +43,6 @@ class TestSettingsManager(QCityTestBase):
 
 
 if __name__ == "__main__":
-    suite = unittest.makeSuite(TestSettingsManager)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestSettingsManager)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)

@@ -42,6 +42,6 @@ class GuiUtilsTest(QCityTestBase):
 
 
 if __name__ == "__main__":
-    suite = unittest.makeSuite(GuiUtilsTest)
+    suite = unittest.TestLoader().loadTestsFromTestCase(GuiUtilsTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
