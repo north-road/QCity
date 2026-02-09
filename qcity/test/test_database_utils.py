@@ -71,7 +71,7 @@ class TestDatabaseUtils(unittest.TestCase):
             "P",
         )
         self.assertEqual(
-            DatabaseUtils.get_field_default(LayerType.BuildingLevels, "level_height"), 6
+            DatabaseUtils.get_field_default(LayerType.BuildingLevels, "level_height"), 3
         )
 
 
