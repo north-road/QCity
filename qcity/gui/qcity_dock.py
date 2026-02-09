@@ -20,7 +20,7 @@ from qcity.gui.widget_tab_development_sites import DevelopmentSitesPageControlle
 from qcity.gui.widget_tab_project_areas import ProjectAreasPageController
 from .widget_tab_building_levels import BuildingLevelsPageController
 from .widget_tab_statistics import WidgetUtilsStatistics
-from ..core import DatabaseUtils, PROJECT_CONTROLLER, LayerType
+from ..core import DatabaseUtils, get_project_controller, LayerType
 from ..core import SETTINGS_MANAGER
 from ..gui.gui_utils import GuiUtils
 
@@ -115,10 +115,10 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         self.restore_saved_database_path()
         self.project.readProject.connect(self.restore_saved_database_path)
 
-        PROJECT_CONTROLLER.has_all_layers_changed.connect(self._check_layers)
+        get_project_controller().has_all_layers_changed.connect(self._check_layers)
 
     def restore_saved_database_path(self) -> None:
-        path = PROJECT_CONTROLLER.associated_database_path()
+        path = get_project_controller().associated_database_path()
         if path:
             self.load_project_database(path, add_layers=False)
 
@@ -176,9 +176,10 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
 
         self.set_widgets_enabled(True)
 
-        PROJECT_CONTROLLER.set_associated_database_path(gpkg_path)
-        PROJECT_CONTROLLER.add_database_layers_to_project(self.project, gpkg_path)
-        PROJECT_CONTROLLER.create_layer_relations()
+        project_controller = get_project_controller()
+        project_controller.set_associated_database_path(gpkg_path)
+        project_controller.add_database_layers_to_project(self.project, gpkg_path)
+        project_controller.create_layer_relations()
 
         self.iface.messageBar().pushMessage(
             self.tr("Success"),
@@ -207,9 +208,10 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
 
         SETTINGS_MANAGER.set_database_path(file_name)
 
-        PROJECT_CONTROLLER.set_associated_database_path(file_name)
+        project_controller = get_project_controller()
+        project_controller.set_associated_database_path(file_name)
         if add_layers:
-            PROJECT_CONTROLLER.add_database_layers_to_project(self.project, file_name)
+            project_controller.add_database_layers_to_project(self.project, file_name)
 
         # Click on first project area item to initialize all other listwidgets
         for widget in [
@@ -228,7 +230,7 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
 
         self.set_widgets_enabled(True)
 
-        PROJECT_CONTROLLER.create_layer_relations()
+        project_controller.create_layer_relations()
 
         self.iface.messageBar().pushMessage(
             self.tr("Success"),

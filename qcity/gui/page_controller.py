@@ -19,7 +19,7 @@ from qgis.core import QgsFeature, NULL, QgsReferencedRectangle, QgsVectorLayer
 from qgis.gui import QgsNewNameDialog, QgsSpinBox, QgsDoubleSpinBox
 
 from .canvas_utils import CanvasUtils
-from ..core import LayerUtils, LayerType, PROJECT_CONTROLLER, DatabaseUtils
+from ..core import LayerUtils, LayerType, get_project_controller, DatabaseUtils
 from ..core.utils import wrapped_edits
 
 
@@ -137,7 +137,7 @@ class PageController(QObject):
         """
         Returns the layer associated with the page
         """
-        layer = PROJECT_CONTROLLER.get_layer(self.layer_type)
+        layer = get_project_controller().get_layer(self.layer_type)
         return layer
 
     def get_feature_by_id(self, feature_id: int) -> QgsFeature:
@@ -319,7 +319,7 @@ class PageController(QObject):
         selected_item = self.list_widget.selectedItems()[0]
         feature_id = selected_item.data(Qt.ItemDataRole.UserRole)
 
-        existing_names = PROJECT_CONTROLLER.get_unique_names(self.layer_type)
+        existing_names = get_project_controller().get_unique_names(self.layer_type)
 
         dialog = QgsNewNameDialog(
             initial=selected_item.text(),

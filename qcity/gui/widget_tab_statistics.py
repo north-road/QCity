@@ -4,7 +4,7 @@ from qgis.PyQt.QtCore import QObject, QDir, QUrl
 from qgis.PyQt.QtWidgets import QLabel, QFileDialog
 from qgis.core import Qgis, QgsFileUtils
 from qgis.utils import iface
-from qcity.core import PROJECT_CONTROLLER, SETTINGS_MANAGER
+from qcity.core import get_project_controller, SETTINGS_MANAGER
 
 
 class WidgetUtilsStatistics(QObject):
@@ -29,13 +29,14 @@ class WidgetUtilsStatistics(QObject):
         super().__init__(og_widget)
         self.og_widget = og_widget
 
-        PROJECT_CONTROLLER.project_area_added.connect(
+        project_controller = get_project_controller()
+        project_controller.project_area_added.connect(
             self.populate_project_area_combo_box
         )
-        PROJECT_CONTROLLER.project_area_deleted.connect(
+        project_controller.project_area_deleted.connect(
             self.populate_project_area_combo_box
         )
-        PROJECT_CONTROLLER.project_area_layer_changed.connect(
+        project_controller.project_area_layer_changed.connect(
             self.populate_project_area_combo_box
         )
 
@@ -46,17 +47,17 @@ class WidgetUtilsStatistics(QObject):
         self.og_widget.comboBox_statistics_projects.currentIndexChanged.connect(
             self._invalidate_stats
         )
-        PROJECT_CONTROLLER.project_area_attribute_changed.connect(
+        project_controller.project_area_attribute_changed.connect(
             self._invalidate_stats
         )
-        PROJECT_CONTROLLER.development_site_added.connect(self._invalidate_stats)
-        PROJECT_CONTROLLER.development_site_deleted.connect(self._invalidate_stats)
-        PROJECT_CONTROLLER.development_site_attribute_changed.connect(
+        project_controller.development_site_added.connect(self._invalidate_stats)
+        project_controller.development_site_deleted.connect(self._invalidate_stats)
+        project_controller.development_site_attribute_changed.connect(
             self._invalidate_stats
         )
-        PROJECT_CONTROLLER.building_level_added.connect(self._invalidate_stats)
-        PROJECT_CONTROLLER.building_level_deleted.connect(self._invalidate_stats)
-        PROJECT_CONTROLLER.building_level_attribute_changed.connect(
+        project_controller.building_level_added.connect(self._invalidate_stats)
+        project_controller.building_level_deleted.connect(self._invalidate_stats)
+        project_controller.building_level_attribute_changed.connect(
             self._invalidate_stats
         )
 
@@ -75,7 +76,7 @@ class WidgetUtilsStatistics(QObject):
         """
         Accumulates the values of all properties belonging to building levels and sets the values in the statistics tab
         """
-        totals = PROJECT_CONTROLLER.calculate_project_area_stats(
+        totals = get_project_controller().calculate_project_area_stats(
             self.og_widget.comboBox_statistics_projects.currentData()
         )
         if not totals:
@@ -101,7 +102,7 @@ class WidgetUtilsStatistics(QObject):
         csv_filename = QgsFileUtils.addExtensionFromFilter(csv_filename, "*.csv")
         SETTINGS_MANAGER.set_last_used_export_path(csv_filename)
 
-        totals = PROJECT_CONTROLLER.calculate_project_area_stats(
+        totals = get_project_controller().calculate_project_area_stats(
             self.og_widget.comboBox_statistics_projects.currentData()
         )
 
@@ -126,7 +127,7 @@ class WidgetUtilsStatistics(QObject):
         """
         Populates the project area combo box
         """
-        area_layer = PROJECT_CONTROLLER.get_project_area_layer()
+        area_layer = get_project_controller().get_project_area_layer()
         if not area_layer or not area_layer.isValid():
             return
 

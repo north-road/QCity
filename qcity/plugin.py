@@ -2,7 +2,7 @@ from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtWidgets import QAction
 from qgis.core import QgsProject, Qgis
 
-from .core import PROJECT_CONTROLLER
+from .core import get_project_controller
 from qcity.gui.maptools import DrawPolygonTool, MapToolHandler
 
 from .gui.gui_utils import GuiUtils
@@ -68,8 +68,9 @@ class QCityPlugin:
             a.deleteLater()
         self.actions = []
 
-        PROJECT_CONTROLLER.cleanup()
-        PROJECT_CONTROLLER.deleteLater()
+        controller = get_project_controller()
+        controller.cleanup()
+        controller.deleteLater()
 
     @staticmethod
     def tr(message) -> str:

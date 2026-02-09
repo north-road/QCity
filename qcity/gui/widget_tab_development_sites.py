@@ -7,7 +7,12 @@ from qgis.core import (
     QgsProject,
 )
 
-from qcity.core import SETTINGS_MANAGER, LayerType, PROJECT_CONTROLLER, DatabaseUtils
+from qcity.core import (
+    SETTINGS_MANAGER,
+    LayerType,
+    get_project_controller,
+    DatabaseUtils,
+)
 from .page_controller import PageController
 
 
@@ -26,17 +31,18 @@ class DevelopmentSitesPageController(PageController):
         )
         self.skip_fields_for_widgets = ["fid", "name", "project_area_pk"]
 
-        PROJECT_CONTROLLER.project_area_changed.connect(self.on_project_area_changed)
-        PROJECT_CONTROLLER.development_site_added.connect(
+        project_controller = get_project_controller()
+        project_controller.project_area_changed.connect(self.on_project_area_changed)
+        project_controller.development_site_added.connect(
             self._on_development_site_added
         )
-        PROJECT_CONTROLLER.development_site_deleted.connect(
+        project_controller.development_site_deleted.connect(
             self._on_development_site_deleted
         )
-        PROJECT_CONTROLLER.development_site_attribute_changed.connect(
+        project_controller.development_site_attribute_changed.connect(
             self._on_development_site_attribute_changed
         )
-        PROJECT_CONTROLLER.development_site_geometry_changed.connect(
+        project_controller.development_site_geometry_changed.connect(
             self._on_development_site_geometry_changed
         )
 
@@ -68,7 +74,7 @@ class DevelopmentSitesPageController(PageController):
         """
         if (
             feature[DatabaseUtils.foreign_key_for_layer(self.layer_type)]
-            != PROJECT_CONTROLLER.current_project_area_fid
+            != get_project_controller().current_project_area_fid
         ):
             return
 
@@ -127,7 +133,7 @@ class DevelopmentSitesPageController(PageController):
             self.add_feature_to_list(feat, set_current=False)
 
     def delete_feature_and_child_objects(self, feature_id: int) -> bool:
-        return PROJECT_CONTROLLER.delete_development_site(feature_id)
+        return get_project_controller().delete_development_site(feature_id)
 
     def update_site_area(self, feature: QgsFeature):
         """
@@ -151,7 +157,7 @@ class DevelopmentSitesPageController(PageController):
         super().set_feature(feature)
         self.update_site_area(feature)
 
-        PROJECT_CONTROLLER.set_current_development_site(feature.id())
+        get_project_controller().set_current_development_site(feature.id())
 
     def _auto_calculate_floorspace_toggled(self, active: bool):
         """
@@ -160,7 +166,7 @@ class DevelopmentSitesPageController(PageController):
         if self._block_feature_updates or not active:
             return
 
-        PROJECT_CONTROLLER.auto_calculate_development_site_floorspace(
+        get_project_controller().auto_calculate_development_site_floorspace(
             self.current_feature_id
         )
 
@@ -171,7 +177,7 @@ class DevelopmentSitesPageController(PageController):
         if self._block_feature_updates or not active:
             return
 
-        PROJECT_CONTROLLER.auto_calculate_development_site_car_parking(
+        get_project_controller().auto_calculate_development_site_car_parking(
             self.current_feature_id
         )
 
@@ -182,6 +188,6 @@ class DevelopmentSitesPageController(PageController):
         if self._block_feature_updates or not active:
             return
 
-        PROJECT_CONTROLLER.auto_calculate_development_site_bicycle_parking(
+        get_project_controller().auto_calculate_development_site_bicycle_parking(
             self.current_feature_id
         )

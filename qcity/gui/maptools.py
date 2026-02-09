@@ -29,7 +29,7 @@ from qgis.gui import (
     QgsNewNameDialog,
 )
 
-from qcity.core import LayerType, PROJECT_CONTROLLER, DatabaseUtils, LayerUtils
+from qcity.core import LayerType, get_project_controller, DatabaseUtils, LayerUtils
 from qcity.core.utils import wrapped_edits
 
 
@@ -75,13 +75,14 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
         elif self._layer_type == LayerType.BuildingLevels:
             parent_layer_type = LayerType.DevelopmentSites
 
+        project_controller = get_project_controller()
         if parent_layer_type is not None:
-            parent_feature = PROJECT_CONTROLLER.get_feature_by_pk(
+            parent_feature = project_controller.get_feature_by_pk(
                 parent_layer_type, self._parent_pk
             )
             if parent_feature is not None:
                 if not LayerUtils.test_geometry_within(
-                    PROJECT_CONTROLLER.get_layer(parent_layer_type),
+                    project_controller.get_layer(parent_layer_type),
                     parent_feature.id(),
                     polygon,
                     self.layer().crs(),
@@ -104,7 +105,7 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
                     ):
                         return
 
-        existing_names = PROJECT_CONTROLLER.get_unique_names(
+        existing_names = project_controller.get_unique_names(
             self._layer_type, self._parent_pk
         )
 
@@ -144,7 +145,8 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
         """
         Called when the new feature should be created
         """
-        layer = PROJECT_CONTROLLER.get_layer(self._layer_type)
+        project_controller = get_project_controller()
+        layer = project_controller.get_layer(self._layer_type)
 
         if not layer.isValid():
             raise Exception("Layer is not valid!")
@@ -155,15 +157,15 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
             initial_attributes[foreign_key] = self._parent_pk
         if self._layer_type == LayerType.BuildingLevels:
             initial_attributes["level_index"] = (
-                PROJECT_CONTROLLER.get_next_building_level(self._parent_pk)
+                project_controller.get_next_building_level(self._parent_pk)
             )
             initial_attributes["base_height"] = (
-                PROJECT_CONTROLLER.get_floor_base_height(
+                project_controller.get_floor_base_height(
                     self._parent_pk, initial_attributes["level_index"]
                 )
             )
 
-        feature = PROJECT_CONTROLLER.create_feature(
+        feature = project_controller.create_feature(
             self._layer_type, feature_name, polygon, initial_attributes
         )
 
