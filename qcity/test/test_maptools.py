@@ -22,9 +22,10 @@ from qcity.core import DatabaseUtils, get_project_controller
 from qcity.gui.qcity_dock import QCityDockWidget
 from qcity.test.utilities import get_qgis_app
 from qcity.gui.maptools import DrawPolygonTool
+from .qcity_test_base import QCityTestBase
 
 
-class MapToolsTest(unittest.TestCase):
+class MapToolsTest(QCityTestBase):
     @classmethod
     def setUpClass(cls):
         """Run before all tests"""

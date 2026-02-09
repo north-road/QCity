@@ -7,21 +7,25 @@ import os
 from qgis.PyQt.QtCore import QCoreApplication, QTranslator
 from .utilities import get_qgis_app
 
+from .qcity_test_base import QCityTestBase
+
 QGIS_APP = get_qgis_app()
 
 
-class SafeTranslationsTest(unittest.TestCase):
+class SafeTranslationsTest(QCityTestBase):
     """Test translations work."""
 
     def setUp(self):
         """Runs before each test."""
         if os.getenv("LANG"):
             del os.environ["LANG"]
+        super().setUp()
 
     def tearDown(self):
         """Runs after each test."""
         if os.getenv("LANG"):
             del os.environ["LANG"]
+        super().tearDown()
 
     def test_qgis_translations(self):
         """Test that translations work."""
