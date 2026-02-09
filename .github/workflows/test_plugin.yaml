@@ -1,0 +1,42 @@
+name: Test plugin
+
+on:
+  push:
+    paths:
+    - "qcity/**"
+    - ".github/workflows/test_plugin.yaml"
+  pull_request:
+    paths:
+    - "qcity/**"
+    - ".github/workflows/test_plugin.yaml"
+
+env:
+  # plugin name/directory where the code for the plugin is stored
+  PLUGIN_NAME: qcity
+  # python notation to test running inside plugin
+  TESTS_RUN_FUNCTION: qcity.test_suite.test_package
+  # Docker settings
+  DOCKER_IMAGE: qgis/qgis
+
+
+jobs:
+
+  Test-plugin-qcity:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        qgis_version: ["3.44", "latest""]
+    env:
+      QGIS_TEST_VERSION: ${{ matrix.qgis_version }}
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Test
+        run: |
+          docker compose -f .docker/docker-compose.yml run qgis /usr/src/.docker/run-docker-tests.sh
