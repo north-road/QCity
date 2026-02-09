@@ -29,8 +29,6 @@ class QCityProjectMainWidgetTest(QCityTestBase):
         _, CANVAS, cls.iface, cls.PARENT = get_qgis_app()
         QgsSettings().clear()
 
-        cls.project = QgsProject()
-
         cls.CANVAS = CANVAS
         cls.CANVAS.setDestinationCrs(QgsCoordinateReferenceSystem("EPSG:3857"))
         cls.CANVAS.setFrameStyle(0)
@@ -39,7 +37,7 @@ class QCityProjectMainWidgetTest(QCityTestBase):
         assert cls.CANVAS.height() == 400
 
     def test_create_database(self) -> None:
-        widget = QCityDockWidget(self.project, self.iface)
+        widget = QCityDockWidget(QgsProject.instance(), self.iface)
 
         with tempfile.TemporaryDirectory() as temp_dir:
             path = os.path.join(temp_dir, "test_database.gpkg")
@@ -50,12 +48,12 @@ class QCityProjectMainWidgetTest(QCityTestBase):
             self.assertEqual(widget.label_current_project_area.text(), "Project")
 
     def test_add_base_layers(self) -> None:
-        widget = QCityDockWidget(self.project, self.iface)
+        widget = QCityDockWidget(QgsProject.instance(), self.iface)
         widget.add_base_layers()
 
         # This needs to be updated if the base layers are changed
         layer_name = "test_point_4326"
-        layers = self.project.mapLayersByName(layer_name)
+        layers = QgsProject.instance().mapLayersByName(layer_name)
         self.assertTrue(layers is not None)
 
     def test_load_project(self) -> None:

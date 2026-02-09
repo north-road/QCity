@@ -48,8 +48,6 @@ class SettingsManager(QObject):
             self.plugin_path, "..", "data", "default_building_level_parameters.json"
         )
 
-        self.project = QgsProject().instance()
-
         if not self.user_base_projects_folder():
             # create the setting so that it shows up in the advanced setting editor
             QgsSettings().setValue(
