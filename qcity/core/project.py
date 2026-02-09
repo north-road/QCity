@@ -219,11 +219,11 @@ class ProjectController(QObject):
             elevation_props = building_levels_layer.elevationProperties()
             elevation_props.setExtrusionEnabled(True)
             elevation_props.dataDefinedProperties().setProperty(
-                QgsMapLayerElevationProperties.ZOffset,
+                QgsMapLayerElevationProperties.Property.ZOffset,
                 QgsProperty.fromField("base_height"),
             )
             elevation_props.dataDefinedProperties().setProperty(
-                QgsMapLayerElevationProperties.ExtrusionHeight,
+                QgsMapLayerElevationProperties.Property.ExtrusionHeight,
                 QgsProperty.fromField("level_height"),
             )
 
@@ -1028,7 +1028,7 @@ class ProjectController(QObject):
             relation.setReferencingLayer(child_layer.id())
             relation.addFieldPair(foreign_key, "fid")
             relation.setId(name)
-            relation.setStrength(QgsRelation.Association)
+            relation.setStrength(QgsRelation.RelationStrength.Association)
             assert relation.isValid(), relation.validationError()
             relation_manager.addRelation(relation)
 

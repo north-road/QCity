@@ -151,9 +151,9 @@ class DatabaseUtils:
         options.driverName = "GPKG"
         options.layerName = table_name
         options.actionOnExistingFile = (
-            QgsVectorFileWriter.CreateOrOverwriteLayer
+            QgsVectorFileWriter.ActionOnExistingFile.CreateOrOverwriteLayer
             if not create_file
-            else QgsVectorFileWriter.CreateOrOverwriteFile
+            else QgsVectorFileWriter.ActionOnExistingFile.CreateOrOverwriteFile
         )
 
         error, error_message, new_filename, new_layer = (
@@ -162,7 +162,7 @@ class DatabaseUtils:
             )
         )
 
-        if not error == QgsVectorFileWriter.NoError:
+        if not error == QgsVectorFileWriter.WriterError.NoError:
             raise Exception(
                 f"Error adding layer to GeoPackage {gpkg_path}: {error_message}"
             )

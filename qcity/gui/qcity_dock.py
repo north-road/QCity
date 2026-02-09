@@ -32,7 +32,7 @@ class DisabledStringListModel(QStringListModel):
         super().__init__(parent)
 
     def flags(self, index):
-        return Qt.NoItemFlags
+        return Qt.ItemFlag.NoItemFlags
 
 
 class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
@@ -183,7 +183,7 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         self.iface.messageBar().pushMessage(
             self.tr("Success"),
             self.tr(f"Project database created: {file_name}"),
-            level=Qgis.Success,
+            level=Qgis.MessageLevel.Success,
         )
 
     def load_project_database(
@@ -233,7 +233,7 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         self.iface.messageBar().pushMessage(
             self.tr("Success"),
             self.tr(f"Project database loaded: {file_name}"),
-            level=Qgis.Success,
+            level=Qgis.MessageLevel.Success,
         )
 
     def add_base_layers(self) -> None:
