@@ -46,6 +46,6 @@ class SafeTranslationsTest(QCityTestBase):
 
 
 if __name__ == "__main__":
-    suite = unittest.makeSuite(SafeTranslationsTest)
+    suite = unittest.TestLoader().loadTestsFromTestCase(SafeTranslationsTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)

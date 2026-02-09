@@ -66,6 +66,6 @@ class QCityProjectMainWidgetTest(QCityTestBase):
 
 
 if __name__ == "__main__":
-    suite = unittest.makeSuite(QCityProjectMainWidgetTest)
+    suite = unittest.TestLoader().loadTestsFromTestCase(QCityProjectMainWidgetTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)

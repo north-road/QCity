@@ -940,6 +940,6 @@ class TestProjectUtils(QCityTestBase):
 
 
 if __name__ == "__main__":
-    suite = unittest.makeSuite(TestProjectUtils)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestProjectUtils)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)

@@ -109,6 +109,6 @@ class MapToolsTest(QCityTestBase):
 
 
 if __name__ == "__main__":
-    suite = unittest.makeSuite(MapToolsTest)
+    suite = unittest.TestLoader().loadTestsFromTestCase(MapToolsTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)

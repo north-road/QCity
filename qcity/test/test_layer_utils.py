@@ -378,6 +378,6 @@ class TestLayerUtils(QCityTestBase):
 
 
 if __name__ == "__main__":
-    suite = unittest.makeSuite(TestLayerUtils)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestLayerUtils)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)

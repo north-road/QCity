@@ -27,6 +27,6 @@ class WidgetTest(QCityTestBase):
 
 
 if __name__ == "__main__":
-    suite = unittest.makeSuite(WidgetTest)
+    suite = unittest.TestLoader().loadTestsFromTestCase(WidgetTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
