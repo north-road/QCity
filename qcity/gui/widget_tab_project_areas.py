@@ -2,7 +2,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QFileDialog
 from qgis.core import QgsFeature, QgsVectorLayer
 
-from qcity.core import SETTINGS_MANAGER, LayerType, PROJECT_CONTROLLER
+from qcity.core import SETTINGS_MANAGER, LayerType, get_project_controller
 from .page_controller import PageController
 
 
@@ -17,8 +17,9 @@ class ProjectAreasPageController(PageController):
         )
         self.skip_fields_for_widgets = ("fid", "name")
 
-        PROJECT_CONTROLLER.project_area_added.connect(self._on_project_area_added)
-        PROJECT_CONTROLLER.project_area_deleted.connect(self._on_project_area_deleted)
+        project_controller = get_project_controller()
+        project_controller.project_area_added.connect(self._on_project_area_added)
+        project_controller.project_area_deleted.connect(self._on_project_area_deleted)
 
         self.og_widget.toolButton_project_area_add.clicked.connect(
             self.add_feature_clicked
@@ -32,7 +33,7 @@ class ProjectAreasPageController(PageController):
             self.rename_current_selection
         )
 
-        PROJECT_CONTROLLER.project_area_layer_changed.connect(
+        project_controller.project_area_layer_changed.connect(
             self.populate_project_area_combo_box
         )
 
@@ -64,8 +65,8 @@ class ProjectAreasPageController(PageController):
         self.remove_item_from_list(feature_id)
 
     def delete_feature_and_child_objects(self, feature_id: int) -> bool:
-        return PROJECT_CONTROLLER.delete_project_area(feature_id)
+        return get_project_controller().delete_project_area(feature_id)
 
     def set_feature(self, feature: QgsFeature):
         super().set_feature(feature)
-        PROJECT_CONTROLLER.set_current_project_area(feature.id())
+        get_project_controller().set_current_project_area(feature.id())

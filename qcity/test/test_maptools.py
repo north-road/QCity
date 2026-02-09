@@ -18,7 +18,7 @@ from qgis.core import (
     QgsSettings,
 )
 
-from qcity.core import DatabaseUtils, PROJECT_CONTROLLER
+from qcity.core import DatabaseUtils, get_project_controller
 from qcity.gui.qcity_dock import QCityDockWidget
 from qcity.test.utilities import get_qgis_app
 from qcity.gui.maptools import DrawPolygonTool
@@ -97,7 +97,7 @@ class MapToolsTest(unittest.TestCase):
 
             self.assertTrue(self.widget.listWidget_project_areas.item(0), "test")
 
-            PROJECT_CONTROLLER.cleanup()
+            get_project_controller().cleanup()
             QgsProject.instance().clear()
 
     def click_from_middle(

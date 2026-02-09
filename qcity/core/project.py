@@ -1634,4 +1634,25 @@ class ProjectController(QObject):
         return totals
 
 
-PROJECT_CONTROLLER = ProjectController(QgsProject.instance())
+_PROJECT_CONTROLLER: Optional[ProjectController] = None
+
+
+def get_project_controller() -> ProjectController:
+    """
+    Returns the global project controller instance
+    """
+    global _PROJECT_CONTROLLER
+    if _PROJECT_CONTROLLER is None:
+        _PROJECT_CONTROLLER = ProjectController(QgsProject.instance())
+    return _PROJECT_CONTROLLER
+
+
+def reset_project_controller():
+    """
+    Helper specifically for tests to force a reset of the global singleton.
+    """
+    global _PROJECT_CONTROLLER
+    if _PROJECT_CONTROLLER is not None:
+        _PROJECT_CONTROLLER.cleanup()
+        _PROJECT_CONTROLLER.deleteLater()
+    _PROJECT_CONTROLLER = None

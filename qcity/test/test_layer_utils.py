@@ -19,7 +19,7 @@ from qgis.core import (
 from qcity.core import LayerType
 from qcity.core.database import DatabaseUtils
 from qcity.core.layer import LayerUtils
-from qcity.core.project import PROJECT_CONTROLLER
+from qcity.core.project import get_project_controller
 from qcity.core.utils import wrapped_edits
 
 test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
@@ -81,9 +81,10 @@ class TestLayerUtils(unittest.TestCase):
             DatabaseUtils.create_base_tables(gpkg_path)
 
             p = QgsProject.instance()
-            PROJECT_CONTROLLER.add_database_layers_to_project(p, gpkg_path)
+            project_controller = get_project_controller()
+            project_controller.add_database_layers_to_project(p, gpkg_path)
 
-            project_area_layer = PROJECT_CONTROLLER.get_project_area_layer()
+            project_area_layer = project_controller.get_project_area_layer()
             # create an initial feature
             f = QgsVectorLayerUtils.createFeature(project_area_layer)
             f["car_parking_1_bedroom"] = 1

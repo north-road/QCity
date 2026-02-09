@@ -9,7 +9,12 @@ from qgis.core import (
     QgsExpression,
 )
 
-from qcity.core import LayerType, PROJECT_CONTROLLER, DatabaseUtils, SETTINGS_MANAGER
+from qcity.core import (
+    LayerType,
+    get_project_controller,
+    DatabaseUtils,
+    SETTINGS_MANAGER,
+)
 from .page_controller import PageController
 
 
@@ -24,17 +29,18 @@ class BuildingLevelsPageController(PageController):
 
         self.og_widget.base_height.setProperty("decimals", 2)
 
-        PROJECT_CONTROLLER.development_site_changed.connect(
+        project_controller = get_project_controller()
+        project_controller.development_site_changed.connect(
             self.on_development_site_changed
         )
-        PROJECT_CONTROLLER.building_level_added.connect(self._on_building_level_added)
-        PROJECT_CONTROLLER.building_level_deleted.connect(
+        project_controller.building_level_added.connect(self._on_building_level_added)
+        project_controller.building_level_deleted.connect(
             self._on_building_level_deleted
         )
-        PROJECT_CONTROLLER.project_area_attribute_changed.connect(
+        project_controller.project_area_attribute_changed.connect(
             self._update_residential_space_total
         )
-        PROJECT_CONTROLLER.building_level_geometry_changed.connect(
+        project_controller.building_level_geometry_changed.connect(
             self._update_residential_space_total
         )
 
@@ -143,8 +149,9 @@ class BuildingLevelsPageController(PageController):
         ):
             total_bedroom_area.append(w.value() / 100 * total_residential_area)
 
-        project_area_feature = PROJECT_CONTROLLER.get_project_area_layer().getFeature(
-            PROJECT_CONTROLLER.current_project_area_fid
+        project_controller = get_project_controller()
+        project_area_feature = project_controller.get_project_area_layer().getFeature(
+            project_controller.current_project_area_fid
         )
         dwelling_sizes = []
         for bedroom_size_field in (
@@ -207,7 +214,7 @@ class BuildingLevelsPageController(PageController):
         """
         if (
             feature[DatabaseUtils.foreign_key_for_layer(self.layer_type)]
-            != PROJECT_CONTROLLER.current_development_site_fid
+            != get_project_controller().current_development_site_fid
         ):
             return
 
@@ -270,7 +277,7 @@ class BuildingLevelsPageController(PageController):
 
     def set_feature(self, feature: QgsFeature):
         super().set_feature(feature)
-        PROJECT_CONTROLLER.set_current_building_level(feature.id())
+        get_project_controller().set_current_building_level(feature.id())
         if self.current_feature_id is None:
             self.og_widget.collapsibleGroupBox_building_levels_development_statistics.setTitle(
                 "Level Composition"
@@ -283,7 +290,7 @@ class BuildingLevelsPageController(PageController):
         self._update_residential_space_total()
 
     def delete_feature_and_child_objects(self, feature_id: int) -> bool:
-        return PROJECT_CONTROLLER.delete_building_level(feature_id)
+        return get_project_controller().delete_building_level(feature_id)
 
     def move_up(self):
         self._move_current_layer(up=True)
@@ -297,7 +304,7 @@ class BuildingLevelsPageController(PageController):
             return
 
         feature_id = selected_items[0].data(Qt.ItemDataRole.UserRole)
-        if PROJECT_CONTROLLER.move_building_level(feature_id, up):
+        if get_project_controller().move_building_level(feature_id, up):
             old_row = self.list_widget.row(selected_items[0])
             item = self.list_widget.takeItem(old_row)
             if up:

@@ -10,7 +10,7 @@ from qgis.core import (
     QgsCsException,
 )
 from .enums import LayerType
-from .project import PROJECT_CONTROLLER
+from .project import get_project_controller
 from .utils import wrapped_edits
 
 
@@ -29,7 +29,7 @@ class LayerUtils:
         """
         Stores a value in a QCity database layer
         """
-        layer = PROJECT_CONTROLLER.get_layer(layer_type)
+        layer = get_project_controller().get_layer(layer_type)
         if not layer:
             return False
 
