@@ -4,11 +4,11 @@ on:
   push:
     paths:
     - "qcity/**"
-    - ".github/workflows/test_plugin.yaml"
+    - ".github/workflows/test_plugin.yml"
   pull_request:
     paths:
     - "qcity/**"
-    - ".github/workflows/test_plugin.yaml"
+    - ".github/workflows/test_plugin.yml"
 
 env:
   # plugin name/directory where the code for the plugin is stored
