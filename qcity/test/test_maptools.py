@@ -32,10 +32,9 @@ class MapToolsTest(QCityTestBase):
         QCoreApplication.setOrganizationDomain("qcity_digitizing")
         QCoreApplication.setApplicationName("qcity_digitizing")
 
-        _, __, cls.iface, cls.PARENT = get_qgis_app()
+        _, __, cls.iface, CANVAS = get_qgis_app()
         QgsSettings().clear()
 
-        cls.project = QgsProject.instance()
         cls.iface.mapCanvas().setDestinationCrs(
             QgsCoordinateReferenceSystem("EPSG:3857")
         )
@@ -43,10 +42,7 @@ class MapToolsTest(QCityTestBase):
     def mocked_get_new_name(self):
         return "new_name"
 
-    @patch("qgis.PyQt.QtWidgets.QInputDialog.getText")
-    def test_digitizing(self, mock_get_text) -> None:
-        mock_get_text.return_value = ("test", "gpkg")
-
+    def test_digitizing(self) -> None:
         self.iface.mapCanvas().setReferencedExtent(
             QgsReferencedRectangle(
                 QgsRectangle(
@@ -59,29 +55,31 @@ class MapToolsTest(QCityTestBase):
             )
         )
 
-        self.widget = QCityDockWidget(self.project, self.iface)
+        widget = QCityDockWidget(QgsProject.instance(), self.iface)
+        widget.show()
+        widget.ensurePolished()
 
         with tempfile.TemporaryDirectory() as temp_dir:
             gpkg_path = os.path.join(temp_dir, "test_database.gpkg")
 
             DatabaseUtils.create_base_tables(gpkg_path)
 
-            self.map_tool = DrawPolygonTool(
+            map_tool = DrawPolygonTool(
                 map_canvas=self.iface.mapCanvas(),
                 cad_dock_widget=self.iface.cadDockWidget(),
             )
-            self.map_tool.get_new_name = self.mocked_get_new_name
+            map_tool.get_new_name = self.mocked_get_new_name
 
-            self.widget.load_project_database(gpkg_path, "gpkg")
-            self.widget.toolButton_project_area_add.clicked.emit()
+            widget.load_project_database(gpkg_path, "gpkg")
+            widget.toolButton_project_area_add.clicked.emit()
 
-            self.map_tool.canvasReleaseEvent(self.click_from_middle())
-            self.map_tool.canvasReleaseEvent(self.click_from_middle(x=10, y=10))
-            self.map_tool.canvasReleaseEvent(self.click_from_middle(x=15, y=15))
+            map_tool.canvasReleaseEvent(self.click_from_middle())
+            map_tool.canvasReleaseEvent(self.click_from_middle(x=10, y=10))
+            map_tool.canvasReleaseEvent(self.click_from_middle(x=15, y=15))
 
-            self.map_tool.canvasReleaseEvent(self.click_from_middle(type="right"))
+            map_tool.canvasReleaseEvent(self.click_from_middle(type="right"))
 
-            self.assertTrue(self.widget.listWidget_project_areas.item(0), "test")
+            self.assertTrue(widget.listWidget_project_areas.item(0), "test")
 
             get_project_controller().cleanup()
             QgsProject.instance().clear()

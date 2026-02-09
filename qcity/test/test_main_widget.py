@@ -29,13 +29,6 @@ class QCityProjectMainWidgetTest(QCityTestBase):
         _, CANVAS, cls.iface, cls.PARENT = get_qgis_app()
         QgsSettings().clear()
 
-        cls.CANVAS = CANVAS
-        cls.CANVAS.setDestinationCrs(QgsCoordinateReferenceSystem("EPSG:3857"))
-        cls.CANVAS.setFrameStyle(0)
-        cls.CANVAS.resize(600, 400)
-        assert cls.CANVAS.width() == 600
-        assert cls.CANVAS.height() == 400
-
     def test_create_database(self) -> None:
         widget = QCityDockWidget(QgsProject.instance(), self.iface)
 
