@@ -22,10 +22,12 @@ from qcity.core.layer import LayerUtils
 from qcity.core.project import get_project_controller
 from qcity.core.utils import wrapped_edits
 
+from .qcity_test_base import QCityTestBase
+
 test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
 
 
-class TestLayerUtils(unittest.TestCase):
+class TestLayerUtils(QCityTestBase):
     """
     LayerUtils tests
     """

@@ -6,11 +6,12 @@ import unittest
 from qgis.core import QgsProviderRegistry
 from .utilities import get_qgis_app
 
+from .qcity_test_base import QCityTestBase
 
 QGIS_APP = get_qgis_app()
 
 
-class QGISTest(unittest.TestCase):
+class QGISTest(QCityTestBase):
     """Test the QGIS Environment"""
 
     def test_qgis_environment(self):

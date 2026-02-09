@@ -11,12 +11,14 @@ from qcity.core.project import ProjectController
 
 from qcity.core import DatabaseUtils, LayerUtils, LayerType
 
+from .qcity_test_base import QCityTestBase
+
 test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
 
 from .utilities import get_qgis_app
 
 
-class TestProjectUtils(unittest.TestCase):
+class TestProjectUtils(QCityTestBase):
     @classmethod
     def setUpClass(cls):
         """Run before all tests"""

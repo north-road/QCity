@@ -8,10 +8,12 @@ from qgis.core import QgsVectorLayer
 
 from qcity.core import DatabaseUtils, LayerType
 
+from .qcity_test_base import QCityTestBase
+
 test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
 
 
-class TestDatabaseUtils(unittest.TestCase):
+class TestDatabaseUtils(QCityTestBase):
     def test_qvariant_type_from_string(self):
         """
         Test qvariant_type_from_string

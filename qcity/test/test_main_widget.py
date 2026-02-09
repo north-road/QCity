@@ -12,11 +12,12 @@ from qgis.core import (
 
 from qcity.gui.qcity_dock import QCityDockWidget
 from qcity.test.utilities import get_qgis_app
+from .qcity_test_base import QCityTestBase
 
 test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
 
 
-class QCityProjectMainWidgetTest(unittest.TestCase):
+class QCityProjectMainWidgetTest(QCityTestBase):
     @classmethod
     def setUpClass(cls):
         """Run before all tests"""

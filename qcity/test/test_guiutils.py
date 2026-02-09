@@ -6,10 +6,13 @@ import unittest
 from ..gui.gui_utils import GuiUtils
 from .utilities import get_qgis_app
 
+
+from .qcity_test_base import QCityTestBase
+
 QGIS_APP = get_qgis_app()
 
 
-class GuiUtilsTest(unittest.TestCase):
+class GuiUtilsTest(QCityTestBase):
     """Test GuiUtils work."""
 
     def testGetIcon(self):
