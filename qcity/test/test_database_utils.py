@@ -12,6 +12,25 @@ test_data_path = os.path.join(os.path.dirname(__file__), "test_data")
 
 
 class TestDatabaseUtils(unittest.TestCase):
+    def test_qvariant_type_from_string(self):
+        """
+        Test qvariant_type_from_string
+        """
+        self.assertEqual(DatabaseUtils.qvariant_type_from_string("int"), QVariant.Int)
+        self.assertEqual(
+            DatabaseUtils.qvariant_type_from_string("double"), QVariant.Double
+        )
+        self.assertEqual(
+            DatabaseUtils.qvariant_type_from_string("string"), QVariant.String
+        )
+        self.assertEqual(DatabaseUtils.qvariant_type_from_string("date"), QVariant.Date)
+        self.assertEqual(DatabaseUtils.qvariant_type_from_string("bool"), QVariant.Bool)
+        self.assertEqual(
+            DatabaseUtils.qvariant_type_from_string("value_map"), QVariant.String
+        )
+        with self.assertRaises(KeyError):
+            DatabaseUtils.qvariant_type_from_string("invalid_key")
+
     def test_create_database(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             gpkg_path = os.path.join(temp_dir, "test_database.gpkg")
