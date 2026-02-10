@@ -21,12 +21,20 @@ class DevelopmentSitesPageController(PageController):
     Page controller for the development sites page
     """
 
-    def __init__(self, og_widget, tab_widget, list_view, current_item_label):
+    def __init__(
+        self,
+        og_widget,
+        tab_widget,
+        list_view,
+        list_filter_line_edit,
+        current_item_label,
+    ):
         super().__init__(
             LayerType.DevelopmentSites,
             og_widget,
             tab_widget,
             list_view,
+            list_filter_line_edit,
             current_item_label,
         )
         self.skip_fields_for_widgets = ["fid", "name", "project_area_pk"]
