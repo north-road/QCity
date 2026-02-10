@@ -24,7 +24,12 @@ class BuildingLevelsPageController(PageController):
     """
 
     def __init__(
-        self, og_widget: "QCityDockWidget", tab_widget, list_view, list_filter_line_edit
+        self,
+        og_widget: "QCityDockWidget",
+        tab_widget,
+        list_view,
+        list_filter_line_edit,
+        list_bounds_filter_toggle_button,
     ):
         super().__init__(
             LayerType.BuildingLevels,
@@ -32,6 +37,7 @@ class BuildingLevelsPageController(PageController):
             tab_widget,
             list_view,
             list_filter_line_edit,
+            list_bounds_filter_toggle_button,
         )
         self.skip_fields_for_widgets = ["fid", "name", "development_site_pk"]
 

@@ -27,6 +27,7 @@ class DevelopmentSitesPageController(PageController):
         tab_widget,
         list_view,
         list_filter_line_edit,
+        list_bounds_filter_toggle_button,
         current_item_label,
     ):
         super().__init__(
@@ -35,6 +36,7 @@ class DevelopmentSitesPageController(PageController):
             tab_widget,
             list_view,
             list_filter_line_edit,
+            list_bounds_filter_toggle_button,
             current_item_label,
         )
         self.skip_fields_for_widgets = ["fid", "name", "project_area_pk"]
