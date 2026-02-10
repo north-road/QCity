@@ -18,6 +18,7 @@ class FeatureListModel(QAbstractListModel):
     """
 
     FEATURE_ID_ROLE = Qt.ItemDataRole.UserRole + 1
+    FEATURE_GEOMETRY_ROLE = Qt.ItemDataRole.UserRole + 2
 
     def __init__(self, layer_type: LayerType, parent: Optional[QObject] = None):
         super().__init__(parent)
@@ -42,6 +43,8 @@ class FeatureListModel(QAbstractListModel):
         feature = self.items[index.row()]
         if role == self.FEATURE_ID_ROLE:
             return feature.id()
+        elif role == self.FEATURE_GEOMETRY_ROLE:
+            return feature.geometry()
         elif role == Qt.ItemDataRole.DisplayRole:
             return feature[DatabaseUtils.name_field_for_layer(self.layer_type)]
 

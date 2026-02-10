@@ -2,8 +2,9 @@
 GUI Utils Test.
 """
 
+from typing import Optional
 import unittest
-from qgis.core import QgsFeature, QgsFields, QgsField
+from qgis.core import QgsFeature, QgsFields, QgsField, QgsGeometry
 from qgis.PyQt.QtCore import QVariant, Qt
 from qcity.gui.feature_list_model import FeatureListModel, FeatureFilterProxyModel
 from qcity.test.utilities import get_qgis_app
@@ -28,7 +29,9 @@ class FeatureListModelTest(QCityTestBase):
     def tearDown(self):
         self.model.deleteLater()
 
-    def create_real_feature(self, fid: int, name_value: str) -> QgsFeature:
+    def create_real_feature(
+        self, fid: int, name_value: str, geom_wkt: Optional[str] = None
+    ) -> QgsFeature:
         """
         Helper to create a QgsFeature with a specific ID and Name.
         """
@@ -37,6 +40,8 @@ class FeatureListModelTest(QCityTestBase):
         feature = QgsFeature(fields)
         feature.setId(fid)
         feature.setAttribute(self.name_field, name_value)
+        if geom_wkt:
+            feature.setGeometry(QgsGeometry.fromWkt(geom_wkt))
         return feature
 
     def test_initial_state(self):
@@ -44,7 +49,7 @@ class FeatureListModelTest(QCityTestBase):
         self.assertEqual(len(self.model.items), 0)
 
     def test_add_feature(self):
-        f1 = self.create_real_feature(1, "Feature A")
+        f1 = self.create_real_feature(1, "Feature A", "Point(1 2)")
         self.model.add_feature(f1)
 
         self.assertEqual(self.model.rowCount(), 1)
@@ -54,8 +59,12 @@ class FeatureListModelTest(QCityTestBase):
             self.model.data(index, Qt.ItemDataRole.DisplayRole), "Feature A"
         )
         self.assertEqual(self.model.data(index, FeatureListModel.FEATURE_ID_ROLE), 1)
+        self.assertEqual(
+            self.model.data(index, FeatureListModel.FEATURE_GEOMETRY_ROLE).asWkt(),
+            "Point (1 2)",
+        )
 
-        f2 = self.create_real_feature(22, "Feature B")
+        f2 = self.create_real_feature(22, "Feature B", "Point(3 4)")
         self.model.add_feature(f2)
 
         self.assertEqual(self.model.rowCount(), 2)
@@ -65,6 +74,10 @@ class FeatureListModelTest(QCityTestBase):
             self.model.data(index, Qt.ItemDataRole.DisplayRole), "Feature B"
         )
         self.assertEqual(self.model.data(index, FeatureListModel.FEATURE_ID_ROLE), 22)
+        self.assertEqual(
+            self.model.data(index, FeatureListModel.FEATURE_GEOMETRY_ROLE).asWkt(),
+            "Point (3 4)",
+        )
 
     def test_insert_feature(self):
         f1 = self.create_real_feature(1, "A")
