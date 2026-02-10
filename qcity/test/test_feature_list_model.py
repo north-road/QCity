@@ -4,7 +4,16 @@ GUI Utils Test.
 
 from typing import Optional
 import unittest
-from qgis.core import QgsFeature, QgsFields, QgsField, QgsGeometry
+from qgis.core import (
+    QgsFeature,
+    QgsFields,
+    QgsField,
+    QgsGeometry,
+    QgsRectangle,
+    QgsCoordinateTransform,
+    QgsCoordinateReferenceSystem,
+    QgsProject,
+)
 from qgis.PyQt.QtCore import QVariant, Qt
 from qcity.gui.feature_list_model import FeatureListModel, FeatureFilterProxyModel
 from qcity.test.utilities import get_qgis_app
@@ -168,9 +177,9 @@ class FeatureListModelTest(QCityTestBase):
         proxy_model = FeatureFilterProxyModel()
         proxy_model.setSourceModel(self.model)
 
-        f1 = self.create_real_feature(1, "Pineapple")
-        f2 = self.create_real_feature(2, "Banana")
-        f3 = self.create_real_feature(3, "Apple")
+        f1 = self.create_real_feature(1, "Pineapple", "Point(1 3)")
+        f2 = self.create_real_feature(2, "Banana", "Point(11 3)")
+        f3 = self.create_real_feature(3, "Apple", "Point(1 5)")
 
         self.model.add_feature(f1)
         self.model.add_feature(f2)
@@ -189,6 +198,29 @@ class FeatureListModelTest(QCityTestBase):
         self.assertEqual(proxy_model.data(proxy_model.index(1, 0)), "Apple")
 
         proxy_model.set_search_string(None)
+        self.assertEqual(proxy_model.rowCount(), 3)
+
+        proxy_model.set_search_bounds(QgsRectangle(0, 0, 3, 6))
+        self.assertEqual(proxy_model.rowCount(), 2)
+        self.assertEqual(proxy_model.data(proxy_model.index(0, 0)), "Pineapple")
+        self.assertEqual(proxy_model.data(proxy_model.index(1, 0)), "Apple")
+
+        proxy_model.set_search_bounds(QgsRectangle(10, 0, 13, 6))
+        self.assertEqual(proxy_model.rowCount(), 1)
+        self.assertEqual(proxy_model.data(proxy_model.index(0, 0)), "Banana")
+
+        proxy_model.set_search_bounds(
+            QgsRectangle(860322, -16729, 1700027, 685870),
+            QgsCoordinateTransform(
+                QgsCoordinateReferenceSystem("EPSG:4326"),
+                QgsCoordinateReferenceSystem("EPSG:3857"),
+                QgsProject.instance(),
+            ),
+        )
+        self.assertEqual(proxy_model.rowCount(), 1)
+        self.assertEqual(proxy_model.data(proxy_model.index(0, 0)), "Banana")
+
+        proxy_model.set_search_bounds(None)
         self.assertEqual(proxy_model.rowCount(), 3)
 
 

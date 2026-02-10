@@ -7,7 +7,13 @@ from qgis.PyQt.QtCore import (
     QModelIndex,
     QSortFilterProxyModel,
 )
-from qgis.core import QgsFeature
+from qgis.core import (
+    QgsFeature,
+    QgsCoordinateTransform,
+    QgsRectangle,
+    QgsCsException,
+    QgsGeometry,
+)
 
 from ..core import LayerType, DatabaseUtils
 
@@ -145,6 +151,8 @@ class FeatureFilterProxyModel(QSortFilterProxyModel):
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
         self._search_string: Optional[str] = None
+        self._bounds: Optional[QgsRectangle] = None
+        self._ct_transform: Optional[QgsCoordinateTransform] = None
         self.setDynamicSortFilter(True)
 
     def set_search_string(self, text: Optional[str]):
@@ -157,18 +165,48 @@ class FeatureFilterProxyModel(QSortFilterProxyModel):
         self._search_string = text
         self.invalidateFilter()
 
+    def set_search_bounds(
+        self,
+        bounds: Optional[QgsRectangle],
+        transform: Optional[QgsCoordinateTransform] = None,
+    ):
+        """
+        Sets a search bounding box to filter features with.
+
+        The optional transform is for the layer geometries TO the bounds geometry
+        """
+        self._ct_transform = transform
+        self._bounds = bounds
+        self.invalidateFilter()
+
     def filterAcceptsRow(self, source_row: int, source_parent: QModelIndex) -> bool:
         """
         Returns True if the item at source_row matches the search string.
         """
-        if not self._search_string:
+        if not self._search_string and self._bounds is None:
             return True
 
         source_model = self.sourceModel()
         index = source_model.index(source_row, 0, source_parent)
 
-        data = source_model.data(index, Qt.ItemDataRole.DisplayRole)
-        if data is None:
-            return False
+        if self._search_string:
+            data = source_model.data(index, Qt.ItemDataRole.DisplayRole)
+            if data is None:
+                return False
 
-        return self._search_string.lower() in str(data).lower()
+            if not self._search_string.lower() in str(data).lower():
+                return False
+
+        if self._bounds is not None:
+            geom: QgsGeometry = source_model.data(
+                index, FeatureListModel.FEATURE_GEOMETRY_ROLE
+            )
+            if self._ct_transform:
+                try:
+                    geom.transform(self._ct_transform)
+                except QgsCsException:
+                    return False
+            if not geom.intersects(self._bounds):
+                return False
+
+        return True
