@@ -172,10 +172,10 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
 
         SETTINGS_MANAGER.set_database_path(gpkg_path)
 
-        self.listWidget_project_areas.model().clear()
+        self.listWidget_project_areas.model().sourceModel().clear()
         self.label_current_project_area.setText("Project")
 
-        self.listWidget_development_sites.model().clear()
+        self.listWidget_development_sites.model().sourceModel().clear()
         self.label_current_development_site.setText("Project")
 
         DatabaseUtils.create_base_tables(gpkg_path)

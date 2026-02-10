@@ -81,7 +81,7 @@ class MapToolsTest(QCityTestBase):
 
             self.assertTrue(
                 widget.listWidget_project_areas.model().data(
-                    widget.listWidget_project_areas.model().index(0)
+                    widget.listWidget_project_areas.model().index(0, 0)
                 ),
                 "test",
             )
