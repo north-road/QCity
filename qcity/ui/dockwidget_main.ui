@@ -1066,6 +1066,22 @@
                  </widget>
                 </item>
                 <item>
+                 <widget class="QToolButton" name="toolButton_building_level_duplicate">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="toolTip">
+                   <string>Duplicate selected building level</string>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <widget class="QToolButton" name="toolButton_building_level_rename">
                   <property name="toolTip">
                    <string>Rename selected building level</string>
