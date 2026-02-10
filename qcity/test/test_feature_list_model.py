@@ -5,7 +5,7 @@ GUI Utils Test.
 import unittest
 from qgis.core import QgsFeature, QgsFields, QgsField
 from qgis.PyQt.QtCore import QVariant, Qt
-from qcity.gui.feature_list_model import FeatureListModel
+from qcity.gui.feature_list_model import FeatureListModel, FeatureFilterProxyModel
 from qcity.test.utilities import get_qgis_app
 from qcity.core import DatabaseUtils, LayerType
 
@@ -150,6 +150,33 @@ class FeatureListModelTest(QCityTestBase):
         index_obj = self.model.index_for_feature(f1)
         self.assertTrue(index_obj.isValid())
         self.assertEqual(index_obj.row(), 1)
+
+    def test_proxy_model(self):
+        proxy_model = FeatureFilterProxyModel()
+        proxy_model.setSourceModel(self.model)
+
+        f1 = self.create_real_feature(1, "Pineapple")
+        f2 = self.create_real_feature(2, "Banana")
+        f3 = self.create_real_feature(3, "Apple")
+
+        self.model.add_feature(f1)
+        self.model.add_feature(f2)
+        self.model.add_feature(f3)
+
+        self.assertEqual(proxy_model.rowCount(), 3)
+        proxy_model.set_search_string("nea")
+        self.assertEqual(proxy_model.rowCount(), 1)
+        self.assertEqual(proxy_model.data(proxy_model.index(0, 0)), "Pineapple")
+        proxy_model.set_search_string("INE")
+        self.assertEqual(proxy_model.rowCount(), 1)
+        self.assertEqual(proxy_model.data(proxy_model.index(0, 0)), "Pineapple")
+        proxy_model.set_search_string("app")
+        self.assertEqual(proxy_model.rowCount(), 2)
+        self.assertEqual(proxy_model.data(proxy_model.index(0, 0)), "Pineapple")
+        self.assertEqual(proxy_model.data(proxy_model.index(1, 0)), "Apple")
+
+        proxy_model.set_search_string(None)
+        self.assertEqual(proxy_model.rowCount(), 3)
 
 
 if __name__ == "__main__":

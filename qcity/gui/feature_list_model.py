@@ -5,6 +5,7 @@ from qgis.PyQt.QtCore import (
     QObject,
     QAbstractListModel,
     QModelIndex,
+    QSortFilterProxyModel,
 )
 from qgis.core import QgsFeature
 
@@ -131,3 +132,40 @@ class FeatureListModel(QAbstractListModel):
             self.beginMoveRows(QModelIndex(), row, row, QModelIndex(), row + 2)
             self.items.insert(row + 1, self.items.pop(row))
             self.endMoveRows()
+
+
+class FeatureFilterProxyModel(QSortFilterProxyModel):
+    """
+    A proxy model that filters the FeatureListModel
+    """
+
+    def __init__(self, parent: Optional[QObject] = None):
+        super().__init__(parent)
+        self._search_string: Optional[str] = None
+        self.setDynamicSortFilter(True)
+
+    def set_search_string(self, text: Optional[str]):
+        """
+        Updates the search string and invalidates the filter to trigger a refresh.
+        """
+        if self._search_string == text:
+            return
+
+        self._search_string = text
+        self.invalidateFilter()
+
+    def filterAcceptsRow(self, source_row: int, source_parent: QModelIndex) -> bool:
+        """
+        Returns True if the item at source_row matches the search string.
+        """
+        if not self._search_string:
+            return True
+
+        source_model = self.sourceModel()
+        index = source_model.index(source_row, 0, source_parent)
+
+        data = source_model.data(index, Qt.ItemDataRole.DisplayRole)
+        if data is None:
+            return False
+
+        return self._search_string.lower() in str(data).lower()
