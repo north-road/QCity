@@ -306,13 +306,15 @@ class BuildingLevelsPageController(PageController):
         if not selected_indices:
             return
 
-        selected_index = selected_indices[0]
+        selected_index = self.proxy_model.mapToSource(selected_indices[0])
         feature_id = self.list_model.data(
             selected_index, FeatureListModel.FEATURE_ID_ROLE
         )
         if get_project_controller().move_building_level(feature_id, up):
             self.list_model.move_row(selected_index, up)
             self.list_view.selectionModel().select(
-                self.list_model.index_for_feature_id(feature_id),
+                self.proxy_model.mapFromSource(
+                    self.list_model.index_for_feature_id(feature_id)
+                ),
                 QItemSelectionModel.SelectionFlag.ClearAndSelect,
             )

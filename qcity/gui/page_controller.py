@@ -23,7 +23,7 @@ from qgis.core import QgsFeature, NULL, QgsReferencedRectangle, QgsVectorLayer
 from qgis.gui import QgsNewNameDialog, QgsSpinBox, QgsDoubleSpinBox
 
 from .canvas_utils import CanvasUtils
-from .feature_list_model import FeatureListModel
+from .feature_list_model import FeatureListModel, FeatureFilterProxyModel
 from ..core import LayerUtils, LayerType, get_project_controller, DatabaseUtils
 from ..core.utils import wrapped_edits
 
@@ -54,8 +54,10 @@ class PageController(QObject):
         self._block_feature_updates = False
 
         self.list_model = FeatureListModel(self.layer_type, self)
+        self.proxy_model = FeatureFilterProxyModel(self)
+        self.proxy_model.setSourceModel(self.list_model)
         if self.list_view is not None:
-            self.list_view.setModel(self.list_model)
+            self.list_view.setModel(self.proxy_model)
 
         self.current_feature_id: Optional[int] = None
         self.clearable_widgets: List[QWidget] = []
@@ -122,8 +124,9 @@ class PageController(QObject):
 
         if set_current:
             model_index = self.list_model.index_for_feature(feature)
+            proxy_index = self.proxy_model.mapFromSource(model_index)
             self.list_view.selectionModel().select(
-                model_index, QItemSelectionModel.SelectionFlag.ClearAndSelect
+                proxy_index, QItemSelectionModel.SelectionFlag.ClearAndSelect
             )
 
     def set_current_feature_from_list(self):
@@ -135,7 +138,7 @@ class PageController(QObject):
             self.clear_feature()
             return
 
-        current_index = selected_indices[0]
+        current_index = self.proxy_model.mapToSource(selected_indices[0])
 
         self.current_feature_id = self.list_model.data(
             current_index, FeatureListModel.FEATURE_ID_ROLE
@@ -332,7 +335,8 @@ class PageController(QObject):
             return
         selected_index = selected_indices[0]
         feature_id = self.list_model.data(
-            selected_index, FeatureListModel.FEATURE_ID_ROLE
+            self.proxy_model.mapToSource(selected_index),
+            FeatureListModel.FEATURE_ID_ROLE,
         )
         selected_item_text = self.list_model.data(selected_index)
 

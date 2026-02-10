@@ -59,7 +59,7 @@ class QCityProjectMainWidgetTest(QCityTestBase):
         # This needs to be updated if the base layers are changed
         self.assertEqual(
             widget.listWidget_project_areas.model().data(
-                widget.listWidget_project_areas.model().index(0)
+                widget.listWidget_project_areas.model().index(0, 0)
             ),
             "1",
         )
