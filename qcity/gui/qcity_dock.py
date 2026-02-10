@@ -1,11 +1,17 @@
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import QCoreApplication, Qt, pyqtSignal, QStringListModel
+from qgis.PyQt.QtCore import (
+    QCoreApplication,
+    Qt,
+    pyqtSignal,
+    QStringListModel,
+    QItemSelectionModel,
+)
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QFileDialog
+from qgis.PyQt.QtWidgets import QFileDialog, QListView
 from qgis.core import (
     QgsProject,
     Qgis,
@@ -166,10 +172,10 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
 
         SETTINGS_MANAGER.set_database_path(gpkg_path)
 
-        self.listWidget_project_areas.clear()
+        self.listWidget_project_areas.model().clear()
         self.label_current_project_area.setText("Project")
 
-        self.listWidget_development_sites.clear()
+        self.listWidget_development_sites.model().clear()
         self.label_current_development_site.setText("Project")
 
         DatabaseUtils.create_base_tables(gpkg_path)
@@ -213,16 +219,17 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         if add_layers:
             project_controller.add_database_layers_to_project(self.project, file_name)
 
-        # Click on first project area item to initialize all other listwidgets
-        for widget in [
+        # select first project area item to initialize all other list views
+        list_views: List[QListView] = [
             self.listWidget_project_areas,
             self.listWidget_development_sites,
             self.listWidget_building_levels,
-        ]:
-            widget.setCurrentRow(0)
-            item = widget.currentItem()
-            if item:
-                widget.itemClicked.emit(item)
+        ]
+        for list_view in list_views:
+            first_index = list_view.model().index(0, 0)
+            list_view.selectionModel().select(
+                first_index, QItemSelectionModel.SelectionFlag.ClearAndSelect
+            )
 
         self.groupbox_dwellings.setEnabled(True)
         self.groupbox_car_parking.setEnabled(True)

@@ -83,7 +83,7 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
-               <widget class="QListWidget" name="listWidget_project_areas"/>
+               <widget class="QListView" name="listWidget_project_areas"/>
               </item>
               <item>
                <layout class="QVBoxLayout" name="verticalLayout">
@@ -538,7 +538,7 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout">
               <item>
-               <widget class="QListWidget" name="listWidget_development_sites"/>
+               <widget class="QListView" name="listWidget_development_sites"/>
               </item>
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -984,7 +984,7 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_4">
               <item>
-               <widget class="QListWidget" name="listWidget_building_levels"/>
+               <widget class="QListView" name="listWidget_building_levels"/>
               </item>
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_4">

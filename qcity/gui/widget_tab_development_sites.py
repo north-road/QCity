@@ -21,12 +21,12 @@ class DevelopmentSitesPageController(PageController):
     Page controller for the development sites page
     """
 
-    def __init__(self, og_widget, tab_widget, list_widget, current_item_label):
+    def __init__(self, og_widget, tab_widget, list_view, current_item_label):
         super().__init__(
             LayerType.DevelopmentSites,
             og_widget,
             tab_widget,
-            list_widget,
+            list_view,
             current_item_label,
         )
         self.skip_fields_for_widgets = ["fid", "name", "project_area_pk"]
@@ -115,7 +115,7 @@ class DevelopmentSitesPageController(PageController):
         Called when the current project area FID is changed
         """
         site_layer = self.get_layer()
-        self.list_widget.clear()
+        self.list_model.clear()
         foreign_key = DatabaseUtils.foreign_key_for_layer(self.layer_type)
 
         filter_expression = QgsExpression.createFieldEqualityExpression(

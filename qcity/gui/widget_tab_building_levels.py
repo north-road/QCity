@@ -1,5 +1,5 @@
 import math
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QItemSelectionModel
 from qgis.core import (
     Qgis,
     QgsFeature,
@@ -15,7 +15,7 @@ from qcity.core import (
     DatabaseUtils,
     SETTINGS_MANAGER,
 )
-from .page_controller import PageController
+from .page_controller import PageController, FeatureListModel
 
 
 class BuildingLevelsPageController(PageController):
@@ -23,8 +23,8 @@ class BuildingLevelsPageController(PageController):
     Page controller for the building levels page
     """
 
-    def __init__(self, og_widget: "QCityDockWidget", tab_widget, list_widget):
-        super().__init__(LayerType.BuildingLevels, og_widget, tab_widget, list_widget)
+    def __init__(self, og_widget: "QCityDockWidget", tab_widget, list_view):
+        super().__init__(LayerType.BuildingLevels, og_widget, tab_widget, list_view)
         self.skip_fields_for_widgets = ["fid", "name", "development_site_pk"]
 
         self.og_widget.base_height.setProperty("decimals", 2)
@@ -231,7 +231,7 @@ class BuildingLevelsPageController(PageController):
         Called when the current development site FID is changed
         """
         level_layer = self.get_layer()
-        self.list_widget.clear()
+        self.list_model.clear()
         foreign_key = DatabaseUtils.foreign_key_for_layer(self.layer_type)
 
         filter_expression = QgsExpression.createFieldEqualityExpression(
@@ -283,8 +283,11 @@ class BuildingLevelsPageController(PageController):
                 "Level Composition"
             )
         else:
+            item_text = self.list_model.data(
+                self.list_model.index_for_feature_id(self.current_feature_id)
+            )
             self.og_widget.collapsibleGroupBox_building_levels_development_statistics.setTitle(
-                "Level Composition ({})".format(self.list_widget.currentItem().text())
+                "Level Composition ({})".format(item_text)
             )
 
         self._update_residential_space_total()
@@ -299,16 +302,17 @@ class BuildingLevelsPageController(PageController):
         self._move_current_layer(up=False)
 
     def _move_current_layer(self, up: bool):
-        selected_items = self.list_widget.selectedItems()
-        if not selected_items:
+        selected_indices = self.list_view.selectionModel().selectedIndexes()
+        if not selected_indices:
             return
 
-        feature_id = selected_items[0].data(Qt.ItemDataRole.UserRole)
+        selected_index = selected_indices[0]
+        feature_id = self.list_model.data(
+            selected_index, FeatureListModel.FEATURE_ID_ROLE
+        )
         if get_project_controller().move_building_level(feature_id, up):
-            old_row = self.list_widget.row(selected_items[0])
-            item = self.list_widget.takeItem(old_row)
-            if up:
-                self.list_widget.insertItem(old_row - 1, item)
-            else:
-                self.list_widget.insertItem(old_row + 1, item)
-            self.list_widget.setCurrentRow(self.list_widget.row(item))
+            self.list_model.move_row(selected_index, up)
+            self.list_view.selectionModel().select(
+                self.list_model.index_for_feature_id(feature_id),
+                QItemSelectionModel.SelectionFlag.ClearAndSelect,
+            )
