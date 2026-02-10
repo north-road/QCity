@@ -18,14 +18,29 @@ from qgis.PyQt.QtWidgets import (
     QDialog,
     QMessageBox,
     QCheckBox,
+    QToolButton,
 )
-from qgis.core import QgsFeature, NULL, QgsReferencedRectangle, QgsVectorLayer
-from qgis.gui import QgsNewNameDialog, QgsSpinBox, QgsDoubleSpinBox, QgsFilterLineEdit
+from qgis.core import (
+    QgsFeature,
+    NULL,
+    QgsReferencedRectangle,
+    QgsVectorLayer,
+    QgsProject,
+    QgsCoordinateTransform,
+)
+from qgis.gui import (
+    QgsNewNameDialog,
+    QgsSpinBox,
+    QgsDoubleSpinBox,
+    QgsFilterLineEdit,
+    QgsMapCanvas,
+)
 
 from .canvas_utils import CanvasUtils
 from .feature_list_model import FeatureListModel, FeatureFilterProxyModel
 from ..core import LayerUtils, LayerType, get_project_controller, DatabaseUtils
 from ..core.utils import wrapped_edits
+from .gui_utils import GuiUtils
 
 
 class PageController(QObject):
@@ -42,6 +57,7 @@ class PageController(QObject):
         tab_widget: QWidget,
         list_view: QListView,
         list_filter_line_edit: QgsFilterLineEdit,
+        list_bounds_filter_toggle_button: QToolButton,
         current_item_label: QLabel = None,
     ):
         super().__init__(og_widget)
@@ -52,6 +68,14 @@ class PageController(QObject):
         self.list_filter_line_edit = list_filter_line_edit
         self.list_filter_line_edit.setShowClearButton(True)
         self.list_filter_line_edit.setPlaceholderText(self.tr("Filter"))
+
+        self.list_bounds_filter_toggle_button = list_bounds_filter_toggle_button
+        self.list_bounds_filter_toggle_button.setCheckable(True)
+        self.list_bounds_filter_toggle_button.setAutoRaise(True)
+        self.list_bounds_filter_toggle_button.setIcon(GuiUtils.get_icon("filter.svg"))
+        self.list_bounds_filter_toggle_button.setToolTip(
+            self.tr("Filter by map canvas")
+        )
 
         self.list_view: QListView = list_view
         self.current_item_label = current_item_label
@@ -66,6 +90,9 @@ class PageController(QObject):
 
         self.list_filter_line_edit.textChanged.connect(
             self.proxy_model.set_search_string
+        )
+        self.list_bounds_filter_toggle_button.toggled.connect(
+            self.proxy_model.set_enable_bounds_search
         )
 
         self.current_feature_id: Optional[int] = None
@@ -117,6 +144,9 @@ class PageController(QObject):
             self.list_view.selectionModel().selectionChanged.connect(
                 self.set_current_feature_from_list
             )
+
+        canvas: QgsMapCanvas = self.og_widget.iface.mapCanvas()
+        canvas.extentsChanged.connect(self.on_canvas_extent_changed)
 
     def add_feature_to_list(
         self, feature: QgsFeature, set_current: bool = True, add_to_top: bool = False
@@ -403,4 +433,16 @@ class PageController(QObject):
         CanvasUtils.zoom_to_extent_if_not_visible(
             self.og_widget.iface.mapCanvas(),
             feature_bbox,
+        )
+
+    def on_canvas_extent_changed(self):
+        canvas: QgsMapCanvas = self.og_widget.iface.mapCanvas()
+
+        self.proxy_model.set_search_bounds(
+            canvas.extent(),
+            QgsCoordinateTransform(
+                self.get_layer().crs(),
+                canvas.mapSettings().destinationCrs(),
+                QgsProject.instance(),
+            ),
         )

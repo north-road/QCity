@@ -12,7 +12,13 @@ class ProjectAreasPageController(PageController):
     """
 
     def __init__(
-        self, og_widget, tab_widget, list_view, list_filter_line_edit, current_label
+        self,
+        og_widget,
+        tab_widget,
+        list_view,
+        list_filter_line_edit,
+        list_bounds_filter_toggle_button,
+        current_label,
     ):
         super().__init__(
             LayerType.ProjectAreas,
@@ -20,6 +26,7 @@ class ProjectAreasPageController(PageController):
             tab_widget,
             list_view,
             list_filter_line_edit,
+            list_bounds_filter_toggle_button,
             current_label,
         )
         self.skip_fields_for_widgets = ("fid", "name")
