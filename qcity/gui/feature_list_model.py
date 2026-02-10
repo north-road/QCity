@@ -153,6 +153,7 @@ class FeatureFilterProxyModel(QSortFilterProxyModel):
         self._search_string: Optional[str] = None
         self._bounds: Optional[QgsRectangle] = None
         self._ct_transform: Optional[QgsCoordinateTransform] = None
+        self._enable_bounds_search: bool = False
         self.setDynamicSortFilter(True)
 
     def set_search_string(self, text: Optional[str]):
@@ -163,6 +164,13 @@ class FeatureFilterProxyModel(QSortFilterProxyModel):
             return
 
         self._search_string = text
+        self.invalidateFilter()
+
+    def set_enable_bounds_search(self, enabled: bool):
+        if self._enable_bounds_search == enabled:
+            return
+
+        self._enable_bounds_search = enabled
         self.invalidateFilter()
 
     def set_search_bounds(
@@ -197,7 +205,7 @@ class FeatureFilterProxyModel(QSortFilterProxyModel):
             if not self._search_string.lower() in str(data).lower():
                 return False
 
-        if self._bounds is not None:
+        if self._bounds is not None and self._enable_bounds_search:
             geom: QgsGeometry = source_model.data(
                 index, FeatureListModel.FEATURE_GEOMETRY_ROLE
             )

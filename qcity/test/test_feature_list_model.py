@@ -201,6 +201,8 @@ class FeatureListModelTest(QCityTestBase):
         self.assertEqual(proxy_model.rowCount(), 3)
 
         proxy_model.set_search_bounds(QgsRectangle(0, 0, 3, 6))
+        self.assertEqual(proxy_model.rowCount(), 3)
+        proxy_model.set_enable_bounds_search(True)
         self.assertEqual(proxy_model.rowCount(), 2)
         self.assertEqual(proxy_model.data(proxy_model.index(0, 0)), "Pineapple")
         self.assertEqual(proxy_model.data(proxy_model.index(1, 0)), "Apple")
