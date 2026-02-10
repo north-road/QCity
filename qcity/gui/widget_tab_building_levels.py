@@ -23,8 +23,16 @@ class BuildingLevelsPageController(PageController):
     Page controller for the building levels page
     """
 
-    def __init__(self, og_widget: "QCityDockWidget", tab_widget, list_view):
-        super().__init__(LayerType.BuildingLevels, og_widget, tab_widget, list_view)
+    def __init__(
+        self, og_widget: "QCityDockWidget", tab_widget, list_view, list_filter_line_edit
+    ):
+        super().__init__(
+            LayerType.BuildingLevels,
+            og_widget,
+            tab_widget,
+            list_view,
+            list_filter_line_edit,
+        )
         self.skip_fields_for_widgets = ["fid", "name", "development_site_pk"]
 
         self.og_widget.base_height.setProperty("decimals", 2)

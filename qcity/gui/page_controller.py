@@ -20,7 +20,7 @@ from qgis.PyQt.QtWidgets import (
     QCheckBox,
 )
 from qgis.core import QgsFeature, NULL, QgsReferencedRectangle, QgsVectorLayer
-from qgis.gui import QgsNewNameDialog, QgsSpinBox, QgsDoubleSpinBox
+from qgis.gui import QgsNewNameDialog, QgsSpinBox, QgsDoubleSpinBox, QgsFilterLineEdit
 
 from .canvas_utils import CanvasUtils
 from .feature_list_model import FeatureListModel, FeatureFilterProxyModel
@@ -41,12 +41,17 @@ class PageController(QObject):
         og_widget: "QCityDockWidget",
         tab_widget: QWidget,
         list_view: QListView,
+        list_filter_line_edit: QgsFilterLineEdit,
         current_item_label: QLabel = None,
     ):
         super().__init__(og_widget)
         self.layer_type = layer_type
         self.og_widget: "QCityDockWidget" = og_widget
         self.tab_widget: QWidget = tab_widget
+
+        self.list_filter_line_edit = list_filter_line_edit
+        self.list_filter_line_edit.setShowClearButton(True)
+        self.list_filter_line_edit.setPlaceholderText(self.tr("Filter"))
 
         self.list_view: QListView = list_view
         self.current_item_label = current_item_label
@@ -58,6 +63,10 @@ class PageController(QObject):
         self.proxy_model.setSourceModel(self.list_model)
         if self.list_view is not None:
             self.list_view.setModel(self.proxy_model)
+
+        self.list_filter_line_edit.textChanged.connect(
+            self.proxy_model.set_search_string
+        )
 
         self.current_feature_id: Optional[int] = None
         self.clearable_widgets: List[QWidget] = []

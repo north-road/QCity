@@ -93,6 +93,7 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
             self,
             self.tab_project_areas,
             self.listWidget_project_areas,
+            self.project_areas_filter_line_edit,
             self.label_current_project_area,
         )
         self.project_area_controller.add_feature_clicked.connect(
@@ -102,6 +103,7 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
             self,
             self.tab_development_sites,
             self.listWidget_development_sites,
+            self.development_sites_filter_line_edit,
             self.label_current_development_site,
         )
         self.development_site_controller.add_feature_clicked.connect(
@@ -109,7 +111,10 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         )
 
         self.building_levels_controller = BuildingLevelsPageController(
-            self, self.tab_building_levels, self.listWidget_building_levels
+            self,
+            self.tab_building_levels,
+            self.listWidget_building_levels,
+            self.building_levels_filter_line_edit,
         )
         self.building_levels_controller.add_feature_clicked.connect(
             self.on_add_feature_clicked
