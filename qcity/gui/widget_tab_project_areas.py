@@ -11,9 +11,9 @@ class ProjectAreasPageController(PageController):
     Page controller for the project areas page
     """
 
-    def __init__(self, og_widget, tab_widget, list_widget, current_label):
+    def __init__(self, og_widget, tab_widget, list_view, current_label):
         super().__init__(
-            LayerType.ProjectAreas, og_widget, tab_widget, list_widget, current_label
+            LayerType.ProjectAreas, og_widget, tab_widget, list_view, current_label
         )
         self.skip_fields_for_widgets = ("fid", "name")
 
@@ -47,7 +47,7 @@ class ProjectAreasPageController(PageController):
         if not area_layer:
             return
 
-        self.list_widget.clear()
+        self.list_model.clear()
         feats = area_layer.getFeatures()
         for feat in feats:
             self.add_feature_to_list(feat)

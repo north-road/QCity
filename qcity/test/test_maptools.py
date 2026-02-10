@@ -79,7 +79,12 @@ class MapToolsTest(QCityTestBase):
 
             map_tool.canvasReleaseEvent(self.click_from_middle(type="right"))
 
-            self.assertTrue(widget.listWidget_project_areas.item(0), "test")
+            self.assertTrue(
+                widget.listWidget_project_areas.model().data(
+                    widget.listWidget_project_areas.model().index(0)
+                ),
+                "test",
+            )
 
             self.delete_qobject(map_tool)
             self.delete_qobject(widget)

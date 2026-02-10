@@ -57,7 +57,12 @@ class QCityProjectMainWidgetTest(QCityTestBase):
         widget.load_project_database(path)
 
         # This needs to be updated if the base layers are changed
-        self.assertEqual(widget.listWidget_project_areas.item(0).text(), "1")
+        self.assertEqual(
+            widget.listWidget_project_areas.model().data(
+                widget.listWidget_project_areas.model().index(0)
+            ),
+            "1",
+        )
         self.delete_qobject(widget)
 
 

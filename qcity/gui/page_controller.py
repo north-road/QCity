@@ -1,24 +1,29 @@
 from typing import Optional, List
 
-from qgis.PyQt.QtCore import Qt, QObject, pyqtSignal
+from qgis.PyQt.QtCore import (
+    Qt,
+    QObject,
+    pyqtSignal,
+    QItemSelectionModel,
+)
 from qgis.PyQt.QtGui import QFontMetrics
 from qgis.PyQt.QtWidgets import (
     QWidget,
     QSpinBox,
     QDoubleSpinBox,
-    QListWidget,
+    QListView,
     QLabel,
     QLineEdit,
     QComboBox,
     QDialog,
     QMessageBox,
-    QListWidgetItem,
     QCheckBox,
 )
 from qgis.core import QgsFeature, NULL, QgsReferencedRectangle, QgsVectorLayer
 from qgis.gui import QgsNewNameDialog, QgsSpinBox, QgsDoubleSpinBox
 
 from .canvas_utils import CanvasUtils
+from .feature_list_model import FeatureListModel
 from ..core import LayerUtils, LayerType, get_project_controller, DatabaseUtils
 from ..core.utils import wrapped_edits
 
@@ -35,25 +40,30 @@ class PageController(QObject):
         layer_type: LayerType,
         og_widget: "QCityDockWidget",
         tab_widget: QWidget,
-        list_widget: QListWidget,
+        list_view: QListView,
         current_item_label: QLabel = None,
     ):
         super().__init__(og_widget)
         self.layer_type = layer_type
         self.og_widget: "QCityDockWidget" = og_widget
         self.tab_widget: QWidget = tab_widget
-        self.list_widget: QListWidget = list_widget
+
+        self.list_view: QListView = list_view
         self.current_item_label = current_item_label
         self.skip_fields_for_widgets = []
         self._block_feature_updates = False
 
+        self.list_model = FeatureListModel(self.layer_type, self)
+        if self.list_view is not None:
+            self.list_view.setModel(self.list_model)
+
         self.current_feature_id: Optional[int] = None
         self.clearable_widgets: List[QWidget] = []
 
-        if self.list_widget is not None:
-            fm = QFontMetrics(self.list_widget.font())
+        if self.list_view is not None:
+            fm = QFontMetrics(self.list_view.font())
             row_height = fm.height()
-            self.list_widget.setMinimumHeight(row_height * 10)
+            self.list_view.setMinimumHeight(row_height * 10)
 
         if self.tab_widget is not None:
             for spin_box in self.tab_widget.findChildren((QSpinBox, QDoubleSpinBox)):
@@ -92,8 +102,8 @@ class PageController(QObject):
                 combo.currentIndexChanged.connect(self.save_widget_value_to_feature)
                 self.clearable_widgets.append(combo)
 
-        if self.list_widget is not None:
-            self.list_widget.currentRowChanged.connect(
+        if self.list_view is not None:
+            self.list_view.selectionModel().selectionChanged.connect(
                 self.set_current_feature_from_list
             )
 
@@ -103,35 +113,37 @@ class PageController(QObject):
         """
         Adds a new feature to the list widget
         """
-        self.list_widget.setEnabled(True)
+        self.list_view.setEnabled(True)
 
-        item = QListWidgetItem()
-        item.setText(feature[DatabaseUtils.name_field_for_layer(self.layer_type)])
-        item.setData(Qt.ItemDataRole.UserRole, feature.id())
-
-        if not add_to_top or self.list_widget.count() == 0:
-            self.list_widget.addItem(item)
+        if not add_to_top or self.list_model.rowCount() == 0:
+            self.list_model.add_feature(feature)
         else:
-            self.list_widget.insertItem(0, item)
+            self.list_model.insert_feature(0, feature)
 
         if set_current:
-            row = self.list_widget.row(item)
-            self.list_widget.setCurrentRow(row)
+            model_index = self.list_model.index_for_feature(feature)
+            self.list_view.selectionModel().select(
+                model_index, QItemSelectionModel.SelectionFlag.ClearAndSelect
+            )
 
-    def set_current_feature_from_list(self, row):
+    def set_current_feature_from_list(self):
         """
         Sets the current feature to show in the widget
         """
-        current_item = self.list_widget.item(row)
-        if not current_item:
+        selected_indices = self.list_view.selectionModel().selectedIndexes()
+        if not selected_indices:
             self.clear_feature()
             return
 
-        self.current_feature_id = current_item.data(Qt.ItemDataRole.UserRole)
+        current_index = selected_indices[0]
+
+        self.current_feature_id = self.list_model.data(
+            current_index, FeatureListModel.FEATURE_ID_ROLE
+        )
         self.set_feature(self.get_feature_by_id(self.current_feature_id))
 
         if self.current_item_label is not None:
-            self.current_item_label.setText(current_item.text())
+            self.current_item_label.setText(self.list_model.data(current_index))
 
     def get_layer(self) -> QgsVectorLayer:
         """
@@ -271,20 +283,23 @@ class PageController(QObject):
         Removes selected objects from the list widget, and deletes them
         (and all child objects) from the database.
         """
-        selected_items = self.list_widget.selectedItems()
-        if not selected_items:
+        selected_indices = self.list_view.selectionModel().selectedIndexes()
+        if not selected_indices:
             return
 
         feature_ids = {
-            item.data(Qt.ItemDataRole.UserRole): item for item in selected_items
+            i.data(FeatureListModel.FEATURE_ID_ROLE): i.data(
+                Qt.ItemDataRole.DisplayRole
+            )
+            for i in selected_indices
         }
         if len(feature_ids) == 1:
-            item_text = next(iter(feature_ids.values())).text()
+            item_text = next(iter(feature_ids.values()))
         else:
-            item_text = ", ".join(t.text() for t in feature_ids.values())
+            item_text = ", ".join(t for t in feature_ids.values())
         if (
             QMessageBox.warning(
-                self.list_widget,
+                self.list_view,
                 self.tr("Remove {}").format(
                     self.layer_type.as_title_case(plural=False)
                 ),
@@ -306,23 +321,25 @@ class PageController(QObject):
         """
         Removes the item with matching feature ID from the list widget
         """
-        for row in range(self.list_widget.count()):
-            item = self.list_widget.item(row)
-            if item.data(Qt.ItemDataRole.UserRole) == feature_id:
-                self.list_widget.takeItem(row)
-                return
+        self.list_model.remove_feature_by_id(feature_id)
 
     def rename_current_selection(self):
         """
         Renames the selected object
         """
-        selected_item = self.list_widget.selectedItems()[0]
-        feature_id = selected_item.data(Qt.ItemDataRole.UserRole)
+        selected_indices = self.list_view.selectionModel().selectedIndexes()
+        if not selected_indices:
+            return
+        selected_index = selected_indices[0]
+        feature_id = self.list_model.data(
+            selected_index, FeatureListModel.FEATURE_ID_ROLE
+        )
+        selected_item_text = self.list_model.data(selected_index)
 
         existing_names = get_project_controller().get_unique_names(self.layer_type)
 
         dialog = QgsNewNameDialog(
-            initial=selected_item.text(),
+            initial=selected_item_text,
             existing=existing_names,
             cs=Qt.CaseSensitivity.CaseSensitive,
             parent=self.og_widget.iface.mainWindow(),
@@ -348,7 +365,7 @@ class PageController(QObject):
             return
 
         new_feat_name = dialog.name()
-        selected_item.setText(new_feat_name)
+        self.list_model.rename(selected_index, new_feat_name)
         if self.current_item_label is not None:
             self.current_item_label.setText(new_feat_name)
 
