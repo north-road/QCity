@@ -436,6 +436,9 @@ class PageController(QObject):
         )
 
     def on_canvas_extent_changed(self):
+        if not self.get_layer():
+            return
+
         canvas: QgsMapCanvas = self.og_widget.iface.mapCanvas()
 
         self.proxy_model.set_search_bounds(
