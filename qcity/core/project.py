@@ -66,6 +66,8 @@ class ProjectController(QObject):
     # final argument is development site feature id
     building_level_geometry_changed = pyqtSignal(int, int)
 
+    building_level_heights_recalculated = pyqtSignal()
+
     plugin_data_path = Path(os.path.dirname(os.path.realpath(__file__))) / ".." / "data"
 
     def __init__(self, project: QgsProject):
@@ -465,6 +467,10 @@ class ProjectController(QObject):
         ):
             self.auto_calculate_development_site_car_parking(feature_id)
             self.auto_calculate_development_site_bicycle_parking(feature_id)
+
+        if field_name == "base_height":
+            if not self._block_floor_height_updates:
+                self.update_floor_heights(feature_id)
 
     def _building_level_attribute_changed(
         self, feature_id: int, field_index: int, value
@@ -884,7 +890,7 @@ class ProjectController(QObject):
 
     def update_floor_heights(self, development_site_id: int) -> bool:
         """
-        Recalculated building floor heights for a development site
+        Recalculates building floor heights for a development site
         """
         if self._block_floor_height_updates:
             return False
@@ -896,6 +902,7 @@ class ProjectController(QObject):
         development_site_pk = development_site_feature[
             DatabaseUtils.primary_key_for_layer(LayerType.DevelopmentSites)
         ]
+        development_site_base_height = development_site_feature["base_height"] or 0
 
         building_level_layer = self.get_building_levels_layer()
         if not building_level_layer:
@@ -935,7 +942,7 @@ class ProjectController(QObject):
             level_index_fidx = fields.lookupField(level_index_field_name)
             base_height_fidx = fields.lookupField(base_height_field_name)
 
-            current_cumulative_height = 0.0
+            current_cumulative_height = development_site_base_height
 
             self._block_floor_height_updates += 1
             for i, level_data in enumerate(all_levels_in_site_data):
@@ -960,6 +967,7 @@ class ProjectController(QObject):
 
             self._block_floor_height_updates -= 1
 
+        self.building_level_heights_recalculated.emit()
         return True
 
     def create_feature(
