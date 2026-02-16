@@ -537,7 +537,7 @@
              <height>1024</height>
             </rect>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0,0,0,0,0,0">
+           <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0,0,0,0,0,0,0">
             <item>
              <widget class="QLabel" name="label_32">
               <property name="text">
@@ -635,26 +635,6 @@
                <string>General Details</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_20" columnstretch="1,2">
-               <item row="3" column="0">
-                <widget class="QLabel" name="label_development_site_year">
-                 <property name="text">
-                  <string>Year</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="label_development_site_status">
-                 <property name="text">
-                  <string>Status</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QComboBox" name="site_status"/>
-               </item>
-               <item row="1" column="0" colspan="2">
-                <widget class="QLineEdit" name="address"/>
-               </item>
                <item row="3" column="1">
                 <widget class="QgsSpinBox" name="year">
                  <property name="minimum">
@@ -664,6 +644,54 @@
                   <number>2900</number>
                  </property>
                 </widget>
+               </item>
+               <item row="5" column="1">
+                <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,0">
+                 <item>
+                  <widget class="QgsDoubleSpinBox" name="site_base_height">
+                   <property name="maximum">
+                    <double>100.000000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_103">
+                   <property name="text">
+                    <string>m</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="label_development_site_year">
+                 <property name="text">
+                  <string>Year</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QComboBox" name="site_status"/>
+               </item>
+               <item row="4" column="0">
+                <widget class="QLabel" name="label_development_site_owner">
+                 <property name="text">
+                  <string>Owner</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="1">
+                <widget class="QLabel" name="label_area">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::TextBrowserInteraction</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0" colspan="2">
+                <widget class="QLineEdit" name="address"/>
                </item>
                <item row="4" column="1">
                 <widget class="QLineEdit" name="site_owner"/>
@@ -675,27 +703,24 @@
                  </property>
                 </widget>
                </item>
-               <item row="4" column="0">
-                <widget class="QLabel" name="label_development_site_owner">
-                 <property name="text">
-                  <string>Owner</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="5" column="0">
+               <item row="6" column="0">
                 <widget class="QLabel" name="label_101">
                  <property name="text">
                   <string>Area</string>
                  </property>
                 </widget>
                </item>
-               <item row="5" column="1">
-                <widget class="QLabel" name="label_area">
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_development_site_status">
                  <property name="text">
-                  <string/>
+                  <string>Status</string>
                  </property>
-                 <property name="textInteractionFlags">
-                  <set>Qt::TextBrowserInteraction</set>
+                </widget>
+               </item>
+               <item row="5" column="0">
+                <widget class="QLabel" name="label_102">
+                 <property name="text">
+                  <string>Site base height</string>
                  </property>
                 </widget>
                </item>
