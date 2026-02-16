@@ -166,3 +166,17 @@ class DatabaseUtils:
             raise Exception(
                 f"Error adding layer to GeoPackage {gpkg_path}: {error_message}"
             )
+
+    @staticmethod
+    def upgrade_table(layer: QgsVectorLayer, layer_type: LayerType):
+        """
+        Upgrades the definition of a table to match current plugin version
+        requirements
+        """
+        from .layer import wrapped_edits
+
+        if layer_type == LayerType.DevelopmentSites:
+            has_base_height_field = layer.fields().lookupField("base_height") >= 0
+            if not has_base_height_field:
+                with wrapped_edits(layer) as edits:
+                    edits.addAttribute(QgsField("base_height", QVariant.Double))

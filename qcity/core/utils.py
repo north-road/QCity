@@ -28,6 +28,12 @@ class wrapped_edits:
         else:
             return False
 
+    def addAttribute(self, *args, **kwargs):
+        if not self.layer.addAttribute(*args, **kwargs):
+            self.error_occurred = True
+            return False
+        return True
+
     def changeAttributeValue(self, *args, **kwargs):
         if not self.layer.changeAttributeValue(*args, **kwargs):
             self.error_occurred = True

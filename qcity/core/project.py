@@ -104,6 +104,8 @@ class ProjectController(QObject):
         Connects/disconnects from current project layers
         """
         project_area_layer = self.get_project_area_layer()
+        if project_area_layer:
+            DatabaseUtils.upgrade_table(project_area_layer, LayerType.ProjectAreas)
 
         if self._current_project_area_layer is not None and sip.isdeleted(
             self._current_project_area_layer
@@ -147,6 +149,11 @@ class ProjectController(QObject):
         self._current_project_area_layer = project_area_layer
 
         development_site_layer = self.get_development_sites_layer()
+        if development_site_layer:
+            DatabaseUtils.upgrade_table(
+                development_site_layer, LayerType.DevelopmentSites
+            )
+
         if self._current_development_sites_layer and (
             disconnect
             or self._current_development_sites_layer != development_site_layer
@@ -186,6 +193,9 @@ class ProjectController(QObject):
         self._current_development_sites_layer = development_site_layer
 
         building_levels_layer = self.get_building_levels_layer()
+        if building_levels_layer:
+            DatabaseUtils.upgrade_table(building_levels_layer, LayerType.BuildingLevels)
+
         if self._current_building_levels_layer and (
             disconnect or self._current_building_levels_layer != building_levels_layer
         ):

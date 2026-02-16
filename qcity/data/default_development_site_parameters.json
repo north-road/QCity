@@ -23,6 +23,10 @@
         "type": "string",
         "default": ""
     },
+    "base_height": {
+        "type": "double",
+        "default": 0
+    },
     "auto_calculate_floorspace": {
         "type": "bool",
         "default": true

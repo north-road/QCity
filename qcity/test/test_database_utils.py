@@ -95,6 +95,17 @@ class TestDatabaseUtils(QCityTestBase):
             DatabaseUtils.get_field_default(LayerType.BuildingLevels, "level_height"), 3
         )
 
+    def test_upgrade_table(self):
+        """
+        Test upgrading table definitions to latest
+        """
+        uri = f"Polygon?crs=epsg:4326&"
+        layer = QgsVectorLayer(uri, "x", "memory")
+        DatabaseUtils.upgrade_table(layer, LayerType.DevelopmentSites)
+
+        field_idx = layer.fields().lookupField("base_height")
+        self.assertNotEqual(field_idx, -1)
+
 
 if __name__ == "__main__":
     suite = unittest.TestLoader().loadTestsFromTestCase(TestDatabaseUtils)
