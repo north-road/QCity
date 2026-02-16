@@ -128,6 +128,9 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
 
         WidgetUtilsStatistics(self)
 
+        self.site_base_height.setShowClearButton(True)
+        self.site_base_height.setClearValue(0)
+
         # set associated database when plugin is started
         self.restore_saved_database_path()
         self.project.readProject.connect(self.restore_saved_database_path)

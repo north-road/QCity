@@ -649,8 +649,11 @@
                 <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,0">
                  <item>
                   <widget class="QgsDoubleSpinBox" name="site_base_height">
+                   <property name="minimum">
+                    <double>-9999999.000000000000000</double>
+                   </property>
                    <property name="maximum">
-                    <double>100.000000000000000</double>
+                    <double>9999999.000000000000000</double>
                    </property>
                   </widget>
                  </item>
