@@ -59,6 +59,9 @@ class BuildingLevelsPageController(PageController):
         project_controller.building_level_geometry_changed.connect(
             self._update_residential_space_total
         )
+        project_controller.building_level_heights_recalculated.connect(
+            self._update_building_level_height
+        )
 
         self.og_widget.toolButton_building_level_add.clicked.connect(
             self.add_feature_clicked
@@ -116,6 +119,16 @@ class BuildingLevelsPageController(PageController):
             self.og_widget.floorspace_sum.setStyleSheet("color: red")
         else:
             self.og_widget.floorspace_sum.setStyleSheet("")
+
+    def _update_building_level_height(self):
+        """
+        Updates building level height widgets
+        """
+        feature = self.get_feature_by_id(self.current_feature_id)
+        if not feature.isValid():
+            return
+
+        self.set_feature(feature)
 
     def _update_residential_space_total(self):
         """
