@@ -78,6 +78,16 @@ class DevelopmentSitesPageController(PageController):
             self._auto_calculate_bicycle_parking_toggled
         )
 
+    def field_to_widget_name(self, field_name: str) -> str:
+        if field_name == "base_height":
+            return "site_base_height"
+        return super().field_to_widget_name(field_name)
+
+    def widget_to_field_name(self, widget_name: str) -> str:
+        if widget_name == "site_base_height":
+            return "base_height"
+        return super().widget_to_field_name(widget_name)
+
     def _on_development_site_added(self, feature: QgsFeature):
         """
         Called when a new development site is created
