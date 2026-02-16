@@ -237,7 +237,7 @@ class PageController(QObject):
             return
 
         widget = self.sender()
-        field_name = widget.objectName()
+        field_name = self.widget_to_field_name(widget.objectName())
         if isinstance(widget, QComboBox):
             value = widget.currentData()
         elif isinstance(widget, QCheckBox):
@@ -267,6 +267,18 @@ class PageController(QObject):
             elif isinstance(widget, QComboBox):
                 widget.setCurrentIndex(-1)
 
+    def field_to_widget_name(self, field_name: str) -> str:
+        """
+        Returns the widget name corresponding to a field
+        """
+        return field_name
+
+    def widget_to_field_name(self, widget_name: str) -> str:
+        """
+        Returns the field  name corresponding to a widget name
+        """
+        return widget_name
+
     def set_feature(self, feature: QgsFeature):
         """
         Sets the current feature to show in the page
@@ -286,7 +298,7 @@ class PageController(QObject):
             if field_name in self.skip_fields_for_widgets:
                 continue
 
-            widget_name = field_name
+            widget_name = self.field_to_widget_name(field_name)
             widget = self.og_widget.findChild((QWidget), widget_name)
             if isinstance(widget, QSpinBox):
                 if value == NULL:
