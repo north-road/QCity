@@ -335,30 +335,11 @@ class BuildingLevelsPageController(PageController):
 
         feature_id = selected_indices[0].data(FeatureListModel.FEATURE_ID_ROLE)
         feature_name = selected_indices[0].data(Qt.ItemDataRole.DisplayRole)
-
-        building_level_feature = QgsFeature(self.get_feature_by_id(feature_id))
-
-        new_feature_name = self.tr("{} copy").format(feature_name)
-        building_level_feature[DatabaseUtils.name_field_for_layer(self.layer_type)] = (
-            new_feature_name
-        )
-
         project_controller = get_project_controller()
 
-        parent_pk = project_controller.current_development_site_fid
+        new_feature_name = self.tr("{} copy").format(feature_name)
 
-        building_level_feature["level_index"] = (
-            project_controller.get_next_building_level(parent_pk)
-        )
-        building_level_feature["base_height"] = (
-            project_controller.get_floor_base_height(
-                parent_pk, building_level_feature["level_index"]
-            )
-        )
-        building_level_feature["fid"] = NULL
-
-        with utils.wrapped_edits(self.get_layer()) as edits:
-            edits.addFeature(building_level_feature)
+        project_controller.duplicate_building_level(feature_id, new_feature_name)
 
     def delete_feature_and_child_objects(self, feature_id: int) -> bool:
         return get_project_controller().delete_building_level(feature_id)
