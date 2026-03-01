@@ -38,7 +38,13 @@ from qgis.gui import (
 
 from .canvas_utils import CanvasUtils
 from .feature_list_model import FeatureListModel, FeatureFilterProxyModel
-from ..core import LayerUtils, LayerType, get_project_controller, DatabaseUtils
+from ..core import (
+    LayerUtils,
+    LayerType,
+    get_project_controller,
+    DatabaseUtils,
+    SETTINGS_MANAGER,
+)
 from ..core.utils import wrapped_edits
 from .gui_utils import GuiUtils
 
@@ -442,10 +448,14 @@ class PageController(QObject):
             feature.geometry().boundingBox(), self.get_layer().crs()
         )
 
-        CanvasUtils.zoom_to_extent_if_not_visible(
-            self.og_widget.iface.mapCanvas(),
-            feature_bbox,
-        )
+        if SETTINGS_MANAGER.always_zoom_to_selection():
+            feature_bbox.scale(1.05)
+            self.og_widget.iface.mapCanvas().setReferencedExtent(feature_bbox)
+        else:
+            CanvasUtils.zoom_to_extent_if_not_visible(
+                self.og_widget.iface.mapCanvas(),
+                feature_bbox,
+            )
 
     def on_canvas_extent_changed(self):
         if not self.get_layer():
