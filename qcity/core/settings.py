@@ -177,6 +177,13 @@ class SettingsManager(QObject):
         """
         return True
 
+    def always_zoom_to_selection(self) -> bool:
+        """
+        Returns True if we should always zoom the canvas to the exact bounds of the selection,
+        instead of only zooming when those bounds are out-of-view.
+        """
+        return True
+
 
 # Settings manager singleton instance
 SETTINGS_MANAGER = SettingsManager()
