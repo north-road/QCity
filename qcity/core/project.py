@@ -1651,6 +1651,38 @@ class ProjectController(QObject):
 
         return totals
 
+    def duplicate_building_level(
+        self, source_feature_id: int, new_feature_name: str
+    ) -> Optional[QgsFeature]:
+        """
+        Duplicates a building level feature
+        """
+        building_level_layer = self.get_building_levels_layer()
+        if not building_level_layer:
+            return None
+        building_level_feature = building_level_layer.getFeature(source_feature_id)
+        if not building_level_feature.isValid():
+            return None
+
+        building_level_feature[
+            DatabaseUtils.name_field_for_layer(LayerType.BuildingLevels)
+        ] = new_feature_name
+        parent_pk = self.current_development_site_fid
+
+        building_level_feature["level_index"] = self.get_next_building_level(parent_pk)
+        building_level_feature["base_height"] = self.get_floor_base_height(
+            parent_pk, building_level_feature["level_index"]
+        )
+        building_level_feature["fid"] = NULL
+
+        with wrapped_edits(building_level_layer) as edits:
+            edits.addFeature(building_level_feature)
+
+        self.auto_calculate_development_site_floorspace(parent_pk)
+        self.auto_calculate_development_site_car_parking(parent_pk)
+        self.auto_calculate_development_site_bicycle_parking(parent_pk)
+        return building_level_feature
+
 
 _PROJECT_CONTROLLER: Optional[ProjectController] = None
 
