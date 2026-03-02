@@ -31,6 +31,7 @@ from qgis.gui import (
 
 from qcity.core import LayerType, get_project_controller, DatabaseUtils, LayerUtils
 from qcity.core.utils import wrapped_edits
+from .project_gui_utils import ProjectGuiUtils
 
 
 class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
@@ -114,38 +115,9 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
         """
         Gets the name for the new object
         """
-        project_controller = get_project_controller()
-        existing_names = project_controller.get_unique_names(
-            self._layer_type, self._parent_pk
+        return ProjectGuiUtils.get_new_name(
+            self._layer_type, self._parent_pk, self.canvas()
         )
-
-        dialog = QgsNewNameDialog(
-            initial="",
-            existing=existing_names,
-            cs=Qt.CaseSensitivity.CaseSensitive,
-            parent=self.canvas(),
-        )
-
-        dialog.setWindowTitle(
-            self.tr("Create {}").format(self._layer_type.as_title_case(plural=False))
-        )
-        dialog.setAllowEmptyName(False)
-        dialog.setOverwriteEnabled(False)
-        dialog.setHintString(
-            self.tr("Input {} name").format(
-                self._layer_type.as_sentence_case(plural=False)
-            )
-        )
-        dialog.setConflictingNameWarning(
-            self.tr("A {} with this name already exists").format(
-                self._layer_type.as_sentence_case(plural=False)
-            )
-        )
-
-        if dialog.exec() != QDialog.DialogCode.Accepted:
-            return None
-
-        return dialog.name()
 
     def create_feature(self, feature_name: str, polygon: QgsGeometry) -> None:
         """
