@@ -34,7 +34,10 @@ class ProjectGuiUtils:
 
     @staticmethod
     def get_new_name(
-        layer_type: LayerType, parent_pk: int, parent: Optional[QWidget] = None
+        layer_type: LayerType,
+        parent_pk: int,
+        initial_name: Optional[str] = None,
+        parent: Optional[QWidget] = None,
     ) -> Optional[str]:
         """
         Gets the name for a new object
@@ -43,28 +46,28 @@ class ProjectGuiUtils:
         existing_names = project_controller.get_unique_names(layer_type, parent_pk)
 
         dialog = QgsNewNameDialog(
-            initial="",
+            initial=initial_name,
             existing=existing_names,
             cs=Qt.CaseSensitivity.CaseSensitive,
             parent=parent,
         )
 
         dialog.setWindowTitle(
-            QCoreApplication.tr("Create {}").format(
-                layer_type.as_title_case(plural=False)
-            )
+            QCoreApplication.instance()
+            .tr("Create {}")
+            .format(layer_type.as_title_case(plural=False))
         )
         dialog.setAllowEmptyName(False)
         dialog.setOverwriteEnabled(False)
         dialog.setHintString(
-            QCoreApplication.tr("Input {} name").format(
-                layer_type.as_sentence_case(plural=False)
-            )
+            QCoreApplication.instance()
+            .tr("Input {} name")
+            .format(layer_type.as_sentence_case(plural=False))
         )
         dialog.setConflictingNameWarning(
-            QCoreApplication.tr("A {} with this name already exists").format(
-                layer_type.as_sentence_case(plural=False)
-            )
+            QCoreApplication.instance()
+            .tr("A {} with this name already exists")
+            .format(layer_type.as_sentence_case(plural=False))
         )
 
         if dialog.exec() != QDialog.DialogCode.Accepted:

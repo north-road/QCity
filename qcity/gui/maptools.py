@@ -116,7 +116,7 @@ class DrawPolygonTool(QgsMapToolCaptureLayerGeometry):
         Gets the name for the new object
         """
         return ProjectGuiUtils.get_new_name(
-            self._layer_type, self._parent_pk, self.canvas()
+            self._layer_type, self._parent_pk, parent=self.canvas()
         )
 
     def create_feature(self, feature_name: str, polygon: QgsGeometry) -> None:

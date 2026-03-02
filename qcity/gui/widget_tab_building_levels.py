@@ -18,6 +18,7 @@ from qcity.core import (
     utils,
 )
 from .page_controller import PageController, FeatureListModel
+from .project_gui_utils import ProjectGuiUtils
 
 
 class BuildingLevelsPageController(PageController):
@@ -338,6 +339,15 @@ class BuildingLevelsPageController(PageController):
         project_controller = get_project_controller()
 
         new_feature_name = self.tr("{} copy").format(feature_name)
+        parent_pk = project_controller.current_development_site_fid
+        new_feature_name = ProjectGuiUtils.get_new_name(
+            LayerType.BuildingLevels,
+            parent_pk,
+            initial_name=new_feature_name,
+            parent=self.og_widget,
+        )
+        if not new_feature_name:
+            return
 
         project_controller.duplicate_building_level(feature_id, new_feature_name)
 
