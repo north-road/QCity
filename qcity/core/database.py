@@ -54,7 +54,7 @@ class DatabaseUtils:
         }[layer]
 
     @staticmethod
-    def qvariant_type_from_string(key: str) -> QVariant.Type:
+    def qvariant_type_from_string(key: str) -> 'QVariant.Type':
         """
         Returns the QVariant.Type corresponding to a config string value
         """
