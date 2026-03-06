@@ -174,10 +174,13 @@ class PageController(QObject):
                 proxy_index, QItemSelectionModel.SelectionFlag.ClearAndSelect
             )
 
-    def set_current_feature_from_list(self):
+    def set_current_feature_from_list(self, selected, deselected):
         """
         Sets the current feature to show in the widget
         """
+        if not selected.indexes() and not deselected.indexes():
+            return
+
         selected_indices = self.list_view.selectionModel().selectedIndexes()
         if not selected_indices:
             self.clear_feature()
