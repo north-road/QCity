@@ -9,6 +9,7 @@ from qgis.PyQt.QtCore import (
     pyqtSignal,
     QStringListModel,
     QItemSelectionModel,
+    QTimer,
 )
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QFileDialog, QListView
@@ -19,8 +20,9 @@ from qgis.core import (
     QgsLayerTreeGroup,
     QgsLayerTreeLayer,
     QgsLayerTreeNode,
+    QgsCoordinateTransform,
 )
-from qgis.gui import QgsDockWidget
+from qgis.gui import QgsDockWidget, QgsMapCanvas
 
 from qcity.gui.widget_tab_development_sites import DevelopmentSitesPageController
 from qcity.gui.widget_tab_project_areas import ProjectAreasPageController
@@ -136,6 +138,13 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         self.project.readProject.connect(self.restore_saved_database_path)
 
         get_project_controller().has_all_layers_changed.connect(self._check_layers)
+
+        self._canvas_extent_changed_timer = QTimer(self)
+        self._canvas_extent_changed_timer.setSingleShot(True)
+        self._canvas_extent_changed_timer.timeout.connect(
+            self._on_canvas_extent_changed_timeout
+        )
+        self.iface.mapCanvas().extentsChanged.connect(self._on_canvas_extent_changed)
 
     def restore_saved_database_path(self) -> None:
         path = get_project_controller().associated_database_path()
@@ -352,3 +361,17 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         Checks whether all required layers are present, and updates UI accordingly
         """
         self.set_widgets_enabled(is_valid)
+
+    def _on_canvas_extent_changed_timeout(self):
+        """
+        Triggered a short timeout after a canvas move/zoom operation occurs
+        """
+        self.project_area_controller.on_canvas_extent_changed()
+        self.development_site_controller.on_canvas_extent_changed()
+        self.building_levels_controller.on_canvas_extent_changed()
+
+    def _on_canvas_extent_changed(self):
+        """
+        Called immediately every time after a canvas move/zoom operation occurs
+        """
+        self._canvas_extent_changed_timer.start(200)
