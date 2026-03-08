@@ -151,9 +151,6 @@ class PageController(QObject):
                 self.set_current_feature_from_list
             )
 
-        canvas: QgsMapCanvas = self.og_widget.iface.mapCanvas()
-        canvas.extentsChanged.connect(self.on_canvas_extent_changed)
-
     def add_feature_to_list(
         self, feature: QgsFeature, set_current: bool = True, add_to_top: bool = False
     ):
