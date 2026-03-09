@@ -1,11 +1,6 @@
 from typing import Optional, List
 
-from qgis.PyQt.QtCore import (
-    Qt,
-    QObject,
-    pyqtSignal,
-    QItemSelectionModel,
-)
+from qgis.PyQt.QtCore import Qt, QObject, pyqtSignal, QItemSelectionModel, QTimer
 from qgis.PyQt.QtGui import QFontMetrics
 from qgis.PyQt.QtWidgets import (
     QWidget,
@@ -94,9 +89,11 @@ class PageController(QObject):
         if self.list_view is not None:
             self.list_view.setModel(self.proxy_model)
 
-        self.list_filter_line_edit.textChanged.connect(
-            self.proxy_model.set_search_string
-        )
+        self._text_filter_changed_timer = QTimer(self)
+        self._text_filter_changed_timer.setSingleShot(True)
+        self._text_filter_changed_timer.timeout.connect(self._set_search_filter)
+
+        self.list_filter_line_edit.textChanged.connect(self._on_filter_changed)
         self.list_bounds_filter_toggle_button.toggled.connect(
             self.proxy_model.set_enable_bounds_search
         )
@@ -471,3 +468,15 @@ class PageController(QObject):
                 QgsProject.instance(),
             ),
         )
+
+    def _on_filter_changed(self):
+        """
+        Called immediately every time after the text filter changes
+        """
+        self._text_filter_changed_timer.start(200)
+
+    def _set_search_filter(self):
+        """
+        Triggered a short timeout after text filter changes
+        """
+        self.proxy_model.set_search_string(self.list_filter_line_edit.text())
