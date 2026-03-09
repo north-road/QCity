@@ -1,6 +1,7 @@
 from .enums import LayerType
 from .settings import SettingsManager as SettingsManager
 from .settings import SETTINGS_MANAGER as SETTINGS_MANAGER
+from .settings import block_zoom_to_feature as block_zoom_to_feature
 from .utils import Utils as Utils
 from .layer import LayerUtils
 from .project import get_project_controller, reset_project_controller
