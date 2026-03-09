@@ -56,6 +56,8 @@ class SettingsManager(QObject):
                 section=QgsSettings.Section.Plugins,
             )
 
+        self._zoom_to_selection: bool = True
+
     def get_base_layers_items(self) -> List[str]:
         """Returns a list of all project files in plugin project directory."""
         project_paths = list()
@@ -183,6 +185,35 @@ class SettingsManager(QObject):
         instead of only zooming when those bounds are out-of-view.
         """
         return True
+
+    def zoom_to_selection_enabled(self) -> bool:
+        """
+        Returns True if we should zoom the canvas to the extent of the selection,
+        or False if we should not
+        """
+        return self._zoom_to_selection
+
+
+class block_zoom_to_feature:
+    """
+    Context manager which temporarily blocks the "zoom to selected feature"
+    setting
+    """
+
+    def __init__(self):
+        self._was_enabled = False
+
+    def __enter__(self):
+        self._was_enabled = SETTINGS_MANAGER._zoom_to_selection
+        SETTINGS_MANAGER._zoom_to_selection = False
+        return self
+
+    def __exit__(self, ex_type, ex_value, traceback):
+        if ex_type is None:
+            SETTINGS_MANAGER._zoom_to_selection = self._was_enabled
+            return True
+        else:
+            return False
 
 
 # Settings manager singleton instance

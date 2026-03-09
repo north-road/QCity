@@ -42,6 +42,7 @@ from ..core import (
 )
 from ..core.utils import wrapped_edits
 from .gui_utils import GuiUtils
+from ..core import block_zoom_to_feature
 
 
 class PageController(QObject):
@@ -291,7 +292,8 @@ class PageController(QObject):
         self.set_widget_values(attributes)
         self._block_feature_updates = False
 
-        self.zoom_to_feature(feature)
+        if SETTINGS_MANAGER.zoom_to_selection_enabled():
+            self.zoom_to_feature(feature)
 
     def set_widget_values(self, widget_values: dict):
         """
@@ -479,4 +481,5 @@ class PageController(QObject):
         """
         Triggered a short timeout after text filter changes
         """
-        self.proxy_model.set_search_string(self.list_filter_line_edit.text())
+        with block_zoom_to_feature():
+            self.proxy_model.set_search_string(self.list_filter_line_edit.text())

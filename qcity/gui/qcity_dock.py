@@ -29,7 +29,7 @@ from qcity.gui.widget_tab_project_areas import ProjectAreasPageController
 from .widget_tab_building_levels import BuildingLevelsPageController
 from .widget_tab_statistics import WidgetUtilsStatistics
 from ..core import DatabaseUtils, get_project_controller, LayerType
-from ..core import SETTINGS_MANAGER
+from ..core import SETTINGS_MANAGER, block_zoom_to_feature
 from ..gui.gui_utils import GuiUtils
 
 DOCK_WIDGET, _ = uic.loadUiType(GuiUtils.get_ui_file_path("dockwidget_main.ui"))
@@ -366,9 +366,10 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         """
         Triggered a short timeout after a canvas move/zoom operation occurs
         """
-        self.project_area_controller.on_canvas_extent_changed()
-        self.development_site_controller.on_canvas_extent_changed()
-        self.building_levels_controller.on_canvas_extent_changed()
+        with block_zoom_to_feature():
+            self.project_area_controller.on_canvas_extent_changed()
+            self.development_site_controller.on_canvas_extent_changed()
+            self.building_levels_controller.on_canvas_extent_changed()
 
     def _on_canvas_extent_changed(self):
         """
