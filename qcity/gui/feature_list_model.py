@@ -154,6 +154,7 @@ class FeatureFilterProxyModel(QSortFilterProxyModel):
         self._bounds: Optional[QgsRectangle] = None
         self._ct_transform: Optional[QgsCoordinateTransform] = None
         self._enable_bounds_search: bool = False
+        self._force_accept_fid: Optional[int] = None
         self.setDynamicSortFilter(True)
 
     def set_search_string(self, text: Optional[str]):
@@ -183,8 +184,24 @@ class FeatureFilterProxyModel(QSortFilterProxyModel):
 
         The optional transform is for the layer geometries TO the bounds geometry
         """
+        if self._ct_transform == transform and self._bounds == bounds:
+            return
+
         self._ct_transform = transform
         self._bounds = bounds
+        self.invalidateFilter()
+
+    def set_force_accept_fid(self, fid: Optional[int]):
+        """
+        Sets a feature ID to always accept, regardless of other filtering
+        options.
+
+        Set fid to None in order to clear the fid filter
+        """
+        if fid == self._force_accept_fid:
+            return
+
+        self._force_accept_fid = fid
         self.invalidateFilter()
 
     def filterAcceptsRow(self, source_row: int, source_parent: QModelIndex) -> bool:
@@ -196,6 +213,11 @@ class FeatureFilterProxyModel(QSortFilterProxyModel):
 
         source_model = self.sourceModel()
         index = source_model.index(source_row, 0, source_parent)
+
+        if self._force_accept_fid is not None:
+            fid = source_model.data(index, FeatureListModel.FEATURE_ID_ROLE)
+            if fid == self._force_accept_fid:
+                return True
 
         if self._search_string:
             data = source_model.data(index, Qt.ItemDataRole.DisplayRole)
