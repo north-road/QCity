@@ -186,6 +186,7 @@ class PageController(QObject):
         self.current_feature_id = self.list_model.data(
             current_index, FeatureListModel.FEATURE_ID_ROLE
         )
+        self.proxy_model.set_force_accept_fid(self.current_feature_id)
         self.set_feature(self.get_feature_by_id(self.current_feature_id))
 
         if self.current_item_label is not None:
