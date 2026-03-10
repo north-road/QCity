@@ -87,7 +87,7 @@ The dwelling sizes and parking ratios configured in the project settings will ap
 
 To create a new project area, left click on the green + button on the right hand side of the project areas panel.
 
-![Project_Settings_Add_Project_Area](https://github.com/user-attachments/assets/0ff09fe1-8f49-4360-9635-27d424ebfb92)
+![Project_Settings_Add_Project_Area](https://github.com/user-attachments/assets/5cf073e2-92b2-405d-8c2c-8d042c091a75)
 
 Then left click on the map area to start creating a polygon. Keep left clicking to create more points in the polygon and then right click to finish digitizing the polygon.
 
@@ -99,7 +99,7 @@ Once digitizing the polygon has been completed, a window will appear requiring a
 
 A project area can be deleted by left clicking on the project area in the Project Setup panel and left clicking on the red minus button on the right hand side of the project areas panel.
 
-![Project_Settings_Remove_Project_Area](https://github.com/user-attachments/assets/3b469dd4-cc16-4f15-99ea-09bf160e7908)
+![Project_Settings_Remove_Project_Area](https://github.com/user-attachments/assets/912ea314-482c-4765-aad2-6cbf111eac32)
 
 **Caution: Deleting a project area will also delete any associated development sites and building levels.**
 
@@ -107,11 +107,11 @@ A project area can be deleted by left clicking on the project area in the Projec
 
 A project area can be renamed by left clicking on the project area in the Project Setup panel and left clicking on the pencil and paper button on the right hand side of the project areas panel.
 
-![Project_Settings_Rename_Project_Area](https://github.com/user-attachments/assets/4ea00ba2-a6e5-499e-9432-a9999ac81cb0)
+![Project_Settings_Rename_Project_Area](https://github.com/user-attachments/assets/17ae6b1f-622b-40ca-988f-b8af2c133fd3)
 
 A new window will open which will allow you to rename the project area.
 
-![Project_Area_Rename_Window](https://github.com/user-attachments/assets/111caf57-77cd-4d12-8048-fbc733dde0bb)
+![Project_Area_Rename_Window](https://github.com/user-attachments/assets/d65bb8bd-b195-4a6e-b04a-5319f56c04a8)
 
 > Should a name already be used, QCity will warn you that the name already exists and will not allow you to reuse it.
 
