@@ -204,20 +204,32 @@ class FeatureFilterProxyModel(QSortFilterProxyModel):
         self._force_accept_fid = fid
         self.invalidateFilter()
 
-    def filterAcceptsRow(self, source_row: int, source_parent: QModelIndex) -> bool:
+    def data(self, index, role=Qt.DisplayRole):
+        if role == Qt.ItemDataRole.DisplayRole:
+            if self._force_accept_fid is not None:
+                fid = self.data(index, FeatureListModel.FEATURE_ID_ROLE)
+                if fid == self._force_accept_fid:
+                    source_index = self.mapToSource(index)
+
+                    if not self._accepts_explicit_filters(
+                        source_index.row(), source_index.parent()
+                    ):
+                        return f"{super().data(index, role)} (selected)"
+
+        return super().data(index, role)
+
+    def _accepts_explicit_filters(
+        self, source_row: int, source_parent: QModelIndex
+    ) -> bool:
         """
-        Returns True if the item at source_row matches the search string.
+        Returns True if the source row and index is acceptable
+        by the explicit text/bounds filters
         """
         if not self._search_string and self._bounds is None:
             return True
 
         source_model = self.sourceModel()
         index = source_model.index(source_row, 0, source_parent)
-
-        if self._force_accept_fid is not None:
-            fid = source_model.data(index, FeatureListModel.FEATURE_ID_ROLE)
-            if fid == self._force_accept_fid:
-                return True
 
         if self._search_string:
             data = source_model.data(index, Qt.ItemDataRole.DisplayRole)
@@ -240,3 +252,20 @@ class FeatureFilterProxyModel(QSortFilterProxyModel):
                 return False
 
         return True
+
+    def filterAcceptsRow(self, source_row: int, source_parent: QModelIndex) -> bool:
+        """
+        Returns True if the item at source_row matches the search string.
+        """
+        if not self._search_string and self._bounds is None:
+            return True
+
+        source_model = self.sourceModel()
+        index = source_model.index(source_row, 0, source_parent)
+
+        if self._force_accept_fid is not None:
+            fid = source_model.data(index, FeatureListModel.FEATURE_ID_ROLE)
+            if fid == self._force_accept_fid:
+                return True
+
+        return self._accepts_explicit_filters(source_row, source_parent)
