@@ -199,7 +199,7 @@ class FeatureListModelTest(QCityTestBase):
         proxy_model.set_force_accept_fid(f2.id())
         self.assertEqual(proxy_model.rowCount(), 3)
         self.assertEqual(proxy_model.data(proxy_model.index(0, 0)), "Pineapple")
-        self.assertEqual(proxy_model.data(proxy_model.index(1, 0)), "Banana")
+        self.assertEqual(proxy_model.data(proxy_model.index(1, 0)), "Banana (selected)")
         self.assertEqual(proxy_model.data(proxy_model.index(2, 0)), "Apple")
         proxy_model.set_force_accept_fid(f1.id())
         self.assertEqual(proxy_model.rowCount(), 2)
