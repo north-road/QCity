@@ -115,6 +115,18 @@ A new window will open which will allow you to rename the project area.
 
 > Should a name already be used, QCity will warn you that the name already exists and will not allow you to reuse it.
 
+### Filtering Project Areas
+
+The project area list can be filtered using the text field located on top of the project area list.
+
+![Project_Area_Filter_Text](https://github.com/user-attachments/assets/8ec5e88c-a97a-41f3-8e33-e9d706185a01)
+
+The project area list can also be filtered using the `Filter by map canvas` button with the appearance of a funnel on top of the project area list. Using this filter option will filter the project area list to only the project areas visible in the current map view. The `Filter by map canvas` and text filter can be used together.
+
+![Project_Area_Filter_Spatial](https://github.com/user-attachments/assets/5f30ff98-2916-4596-b1b5-9ca362ec3033)
+
+> The selected project area will always be visible in the project area list even if it does not match the text filter or `Filter by map canvas`. If the currently selected project area does not match the text filter or `Filter by map canvas`, the string "(selected)" will be appended to the name in the list to indicate that the project area is currently selected and shown in the list even if it doesn't match the applied filters.
+
 ## Development Sites
 
 Each development site has the following settings that can be configured:
@@ -128,11 +140,11 @@ Each development site has the following settings that can be configured:
 
 The `Development Sites` tab includes the name of the project area which it is associated with under the development sites heading. This provides you with an indication which project area you are creating the development site within.
 
-![Development_Sites_Heading](https://github.com/user-attachments/assets/8f7f6a34-c812-4fcc-ac01-05b4f890f1a3)
+![Development_Sites_Heading](https://github.com/user-attachments/assets/93a1f4a7-3a5c-40ea-8f57-6724b205e34a)
 
 Should you digitize a development site outside of the project area boundary, QCity will present a warning that the development site is outside of the spatial extent of the project area.
 
-![Development_Sites_Warning_Spatial_Extent](https://github.com/user-attachments/assets/76a03016-7926-4b65-b160-3f1ba4901bf8)
+![Development_Sites_Warning_Spatial_Extent](https://github.com/user-attachments/assets/234ece4c-0b81-4a28-9764-231d432452bd)
 
 > The development site is linked to the project area that is selected in the projects tab. When working with multiple project areas, always ensure you check the header of the development sites tab to see which project area it is associated with.
 
@@ -140,13 +152,13 @@ Should you digitize a development site outside of the project area boundary, QCi
 
 To create a new development site, left click on the green + button on the right hand side of the development sites panel.
 
-![Development_Site_Create](https://github.com/user-attachments/assets/aa1c15d7-6148-49d9-8924-24eb75726415)
+![Development_Sites_Create](https://github.com/user-attachments/assets/868f6c10-74b8-4714-8168-8bb85f09e499)
 
 Then left click on the map area to start creating a polygon. Keep left clicking to create more points in the polygon and then right click to finish digitizing the polygon.
 
 Once digitizing the polygon has been completed, a window will appear requiring a development site name to be provided.
 
-![Development_Site_Name](https://github.com/user-attachments/assets/96f33afe-954c-4a3b-9c54-c84804c5e79b)
+![Development_Site_Name](https://github.com/user-attachments/assets/8e3c6b9a-2a09-4194-865b-aa4627e89654)
 
 ### Creating a Development Site - Snapping
 
@@ -182,7 +194,7 @@ Once snapping has been enabled, when created a new development site, you will se
 
 A development site can be deleted by selecting the development site you want to delete in the development sites panel and left clicking on the red minus button on the right hand side of the development sites panel.
 
-![Development_Sites_Delete](https://github.com/user-attachments/assets/a410c6fa-58c4-4099-bc60-5ed28da75db8)
+![Development_Sites_Delete](https://github.com/user-attachments/assets/f067ff76-87e3-464a-988c-31196a16f316)
 
 **Caution: Deleting a development site will also delete any associated building levels.**
 
@@ -190,13 +202,25 @@ A development site can be deleted by selecting the development site you want to 
 
 A development site can be renamed by selecting the development site you want to rename in the development sites panel and left clicking on the pencil and paper button on the right hand side of the development sites panel.
 
-![Development_Sites_Rename](https://github.com/user-attachments/assets/218b3f89-b031-4b8f-8ff9-86fbb9af5cc9)
+![Development_Sites_Rename](https://github.com/user-attachments/assets/97e05382-815b-4eec-ac17-976142c5f594)
 
 A new window will open which will allow you to rename the development site.
 
-![Development_Site_Rename_Window](https://github.com/user-attachments/assets/5139b1b6-111b-4e1f-b125-628ceaed7e66)
+![Development_Sites_Rename_Window](https://github.com/user-attachments/assets/3f382082-b439-4a53-ae90-858fe2787e46)
 
 > Should a name already be used, QCity will warn you that the name already exists and will not allow you to reuse it.
+
+### Filtering Development Sites
+
+The development sites list can be filtered using the text field located on top of the development sites list.
+
+![Development_Site_Filter_text](https://github.com/user-attachments/assets/f2d09bf3-542b-41ac-bc8a-bd76f6f18886)
+
+The development sites list can also be filtered using the `Filter by map canvas` button with the appearance of a funnel on top of the development sites list. Using this filter option will filter the development sites list to only the development sites visible in the current map view. The `Filter by map canvas` and text filter can be used together.
+
+![Development_Site_Filter_Spatial](https://github.com/user-attachments/assets/836faa3e-7ac9-4cb7-a50b-d4b1892f0c9a)
+
+> The selected development site will always be visible in the development sites list even if it does not match the text filter or `Filter by map canvas`. If the currently selected development site does not match the text filter or `Filter by map canvas`, the string "(selected)" will be appended to the name in the list to indicate that the development site is currently selected and shown in the list even if it doesn't match the applied filters.
 
 ### General Details
 
@@ -209,6 +233,8 @@ The general details section of the developent sites tab allows you to input the 
     3. `Modeled` for development sites which are hypothetical developments yet to occur
 3. Year - The year of construction, approval or anticipated construction date
 4. Owner - Owner of the development site
+5. Site base height - The relative height of the development site. This can be set to positive or negative values and will result in building levels being shifted vertically when viewed in 3D
+6. Area - The area of the development site
 
 ### Development Statistics
 
