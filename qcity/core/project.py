@@ -396,6 +396,9 @@ class ProjectController(QObject):
         field_name = layer.fields()[field_index].name()
 
         original_feature = layer.getFeature(feature_id)
+        if not original_feature.isValid():
+            return
+
         project_area_key = original_feature[
             DatabaseUtils.foreign_key_for_layer(LayerType.DevelopmentSites)
         ]
