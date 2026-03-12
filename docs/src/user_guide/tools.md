@@ -267,11 +267,11 @@ With the attribute table you can view the statistics for all the development sit
 
 The `Building Levels` tab includes the name of the development site which it is associated with under the building levels heading. This provides you with an indication which development site you are creating the building levels within.
 
-![Building_Levels_Heading](https://github.com/user-attachments/assets/4ab21a68-d6fd-448a-bd30-1ce5112d9e04)
+![Building_Levels_Heading](https://github.com/user-attachments/assets/98d6ec08-71e6-4039-9345-96908a02e25d)
 
 Should you digitize a building level outside of the development site boundary, QCity will present a warning that the building level is outside the spatial extent of the development site.
 
-![Building_Levels_Warning_Spatial_Extent](https://github.com/user-attachments/assets/a6ceaf19-e5c2-4ffc-82d4-f9b86aee479c)
+![Building_Levels_Warning_Spatial_Extent](https://github.com/user-attachments/assets/a49a78f8-c4b2-453c-83ee-9de7d74d9c1c)
 
 > The building levels are linked to the development site that is selected in the development sites tab. When working with multiple development sites, always ensure you check the header of the building levels tab to see which development site it is associated with.
 
@@ -279,13 +279,13 @@ Should you digitize a building level outside of the development site boundary, Q
 
 To create a new building level, left click on the green + button on the right hand side of the building levels panel.
 
-![Building_Levels_Create](https://github.com/user-attachments/assets/d489d8ad-b209-41d4-87d3-022c3cd4282a)
+![Building_Levels_Create](https://github.com/user-attachments/assets/45c88dc8-b47d-434f-aad5-2d62a92a75f6)
 
 Then left click on the map area to start creating a polygon. Keep left clicking to create more points in the polygon and then right click to finish digitizing the polygon.
 
 Once digitizing the polygon has been completed, a window will appear requiring a building level name to be provided.
 
-![Building_Level_Name](https://github.com/user-attachments/assets/76cc54ca-fff8-4e16-a912-4b3520eeeaa3)
+![Building_Levels_Name](https://github.com/user-attachments/assets/0fc680d6-f578-453c-9e52-c19dcb30538d)
 
 Left click on `OK` and the building level will be created.
 
@@ -364,17 +364,17 @@ Once you had created the first point of the polygon, enter the distance and angl
 
 Some development sites have multiple separate dwellings on the same level such as townhouse developments. To digitize multi part building levels, begin by putting the building levels layer into edit mode by right clicking on the building levels layer in the layer panel and left clicking on `Toggle Editing` in the context menu.
 
-![Building_Levels_Multi_Part_Enable_Editing](https://github.com/user-attachments/assets/8a3cdb62-a08c-44ca-af24-62d7efc78b95)
+![Building_Levels_Multi_Part_Enable_Editing](https://github.com/user-attachments/assets/5264bfa3-22b0-4b69-8bb8-16f862fe541d)
 
 Once the building levels layer is in edit mode, left click on the green + button on the right hand side of the building levels panel.
 
-![Building_Levels_Create](https://github.com/user-attachments/assets/d489d8ad-b209-41d4-87d3-022c3cd4282a)
+![Building_Levels_Multi_Part_Create](https://github.com/user-attachments/assets/3943766a-4455-4239-88da-fdd0ea7db9f4)
 
 Then left click on the map area to start creating a polygon. Keep left clicking to create more points in the polygon and then right click to finish digitizing the polygon.
 
 Once digitizing the polygon has been completed, a window will appear requiring a building level name to be provided.
 
-![Building_Level_Name](https://github.com/user-attachments/assets/76cc54ca-fff8-4e16-a912-4b3520eeeaa3)
+![Building_Levels_Name](https://github.com/user-attachments/assets/b6e26028-5b30-4ea6-8c9a-9fd3a6831520)
 
 Left click on `OK` and the building level will be created.
 
@@ -382,7 +382,7 @@ Left click on `OK` and the building level will be created.
 
 Left click on the `Save Layer Edits` button on the Digitizing Toolbar.
 
-![Building_Levels_Multi_Part_Save_Edits](https://github.com/user-attachments/assets/70792b44-a072-44e7-80d9-8e50fc91857b)
+![Building_Levels_Multi_Part_Save_Edits](https://github.com/user-attachments/assets/f638912e-7a94-4a06-a5f1-3f5bde8bd403)
 
 The first part of the multi part building level is now created. In order to create other parts, ensure that the first part of the building level is selected and left click on the `Add Part` button in the Advanced Digitizing Toolbar.
 
@@ -396,11 +396,11 @@ Then left click on the map area to start creating a new polygon part. Keep left 
 
 Left click on the `Save Layer Edits` button on the Digitizing Toolbar to save the changes.
 
-![Building_Levels_Multi_Part_Save_Edits](https://github.com/user-attachments/assets/70792b44-a072-44e7-80d9-8e50fc91857b)
+![Building_Levels_Multi_Part_Save_Edits_Complete](https://github.com/user-attachments/assets/863ee83c-ad8e-4ff0-8f11-7233e6171539)
 
 Toggle the editing mode for the building levels layer to off by right clicking on the building levels layer in the layer panel and left clicking on `Toggle Editing`. A multi part polygon is now created which represents multiple separate dwellings in a development site.
 
-![Building_Levels_Multi_Part_Complete](https://github.com/user-attachments/assets/a5c72369-2de8-49b5-ac72-f0d6932069a9)
+![Building_Levels_Multi_Part_Complete](https://github.com/user-attachments/assets/343dce6f-c8a8-465d-8661-cba80f70934c)
 
 >Creating multiple parts to polygons can also be used to digitize development sites and project areas that are not contiguous.
 
@@ -408,17 +408,29 @@ Toggle the editing mode for the building levels layer to off by right clicking o
 
 A building level can be deleted by selecting the building level you want to delete in the building levels panel and left clicking on the red minus button on the right hand side of the building levels panel.
 
-![Building_Levels_Delete](https://github.com/user-attachments/assets/ce491c6e-06ab-4b2f-ab2b-57f62fb7ec5d)
+![Building_Levels_Delete](https://github.com/user-attachments/assets/e67ec900-5de8-4f00-ab20-b37766daa460)
+
+### Duplicating a Building Level
+
+A building level can be duplicated by selecting the building level you want to duplicate in the building level panel and left clicking on the `Duplicate selected building level` button on the right hand side of the building levels panel.
+
+![Building_Levels_Duplicate](https://github.com/user-attachments/assets/da8cd485-6e43-4db0-b903-ad7109128da2)
+
+A new window will open which will let you assign a new name for the duplicated building level.
+
+![Building_Levels_Duplicate_Window](https://github.com/user-attachments/assets/f4f5d2ee-a3e8-4d02-b261-54cbfb105e42)
+
+> Should a name already be used, QCity will warn you that the name already exists and will not allow you to reuse it.
 
 ### Renaming a Building Level
 
 A building level can be renamed by selecting the building level you want to rename in the building level panel and left clicking on the pencil and paper button on the right hand side of the building level panel.
 
-![Building_Levels_Rename](https://github.com/user-attachments/assets/9ef4b78b-435b-463a-ab98-c4caa03acc2a)
+![Building_Levels_Rename](https://github.com/user-attachments/assets/f4f2d2fe-588e-4349-aadd-6ea0af5dfebc)
 
 A new window will open which will allow you to rename the building level.
 
-![Building_Levels_Rename_Window](https://github.com/user-attachments/assets/19041748-6279-4691-a72a-d2edc6a3a549)
+![Building_Levels_Rename_Window](https://github.com/user-attachments/assets/f94c95e0-9fcb-45f1-9d0d-9dd6b79319f2)
 
 > Should a name already be used, QCity will warn you that the name already exists and will not allow you to reuse it.
 
@@ -426,11 +438,11 @@ A new window will open which will allow you to rename the building level.
 
 The order of building levels in the building levels panel can be changed by left clicking on the up and down arrow buttons on the right hand side of the building levels panel.
 
-![Building_Levels_Reorder](https://github.com/user-attachments/assets/ad252a6c-95cf-440e-b771-a78ee6c4f790)
+![Building_Levels_Reorder](https://github.com/user-attachments/assets/2898c83b-e605-434a-93ad-7bc08be178bd)
 
 Reordering the building levels in the building levels panel will also change their position in the 3D map. In the below image the ground level has been moved to the top of the list and now is at the top of the building when viewed in 3D.
 
-![Building_Levels_Reorder_3D](https://github.com/user-attachments/assets/79634037-b665-4cf2-9cd2-1086495c4b1f)
+![Building_Levels_Reorder_3D](https://github.com/user-attachments/assets/dda5f27f-5d35-4b7b-870a-4745cbb73404)
 
 ### Level Composition
 
@@ -444,7 +456,9 @@ The level composition section of the building levels panel also includes the fol
 2. Floor level - This represents the floor level of the building level which is dependent on the floor heights and levels of the building levels beneath it.
 3. Floor height - This represents the height of the building level in 3D and will impact the floor level of the building levels above it. Changing the floor height will change the floor level of building levels above.
 
-![Building_Levels_composition](https://github.com/user-attachments/assets/8501c1f7-0520-4a64-aeb8-9af5aae640c6)
+![Building_Levels_Composition](https://github.com/user-attachments/assets/b4c63d90-5a81-425b-8631-6ae6a57ab8ef)
+
+> The currently selected building level name will be shown in brackets after the Level Composition heading.
 
 ### Unallocated Residential Floorspace
 
