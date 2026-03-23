@@ -151,7 +151,9 @@ class DevelopmentSitesPageController(PageController):
         request = QgsFeatureRequest()
         request.setFilterExpression(filter_expression)
 
+        self._block_feature_updates = True
         self.clear_feature()
+        self._block_feature_updates = False
 
         for feat in site_layer.getFeatures(request):
             self.add_feature_to_list(feat, set_current=False)
