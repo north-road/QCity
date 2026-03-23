@@ -22,8 +22,8 @@ from qgis.core import (
     QgsLayerTreeNode,
     QgsCoordinateTransform,
     QgsTiledSceneLayer,
-    QgsTiledSceneLayer3DRenderer,
 )
+from qgis._3d import QgsTiledSceneLayer3DRenderer
 from qgis.gui import QgsDockWidget, QgsMapCanvas
 
 from qcity.gui.widget_tab_development_sites import DevelopmentSitesPageController
