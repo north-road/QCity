@@ -255,6 +255,12 @@ class PageController(QObject):
             self.layer_type, self.current_feature_id, field_name, value
         )
 
+    def get_current_parent_key(self):
+        """
+        Returns the current associated parent key, or None
+        """
+        return None
+
     def clear_feature(self):
         """
         Clears the current feature from the page
@@ -397,7 +403,9 @@ class PageController(QObject):
         )
         selected_item_text = self.list_model.data(selected_index)
 
-        existing_names = get_project_controller().get_unique_names(self.layer_type)
+        existing_names = get_project_controller().get_unique_names(
+            self.layer_type, self.get_current_parent_key()
+        )
 
         dialog = QgsNewNameDialog(
             initial=selected_item_text,

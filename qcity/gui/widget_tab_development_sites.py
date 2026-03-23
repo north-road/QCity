@@ -88,6 +88,10 @@ class DevelopmentSitesPageController(PageController):
             return "base_height"
         return super().widget_to_field_name(widget_name)
 
+    def get_current_parent_key(self):
+        project_controller = get_project_controller()
+        return project_controller.current_project_area_fid
+
     def _on_development_site_added(self, feature: QgsFeature):
         """
         Called when a new development site is created

@@ -287,6 +287,10 @@ class BuildingLevelsPageController(PageController):
         for feat in level_layer.getFeatures(request):
             self.add_feature_to_list(feat, set_current=False)
 
+    def get_current_parent_key(self):
+        project_controller = get_project_controller()
+        return project_controller.current_development_site_fid
+
     def clear_feature(self):
         super().clear_feature()
 
