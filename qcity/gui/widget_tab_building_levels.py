@@ -312,6 +312,9 @@ class BuildingLevelsPageController(PageController):
         self.og_widget.label_3bed_unallocated.clear()
         self.og_widget.label_4bed_unallocated.clear()
         self.og_widget.label_residential_unallocated.clear()
+        self.og_widget.collapsibleGroupBox_building_levels_development_statistics.setTitle(
+            "Level Composition"
+        )
 
     def set_feature(self, feature: QgsFeature):
         super().set_feature(feature)
