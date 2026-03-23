@@ -21,6 +21,8 @@ from qgis.core import (
     QgsLayerTreeLayer,
     QgsLayerTreeNode,
     QgsCoordinateTransform,
+    QgsTiledSceneLayer,
+    QgsTiledSceneLayer3DRenderer,
 )
 from qgis.gui import QgsDockWidget, QgsMapCanvas
 
@@ -289,6 +291,9 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
                 _dest_parent.insertLayer(_at_index, new_layer)
             else:
                 _dest_parent.addLayer(new_layer)
+
+            if isinstance(new_layer, QgsTiledSceneLayer) and not new_layer.renderer3D():
+                new_layer.setRenderer3D(QgsTiledSceneLayer3DRenderer())
 
         def add_group(
             _group: QgsLayerTreeGroup,
