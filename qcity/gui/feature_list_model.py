@@ -204,7 +204,7 @@ class FeatureFilterProxyModel(QSortFilterProxyModel):
         self._force_accept_fid = fid
         self.invalidateFilter()
 
-    def data(self, index, role=Qt.DisplayRole):
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         if role == Qt.ItemDataRole.DisplayRole:
             if self._force_accept_fid is not None:
                 fid = self.data(index, FeatureListModel.FEATURE_ID_ROLE)
