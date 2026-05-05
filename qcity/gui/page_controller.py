@@ -396,9 +396,9 @@ class PageController(QObject):
         selected_indices = self.list_view.selectionModel().selectedIndexes()
         if not selected_indices:
             return
-        selected_index = selected_indices[0]
+        selected_index = self.proxy_model.mapToSource(selected_indices[0])
         feature_id = self.list_model.data(
-            self.proxy_model.mapToSource(selected_index),
+            selected_index,
             FeatureListModel.FEATURE_ID_ROLE,
         )
         selected_item_text = self.list_model.data(selected_index)
