@@ -72,9 +72,12 @@ class SettingsManager(QObject):
         # also add projects from the user/admin-settable template folder
         user_path = self.user_base_projects_folder()
         if user_path:
-            for path in os.listdir(user_path):
-                if path.lower().endswith(".qgz") or path.lower().endswith(".qgs"):
-                    project_paths.append(user_path + "/" + path)
+            try:
+                for path in os.listdir(user_path):
+                    if path.lower().endswith(".qgz") or path.lower().endswith(".qgs"):
+                        project_paths.append(user_path + "/" + path)
+            except FileNotFoundError:
+                pass
 
         return project_paths
 
