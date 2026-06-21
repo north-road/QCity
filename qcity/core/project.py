@@ -578,6 +578,37 @@ class ProjectController(QObject):
             # ignore uncommitted features
             return
 
+        # here we HAVE to obtain the feature from the provider not the layer,
+        # as the layer no longer contains that feature. But the changes
+        # haven't been committed yet, so the feature will still exist in
+        # the provider
+        layer = self.get_building_levels_layer()
+        request = QgsFeatureRequest().setFilterFid(building_level_fid)
+        try:
+            original_feature = next(layer.dataProvider().getFeatures(request))
+            development_site_key = original_feature[
+                DatabaseUtils.foreign_key_for_layer(LayerType.BuildingLevels)
+            ]
+
+            request = QgsFeatureRequest().setFilterExpression(
+                QgsExpression.createFieldEqualityExpression(
+                    DatabaseUtils.primary_key_for_layer(LayerType.DevelopmentSites),
+                    development_site_key,
+                )
+            )
+            development_site_layer = self.get_development_sites_layer()
+            development_site_features = [
+                f for f in development_site_layer.getFeatures(request)
+            ]
+            development_site_feature = development_site_features[0]
+
+            self.auto_calculate_development_site_floorspace(
+                development_site_feature.id()
+            )
+
+        except StopIteration:
+            pass
+
         self.building_level_deleted.emit(building_level_fid)
 
     @staticmethod
