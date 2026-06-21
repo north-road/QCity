@@ -13,7 +13,7 @@ qgisMinimumVersion=3.44
 qgisMaximumVersion=4.99
 supportsQt6=yes
 description=Urban development modeling in QGIS
-version=0.5.1
+version=0.6.0
 author=North Road
 email=
 
