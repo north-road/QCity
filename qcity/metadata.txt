@@ -25,6 +25,8 @@ repository=https://github.com/north-road/QCity
 
 # Recommended items:
 
+documentation=https://north-road.github.io/QCity/
+
 # Uncomment the following line and add your changelog:
 changelog=changelog
 
