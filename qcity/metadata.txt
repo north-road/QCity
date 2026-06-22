@@ -37,7 +37,7 @@ homepage=
 category=Vector
 icon=icon.svg
 # experimental flag
-experimental=False
+experimental=True
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
