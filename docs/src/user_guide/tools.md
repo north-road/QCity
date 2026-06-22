@@ -64,6 +64,8 @@ Left click on `Ok` and restart QGIS. Once QGIS is restarted the `Add base layers
 
 ![Base_Layers_Dropdown](https://github.com/user-attachments/assets/ddb7188d-819c-42b1-880e-d582bff4d7f8)
 
+> Should the base layers folder not be accessible, QCity will continue to load, however no base layers will be visible in the drop down list until the the base layers folder is accessible and QGIS is restarted.
+
 Left click on the base layer you want to add to your project and then left click on the `Load selected base layers` button to the right hand side of the `Add base layers` dropdown. This will then add the layers configured in the QGIS project in the base layers folder to your project.
 
 ![Base_Layers_Add_Layers_Button](https://github.com/user-attachments/assets/1734ddcf-1cdf-4a36-af8d-f9d38e341efe)
