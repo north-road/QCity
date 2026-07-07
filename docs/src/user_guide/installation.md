@@ -4,9 +4,19 @@ To install QCity, open the QGIS **Plugin Manager** by clicking on the top menu `
 
 ![QGIS_Plugin_Menu](https://github.com/user-attachments/assets/3c2d6b9c-7709-47e6-98e4-ee28590b809c)
 
-In the dialog that opens, type *QCity* in the search bar.
+<!-- Remove the experimental sections of this documentation once QCity is no longer marked as experimental. -->
 
-In the middle panel, click on *QCity* and then click on `Install Plugin`.
+In the dialog that opens, left click on `Settings` and left click on the `Show also Experimental Plugins`.
+
+![Plugin_Experimental_Toggle](https://github.com/user-attachments/assets/d57d277d-bfac-4d5a-ac5c-c6712fc7b89f)
+
+> QCity is marked as experimental until version 1.0 is released. Current builds of QCity are hardcoded to a projection of EPSG: 7844 and therefore only usable in Australia. Future development in the lead up to version 1.0 will enable QCity to be used in other projections.
+
+Left click on `All` in the side panel and type *QCity* in the search bar.
+
+In the middle panel, click on *QCity* and then click on `Install Experimental Plugin`.
+
+![Plugin_Install](https://github.com/user-attachments/assets/99a83d51-f73d-4143-a1f4-05ebee580033)
 
 The Plugin Manager will then install QCity for you. When the installation is complete, click on `Close`.
 
