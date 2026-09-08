@@ -12,7 +12,7 @@ from qgis.PyQt.QtCore import (
     QTimer,
 )
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QFileDialog, QListView
+from qgis.PyQt.QtWidgets import QFileDialog, QListView, QToolButton
 from qgis.core import (
     QgsProject,
     Qgis,
@@ -22,6 +22,7 @@ from qgis.core import (
     QgsLayerTreeNode,
     QgsCoordinateTransform,
     QgsTiledSceneLayer,
+    QgsApplication,
 )
 from qgis._3d import QgsTiledSceneLayer3DRenderer
 from qgis.gui import QgsDockWidget, QgsMapCanvas
@@ -74,6 +75,14 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         )
         self.button_move_up.setIcon(GuiUtils.get_icon("up.svg"))
         self.button_move_down.setIcon(GuiUtils.get_icon("down.svg"))
+
+        settings_button = QToolButton(self)
+        settings_button.setIcon(QgsApplication.getThemeIcon("mActionOptions.svg"))
+        settings_button.setToolTip(self.tr("QCity settings"))
+        settings_button.clicked.connect(self.open_settings)
+        self.gridLayout.addWidget(
+            settings_button, 0, 0, Qt.AlignmentFlag.AlignTop
+        )
 
         self.project = project
         self.iface = iface
@@ -158,6 +167,15 @@ class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
         self.pushButton_add_base_layer.setEnabled(
             self.comboBox_base_layers.currentIndex() > 0
         )
+
+    def open_settings(self) -> None:
+        """
+        Opens the QCity settings dialog
+        """
+        from qcity.gui.qcity_settings_dialog import QCitySettingsDialog
+
+        dialog = QCitySettingsDialog(self)
+        dialog.exec_()
 
     def set_base_layer_items(self):
         """Adds all possible base layers to the selection combobox"""

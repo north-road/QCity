@@ -10,7 +10,7 @@ In the dialog that opens, left click on `Settings` and left click on the `Show a
 
 ![Plugin_Experimental_Toggle](https://github.com/user-attachments/assets/d57d277d-bfac-4d5a-ac5c-c6712fc7b89f)
 
-> QCity is marked as experimental until version 1.0 is released. Current builds of QCity are hardcoded to a projection of EPSG: 7844 and therefore only usable in Australia. Future development in the lead up to version 1.0 will enable QCity to be used in other projections.
+> QCity is marked as experimental until version 1.0 is released. New QCity databases are created in the projection chosen in the QCity settings, EPSG 7844 by default. You can change this from the settings button in the QCity panel.
 
 Left click on `All` in the side panel and type *QCity* in the search bar.
 
