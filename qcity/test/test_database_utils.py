@@ -6,7 +6,7 @@ from qgis.PyQt.QtCore import QVariant, QDate
 
 from qgis.core import QgsVectorLayer
 
-from qcity.core import DatabaseUtils, LayerType
+from qcity.core import DatabaseUtils, LayerType, SETTINGS_MANAGER
 
 from qcity.test.qcity_test_base import QCityTestBase
 
@@ -70,6 +70,21 @@ class TestDatabaseUtils(QCityTestBase):
             office_floorspace_idx = fields.lookupField("office_floorspace")
             field = fields[office_floorspace_idx]
             self.assertEqual(field.type(), QVariant.Double)
+
+    def test_create_database_uses_configured_crs(self) -> None:
+        original_crs = SETTINGS_MANAGER.default_database_crs()
+        try:
+            SETTINGS_MANAGER.set_default_database_crs("EPSG:4326")
+            with tempfile.TemporaryDirectory() as temp_dir:
+                gpkg_path = os.path.join(temp_dir, "test_crs.gpkg")
+
+                DatabaseUtils.create_base_tables(gpkg_path)
+
+                vl = QgsVectorLayer(gpkg_path + "|layername=project_areas")
+                self.assertTrue(vl.isValid())
+                self.assertEqual(vl.crs().authid(), "EPSG:4326")
+        finally:
+            SETTINGS_MANAGER.set_default_database_crs(original_crs)
 
     def test_field_default(self):
         self.assertIsNone(

@@ -15,6 +15,7 @@ from qgis.core import (
     QgsVectorLayer,
     QgsProject,
     QgsFeatureRequest,
+    QgsCoordinateReferenceSystem,
 )
 
 
@@ -24,6 +25,9 @@ class SettingsManager(QObject):
     """
 
     SETTINGS_KEY = "qcity"
+
+    # default projection used for newly created QCity database layers
+    DEFAULT_DATABASE_CRS = "EPSG:7844"
 
     database_path_changed = pyqtSignal(str)
     database_path_with_project_name_saved = pyqtSignal(dict)
@@ -131,6 +135,39 @@ class SettingsManager(QObject):
         return QgsSettings().value(
             f"{self.SETTINGS_KEY}/last_used_export_path",
             QDir.homePath(),
+            section=QgsSettings.Section.Plugins,
+        )
+
+    def default_database_crs(self) -> str:
+        """
+        Returns the authid of the projection used for newly created QCity
+        database layers, e.g. ``EPSG:7844``.
+
+        Falls back to :py:attr:`DEFAULT_DATABASE_CRS` when the stored value
+        does not describe a valid projection.
+        """
+        authid = QgsSettings().value(
+            f"{self.SETTINGS_KEY}/default_database_crs",
+            self.DEFAULT_DATABASE_CRS,
+            section=QgsSettings.Section.Plugins,
+        )
+        if not QgsCoordinateReferenceSystem(authid).isValid():
+            return self.DEFAULT_DATABASE_CRS
+        return authid
+
+    def set_default_database_crs(self, authid: str) -> None:
+        """
+        Sets the projection used for newly created QCity database layers.
+
+        Raises a ``ValueError`` when ``authid`` does not describe a valid
+        projection.
+        """
+        crs = QgsCoordinateReferenceSystem(authid)
+        if not crs.isValid():
+            raise ValueError(f"Invalid projection authid: {authid}")
+        QgsSettings().setValue(
+            f"{self.SETTINGS_KEY}/default_database_crs",
+            crs.authid(),
             section=QgsSettings.Section.Plugins,
         )
 

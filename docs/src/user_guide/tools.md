@@ -9,6 +9,8 @@ The QCity panel is separated into 4 vertical tabs:
 3. Building levels - digitizing building levels and setting floor level composition.
 4. Statistics - viewing statistics for each project area and exporting statistics to csv files.
 
+The settings button in the top left corner of the panel opens the QCity settings dialog. It currently contains a single option: the projection used for layers in newly created QCity databases (EPSG 7844 by default). Changing this option only affects new databases; existing QCity databases keep the projection they were created with.
+
 ## Project Areas
 
 QCity uses GeoPackages to store layer files. GeoPackage is an open, standards-based, platform independent and portable format for geospatial information. GeoPackages are a file format that act as a container for multiple spatial layers to be stored inside. For more information on GeoPackage, see the [GeoPackage Website](https://www.geopackage.org/).
