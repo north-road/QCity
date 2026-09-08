@@ -305,6 +305,18 @@ Should you digitize a building level outside of the development site boundary, Q
 
 > The building levels are linked to the development site that is selected in the development sites tab. When working with multiple development sites, always ensure you check the header of the building levels tab to see which development site it is associated with.
 
+### Reassigning Building Levels to Development Sites
+
+If you copy or move building level polygons between development sites using the standard QGIS editing tools, they keep their original development site association. The QCity processing algorithm `Reassign building levels to development sites` fixes this: for each building level it finds the development site which the building level overlaps the most and updates the association to that site.
+
+The algorithm is available from the QGIS processing toolbox (under the QCity provider) and takes:
+
+- the building levels layer (from the QCity database),
+- the development sites layer,
+- an option to only process the selected building levels.
+
+It edits the building levels layer in place. When more than 5% of a building level's area falls outside the development site it is assigned to, the algorithm reports a warning, matching the warning shown when digitizing a building level.
+
 ### Creating a new Building Level
 
 To create a new building level, left click on the green + button on the right hand side of the building levels panel.

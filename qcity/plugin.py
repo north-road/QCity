@@ -1,6 +1,6 @@
 from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtWidgets import QAction
-from qgis.core import QgsProject, Qgis
+from qgis.core import QgsProject, QgsApplication
 
 from .core import get_project_controller
 from qcity.gui.maptools import DrawPolygonTool, MapToolHandler
@@ -9,6 +9,7 @@ from .gui.gui_utils import GuiUtils
 from .gui.qcity_dock import (
     QCityDockWidget,
 )
+from .processing import QCityProcessingProvider
 
 
 class QCityPlugin:
@@ -22,6 +23,7 @@ class QCityPlugin:
         self.action_maptool = None
         self.map_tool = None
         self.handler = None
+        self.processing_provider = None
 
     def initGui(self) -> None:
         self.widget = QCityDockWidget(self.project, self.iface)
@@ -48,10 +50,20 @@ class QCityPlugin:
 
         self.widget.add_feature_clicked.connect(self.map_tool.add_feature)
 
+        # register the QCity processing provider
+        self.processing_provider = QCityProcessingProvider()
+        QgsApplication.processingRegistry().addProvider(self.processing_provider)
+
         self.widget.show()
 
     def unload(self) -> None:
         """Removes the plugin menu item and icon from QGIS GUI."""
+        if self.processing_provider:
+            QgsApplication.processingRegistry().removeProvider(
+                self.processing_provider
+            )
+            self.processing_provider = None
+
         if self.widget:
             self.widget.deleteLater()
             self.widget = None
