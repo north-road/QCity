@@ -17,7 +17,7 @@ from qgis.core import (
 )
 
 from qcity.core import DatabaseUtils, get_project_controller
-from qcity.gui.qcity_dock import QCityDockWidget
+from qcity.gui.main_panel import MainPanel
 from qcity.test.utilities import get_qgis_app
 from qcity.gui.maptools import DrawPolygonTool
 from qcity.test.qcity_test_base import QCityTestBase
@@ -55,7 +55,7 @@ class MapToolsTest(QCityTestBase):
             )
         )
 
-        widget = QCityDockWidget(QgsProject.instance(), self.iface)
+        widget = MainPanel(QgsProject.instance(), self.iface)
         widget.show()
         widget.ensurePolished()
 
