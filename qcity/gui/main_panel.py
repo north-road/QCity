@@ -35,6 +35,7 @@ from ..core import SETTINGS_MANAGER, block_zoom_to_feature
 
 from .gui_utils import GuiUtils
 from .settings_panel import SettingsPanel
+from .database_settings import DatabaseSettingsPanel
 
 WIDGET, _ = uic.loadUiType(GuiUtils.get_ui_file_path("main_panel.ui"))
 
@@ -82,8 +83,6 @@ class MainPanel(WIDGET, QgsPanelWidget):
         self.project = project
         self.iface = iface
         self.set_base_layer_items()
-
-        self.set_widgets_enabled(False)
 
         self.pushButton_add_base_layer.clicked.connect(self.add_base_layers)
         self.pushButton_create_database.clicked.connect(
@@ -153,9 +152,15 @@ class MainPanel(WIDGET, QgsPanelWidget):
         self.iface.mapCanvas().extentsChanged.connect(self._on_canvas_extent_changed)
 
         self.menu = QMenu(self)
+        self.current_db_settings_action = QAction(self.tr("Database Properties…"), self)
+        self.current_db_settings_action.triggered.connect(self.show_db_settings)
+
         settings_action = QAction(self.tr("QCity Settings…"), self)
         settings_action.triggered.connect(self.show_settings)
+        self.menu.addAction(self.current_db_settings_action)
         self.menu.addAction(settings_action)
+
+        self.set_widgets_enabled(False)
 
     def menuButtonMenu(self) -> QMenu:
         return self.menu
@@ -165,6 +170,11 @@ class MainPanel(WIDGET, QgsPanelWidget):
 
     def show_settings(self):
         self.settings_panel = SettingsPanel()
+        self.settings_panel.panelAccepted.connect(self.panel_dismissed)
+        self.openPanel(self.settings_panel)
+
+    def show_db_settings(self):
+        self.settings_panel = DatabaseSettingsPanel()
         self.settings_panel.panelAccepted.connect(self.panel_dismissed)
         self.openPanel(self.settings_panel)
 
@@ -351,6 +361,7 @@ class MainPanel(WIDGET, QgsPanelWidget):
         self.tab_building_levels.setEnabled(enabled)
         self.tab_statistics.setEnabled(enabled)
         self.project_area_scroll_area.setEnabled(enabled)
+        self.current_db_settings_action.setEnabled(enabled)
 
     @staticmethod
     def tr(message: str) -> str:
