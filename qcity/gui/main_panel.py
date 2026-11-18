@@ -138,6 +138,17 @@ class MainPanel(WIDGET, QgsPanelWidget):
         self.site_base_height.setShowClearButton(True)
         self.site_base_height.setClearValue(0)
 
+        self.menu = QMenu(self)
+        self.current_db_settings_action = QAction(self.tr("Database Properties…"), self)
+        self.current_db_settings_action.triggered.connect(self.show_db_settings)
+
+        settings_action = QAction(self.tr("QCity Settings…"), self)
+        settings_action.triggered.connect(self.show_settings)
+        self.menu.addAction(self.current_db_settings_action)
+        self.menu.addAction(settings_action)
+
+        self.set_widgets_enabled(False)
+
         # set associated database when plugin is started
         self.restore_saved_database_path()
         self.project.readProject.connect(self.restore_saved_database_path)
@@ -150,17 +161,6 @@ class MainPanel(WIDGET, QgsPanelWidget):
             self._on_canvas_extent_changed_timeout
         )
         self.iface.mapCanvas().extentsChanged.connect(self._on_canvas_extent_changed)
-
-        self.menu = QMenu(self)
-        self.current_db_settings_action = QAction(self.tr("Database Properties…"), self)
-        self.current_db_settings_action.triggered.connect(self.show_db_settings)
-
-        settings_action = QAction(self.tr("QCity Settings…"), self)
-        settings_action.triggered.connect(self.show_settings)
-        self.menu.addAction(self.current_db_settings_action)
-        self.menu.addAction(settings_action)
-
-        self.set_widgets_enabled(False)
 
     def menuButtonMenu(self) -> QMenu:
         return self.menu
