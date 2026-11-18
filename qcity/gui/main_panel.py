@@ -12,7 +12,7 @@ from qgis.PyQt.QtCore import (
     QTimer,
 )
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QFileDialog, QListView
+from qgis.PyQt.QtWidgets import QFileDialog, QListView, QMenu, QAction
 from qgis.core import (
     QgsProject,
     Qgis,
@@ -32,7 +32,9 @@ from .widget_tab_building_levels import BuildingLevelsPageController
 from .widget_tab_statistics import WidgetUtilsStatistics
 from ..core import DatabaseUtils, get_project_controller, LayerType
 from ..core import SETTINGS_MANAGER, block_zoom_to_feature
-from ..gui.gui_utils import GuiUtils
+
+from .gui_utils import GuiUtils
+from .settings_panel import SettingsPanel
 
 WIDGET, _ = uic.loadUiType(GuiUtils.get_ui_file_path("main_panel.ui"))
 
@@ -51,6 +53,7 @@ class MainPanel(WIDGET, QgsPanelWidget):
     """
 
     add_feature_clicked = pyqtSignal(LayerType, object)
+    panel_dismissed = pyqtSignal()
 
     def __init__(self, project, iface) -> None:
         super(MainPanel, self).__init__()
@@ -148,6 +151,22 @@ class MainPanel(WIDGET, QgsPanelWidget):
             self._on_canvas_extent_changed_timeout
         )
         self.iface.mapCanvas().extentsChanged.connect(self._on_canvas_extent_changed)
+
+        self.menu = QMenu(self)
+        settings_action = QAction(self.tr("QCity Settings…"), self)
+        settings_action.triggered.connect(self.show_settings)
+        self.menu.addAction(settings_action)
+
+    def menuButtonMenu(self) -> QMenu:
+        return self.menu
+
+    def menuButtonTooltip(self) -> str:
+        return self.tr("Options")
+
+    def show_settings(self):
+        self.settings_panel = SettingsPanel()
+        self.settings_panel.panelAccepted.connect(self.panel_dismissed)
+        self.openPanel(self.settings_panel)
 
     def restore_saved_database_path(self) -> None:
         path = get_project_controller().associated_database_path()
