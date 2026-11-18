@@ -6,8 +6,8 @@ from .core import get_project_controller
 from qcity.gui.maptools import DrawPolygonTool, MapToolHandler
 
 from .gui.gui_utils import GuiUtils
-from .gui.qcity_dock import (
-    QCityDockWidget,
+from .gui.dock import (
+    QCityDock,
 )
 
 
@@ -17,24 +17,24 @@ class QCityPlugin:
         self.iface = iface
         self.actions = list()
         self.project = QgsProject.instance()
-        self.widget = None
+        self.dock = None
         self.action = None
         self.action_maptool = None
         self.map_tool = None
         self.handler = None
 
     def initGui(self) -> None:
-        self.widget = QCityDockWidget(self.project, self.iface)
+        self.dock = QCityDock(self.project, self.iface)
 
         self.action = QAction("QCity")
         self.action.setCheckable(True)
         self.action.setIcon(GuiUtils.get_icon("plugin.svg"))
         self.actions.append(self.action)
-        self.widget.setToggleVisibilityAction(self.action)
+        self.dock.setToggleVisibilityAction(self.action)
 
         self.iface.pluginToolBar().addAction(self.action)
 
-        self.iface.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.widget)
+        self.iface.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dock)
 
         self.action_maptool = QAction("QCity", self.iface.mainWindow())
 
@@ -46,15 +46,15 @@ class QCityPlugin:
         self.handler = MapToolHandler(self.map_tool, self.action_maptool)
         self.iface.registerMapToolHandler(self.handler)
 
-        self.widget.add_feature_clicked.connect(self.map_tool.add_feature)
+        self.dock.main_panel().add_feature_clicked.connect(self.map_tool.add_feature)
 
-        self.widget.show()
+        self.dock.setUserVisible(True)
 
     def unload(self) -> None:
         """Removes the plugin menu item and icon from QGIS GUI."""
-        if self.widget:
-            self.widget.deleteLater()
-            self.widget = None
+        if self.dock:
+            self.dock.deleteLater()
+            self.dock = None
 
         if self.handler:
             self.iface.unregisterMapToolHandler(self.handler)
