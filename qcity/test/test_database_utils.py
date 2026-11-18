@@ -4,9 +4,9 @@ import tempfile
 
 from qgis.PyQt.QtCore import QVariant, QDate
 
-from qgis.core import QgsVectorLayer
+from qgis.core import QgsVectorLayer, QgsCoordinateReferenceSystem
 
-from qcity.core import DatabaseUtils, LayerType
+from qcity.core import DatabaseUtils, LayerType, SETTINGS_MANAGER
 
 from qcity.test.qcity_test_base import QCityTestBase
 
@@ -105,6 +105,35 @@ class TestDatabaseUtils(QCityTestBase):
 
         field_idx = layer.fields().lookupField("base_height")
         self.assertNotEqual(field_idx, -1)
+
+    def test_create_database_uses_configured_crs(self) -> None:
+        original_crs = SETTINGS_MANAGER.default_database_crs()
+        try:
+            SETTINGS_MANAGER.set_default_database_crs(
+                QgsCoordinateReferenceSystem("EPSG:3111")
+            )
+            with tempfile.TemporaryDirectory() as temp_dir:
+                gpkg_path = os.path.join(temp_dir, "test_database.gpkg")
+
+                DatabaseUtils.create_base_tables(gpkg_path)
+
+                vl = QgsVectorLayer(gpkg_path + "|layername=project_areas")
+                self.assertTrue(vl.isValid())
+                self.assertEqual(vl.crs().authid(), "EPSG:3111")
+
+            SETTINGS_MANAGER.set_default_database_crs(
+                QgsCoordinateReferenceSystem("EPSG:28356")
+            )
+            with tempfile.TemporaryDirectory() as temp_dir:
+                gpkg_path = os.path.join(temp_dir, "test_database.gpkg")
+
+                DatabaseUtils.create_base_tables(gpkg_path)
+
+                vl = QgsVectorLayer(gpkg_path + "|layername=project_areas")
+                self.assertTrue(vl.isValid())
+                self.assertEqual(vl.crs().authid(), "EPSG:28356")
+        finally:
+            SETTINGS_MANAGER.set_default_database_crs(original_crs)
 
 
 if __name__ == "__main__":
