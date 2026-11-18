@@ -24,7 +24,7 @@ from qgis.core import (
     QgsTiledSceneLayer,
 )
 from qgis._3d import QgsTiledSceneLayer3DRenderer
-from qgis.gui import QgsDockWidget, QgsMapCanvas
+from qgis.gui import QgsPanelWidget, QgsMapCanvas
 
 from qcity.gui.widget_tab_development_sites import DevelopmentSitesPageController
 from qcity.gui.widget_tab_project_areas import ProjectAreasPageController
@@ -34,7 +34,7 @@ from ..core import DatabaseUtils, get_project_controller, LayerType
 from ..core import SETTINGS_MANAGER, block_zoom_to_feature
 from ..gui.gui_utils import GuiUtils
 
-DOCK_WIDGET, _ = uic.loadUiType(GuiUtils.get_ui_file_path("dockwidget_main.ui"))
+WIDGET, _ = uic.loadUiType(GuiUtils.get_ui_file_path("main_panel.ui"))
 
 
 class DisabledStringListModel(QStringListModel):
@@ -45,17 +45,18 @@ class DisabledStringListModel(QStringListModel):
         return Qt.ItemFlag.NoItemFlags
 
 
-class QCityDockWidget(DOCK_WIDGET, QgsDockWidget):
+class MainPanel(WIDGET, QgsPanelWidget):
     """
-    Main dock widget.
+    Main panel widget.
     """
 
     add_feature_clicked = pyqtSignal(LayerType, object)
 
     def __init__(self, project, iface) -> None:
-        super(QCityDockWidget, self).__init__()
+        super(MainPanel, self).__init__()
         self.setupUi(self)
-        self.setObjectName("QCityDockWidget")
+
+        self.setPanelTitle(self.tr("QCity"))
 
         self.pushButton_add_base_layer.setIcon(GuiUtils.get_icon("load_layers.svg"))
         self.toolButton_project_area_add.setIcon(GuiUtils.get_icon("add.svg"))
