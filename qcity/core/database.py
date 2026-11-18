@@ -3,12 +3,13 @@ from typing import Optional, Dict
 
 from qgis.PyQt.QtCore import QVariant, QDate
 from qgis.core import (
+    Qgis,
     QgsFields,
     QgsField,
     QgsVectorLayer,
     QgsVectorFileWriter,
     QgsCoordinateTransformContext,
-    QgsProject,
+    QgsMemoryProviderUtils,
 )
 
 from .settings import SETTINGS_MANAGER
@@ -143,9 +144,11 @@ class DatabaseUtils:
                 )
             )
 
-        layer = QgsVectorLayer("MultiPolygon?crs=EPSG:7844", table_name, "memory")
-        layer.dataProvider().addAttributes(fields)
-        layer.updateFields()
+        default_crs = SETTINGS_MANAGER.default_database_crs()
+
+        layer = QgsMemoryProviderUtils.createMemoryLayer(
+            table_name, fields, Qgis.WkbType.MultiPolygon, default_crs
+        )
 
         options = QgsVectorFileWriter.SaveVectorOptions()
         options.driverName = "GPKG"
