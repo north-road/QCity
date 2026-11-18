@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>dockWidget_QCity</class>
- <widget class="QgsPanelWidget" name="dockWidget_QCity">
+ <widget class="QWidget" name="dockWidget_QCity">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -2122,12 +2122,6 @@
    <class>QgsFilterLineEdit</class>
    <extends>QLineEdit</extends>
    <header>qgis.gui</header>
-  </customwidget>
-  <customwidget>
-   <class>QgsPanelWidget</class>
-   <extends>QWidget</extends>
-   <header>qgis.gui</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>
