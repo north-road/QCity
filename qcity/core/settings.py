@@ -14,7 +14,7 @@ from qgis.core import (
     QgsSettings,
     QgsVectorLayer,
     QgsProject,
-    QgsFeatureRequest,
+    QgsCoordinateReferenceSystem,
 )
 
 
@@ -24,6 +24,8 @@ class SettingsManager(QObject):
     """
 
     SETTINGS_KEY = "qcity"
+
+    DEFAULT_DATABASE_CRS = "EPSG:4326"
 
     database_path_changed = pyqtSignal(str)
     database_path_with_project_name_saved = pyqtSignal(dict)
@@ -195,6 +197,37 @@ class SettingsManager(QObject):
         or False if we should not
         """
         return self._zoom_to_selection
+
+    def set_default_database_crs(self, crs: QgsCoordinateReferenceSystem) -> None:
+        """
+        Sets the default database CRS
+        """
+        if crs.isValid():
+            QgsSettings().setValue(
+                f"{self.SETTINGS_KEY}/database_crs",
+                crs.authid(),
+                section=QgsSettings.Section.Plugins,
+            )
+        else:
+            QgsSettings().remove(
+                f"{self.SETTINGS_KEY}/database_crs",
+                section=QgsSettings.Section.Plugins,
+            )
+
+    def default_database_crs(self) -> QgsCoordinateReferenceSystem:
+        """
+        Get the default database CRS.
+        """
+        authid = QgsSettings().value(
+            f"{self.SETTINGS_KEY}/database_crs",
+            QDir.homePath(),
+            section=QgsSettings.Section.Plugins,
+        )
+        crs = QgsCoordinateReferenceSystem(authid)
+        if crs.isValid():
+            return crs
+
+        return QgsCoordinateReferenceSystem(SettingsManager.DEFAULT_DATABASE_CRS)
 
 
 class block_zoom_to_feature:
