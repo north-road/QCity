@@ -6,7 +6,14 @@ from qgis.PyQt.QtCore import QCoreApplication, QDir
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtTest import QSignalSpy
 
-from qgis.core import Qgis, QgsSettings, QgsRasterLayer, QgsProject, QgsVectorLayer
+from qgis.core import (
+    Qgis,
+    QgsSettings,
+    QgsRasterLayer,
+    QgsProject,
+    QgsVectorLayer,
+    QgsCoordinateReferenceSystem,
+)
 from qcity.core import SettingsManager
 from qcity.test.utilities import get_qgis_app
 
@@ -39,6 +46,22 @@ class TestSettingsManager(QCityTestBase):
         self.settings_manager.set_last_used_database_folder("/home/test/dbs")
         self.assertEqual(
             self.settings_manager.last_used_database_folder(), "/home/test/dbs"
+        )
+
+    def test_default_database_crs(self):
+        """
+        Test default database crs
+        """
+        self.settings_manager.set_default_database_crs(QgsCoordinateReferenceSystem())
+        self.assertEqual(
+            self.settings_manager.default_database_crs().authid(),
+            SettingsManager.DEFAULT_DATABASE_CRS,
+        )
+        self.settings_manager.set_default_database_crs(
+            QgsCoordinateReferenceSystem("EPSG:3111")
+        )
+        self.assertEqual(
+            self.settings_manager.default_database_crs().authid(), "EPSG:3111"
         )
 
 
