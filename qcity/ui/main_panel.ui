@@ -29,7 +29,7 @@
    <item row="0" column="1">
     <widget class="QTabWidget" name="tabWidget">
      <property name="tabPosition">
-      <enum>QTabWidget::TabPosition::West</enum>
+      <enum>QTabWidget::West</enum>
      </property>
      <property name="currentIndex">
       <number>2</number>
@@ -151,7 +151,7 @@
                <item>
                 <spacer name="verticalSpacer_2">
                  <property name="orientation">
-                  <enum>Qt::Orientation::Vertical</enum>
+                  <enum>Qt::Vertical</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
@@ -626,7 +626,7 @@
                <item>
                 <spacer name="verticalSpacer_3">
                  <property name="orientation">
-                  <enum>Qt::Orientation::Vertical</enum>
+                  <enum>Qt::Vertical</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
@@ -700,7 +700,7 @@
                  <string/>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextInteractionFlag::TextBrowserInteraction</set>
+                 <set>Qt::TextBrowserInteraction</set>
                 </property>
                </widget>
               </item>
@@ -855,10 +855,10 @@
               <item row="4" column="0">
                <spacer name="horizontalSpacer_2">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeType">
-                 <enum>QSizePolicy::Policy::Fixed</enum>
+                 <enum>QSizePolicy::Fixed</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -1153,7 +1153,7 @@
                <item>
                 <spacer name="verticalSpacer_4">
                  <property name="orientation">
-                  <enum>Qt::Orientation::Vertical</enum>
+                  <enum>Qt::Vertical</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
@@ -1274,10 +1274,10 @@
               <item row="4" column="0">
                <spacer name="horizontalSpacer">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeType">
-                 <enum>QSizePolicy::Policy::Fixed</enum>
+                 <enum>QSizePolicy::Fixed</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -1314,7 +1314,7 @@
                  <string/>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextInteractionFlag::TextBrowserInteraction</set>
+                 <set>Qt::TextBrowserInteraction</set>
                 </property>
                </widget>
               </item>
@@ -1373,7 +1373,7 @@
                  <string/>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextInteractionFlag::TextBrowserInteraction</set>
+                 <set>Qt::TextBrowserInteraction</set>
                 </property>
                </widget>
               </item>
@@ -1497,7 +1497,7 @@
                  <string/>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextInteractionFlag::TextBrowserInteraction</set>
+                 <set>Qt::TextBrowserInteraction</set>
                 </property>
                </widget>
               </item>
@@ -1549,7 +1549,7 @@
                  <string/>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextInteractionFlag::TextBrowserInteraction</set>
+                 <set>Qt::TextBrowserInteraction</set>
                 </property>
                </widget>
               </item>
@@ -1559,7 +1559,7 @@
                  <string/>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextInteractionFlag::TextBrowserInteraction</set>
+                 <set>Qt::TextBrowserInteraction</set>
                 </property>
                </widget>
               </item>
@@ -1569,7 +1569,7 @@
                  <string/>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextInteractionFlag::TextBrowserInteraction</set>
+                 <set>Qt::TextBrowserInteraction</set>
                 </property>
                </widget>
               </item>
@@ -1614,7 +1614,7 @@
                  <string/>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextInteractionFlag::TextBrowserInteraction</set>
+                 <set>Qt::TextBrowserInteraction</set>
                 </property>
                </widget>
               </item>
@@ -1624,7 +1624,7 @@
                  <string/>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextInteractionFlag::TextBrowserInteraction</set>
+                 <set>Qt::TextBrowserInteraction</set>
                 </property>
                </widget>
               </item>
@@ -1634,7 +1634,7 @@
                  <string/>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextInteractionFlag::TextBrowserInteraction</set>
+                 <set>Qt::TextBrowserInteraction</set>
                 </property>
                </widget>
               </item>
@@ -1644,7 +1644,7 @@
                  <string/>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextInteractionFlag::TextBrowserInteraction</set>
+                 <set>Qt::TextBrowserInteraction</set>
                 </property>
                </widget>
               </item>
@@ -1654,7 +1654,7 @@
                  <string/>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextInteractionFlag::TextBrowserInteraction</set>
+                 <set>Qt::TextBrowserInteraction</set>
                 </property>
                </widget>
               </item>
@@ -1664,7 +1664,7 @@
                  <string/>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextInteractionFlag::TextBrowserInteraction</set>
+                 <set>Qt::TextBrowserInteraction</set>
                 </property>
                </widget>
               </item>
@@ -1674,7 +1674,7 @@
                  <string/>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextInteractionFlag::TextBrowserInteraction</set>
+                 <set>Qt::TextBrowserInteraction</set>
                 </property>
                </widget>
               </item>
@@ -1684,7 +1684,7 @@
                  <string/>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextInteractionFlag::TextBrowserInteraction</set>
+                 <set>Qt::TextBrowserInteraction</set>
                 </property>
                </widget>
               </item>
@@ -1694,7 +1694,7 @@
                  <string/>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextInteractionFlag::TextBrowserInteraction</set>
+                 <set>Qt::TextBrowserInteraction</set>
                 </property>
                </widget>
               </item>
@@ -1704,7 +1704,7 @@
                  <string/>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextInteractionFlag::TextBrowserInteraction</set>
+                 <set>Qt::TextBrowserInteraction</set>
                 </property>
                </widget>
               </item>
@@ -1789,7 +1789,7 @@
                    <string>0</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -1825,7 +1825,7 @@
                    <string>0</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -1835,7 +1835,7 @@
                    <string>0</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -1845,7 +1845,7 @@
                    <string>0</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -1876,7 +1876,7 @@
                    <string>0</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -1886,7 +1886,7 @@
                    <string>0</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -1909,7 +1909,7 @@
                    <string>0</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -1926,7 +1926,7 @@
                    <string>0</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -1955,7 +1955,7 @@
                    <string>0</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -1965,7 +1965,7 @@
                    <string>0</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -1975,7 +1975,7 @@
                    <string>0</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -1999,7 +1999,7 @@
              <item row="6" column="1">
               <spacer name="verticalSpacer_5">
                <property name="orientation">
-                <enum>Qt::Orientation::Vertical</enum>
+                <enum>Qt::Vertical</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -2047,7 +2047,7 @@
                    <string>0</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -2071,7 +2071,7 @@
                    <string>0</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -2088,7 +2088,7 @@
                    <string>0</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
