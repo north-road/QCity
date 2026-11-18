@@ -10,7 +10,7 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
 )
 
-from qcity.gui.qcity_dock import QCityDockWidget
+from qcity.gui.main_panel import MainPanel
 from qcity.test.utilities import get_qgis_app
 from qcity.test.qcity_test_base import QCityTestBase
 
@@ -30,7 +30,7 @@ class QCityProjectMainWidgetTest(QCityTestBase):
         QgsSettings().clear()
 
     def test_create_database(self) -> None:
-        widget = QCityDockWidget(QgsProject.instance(), self.iface)
+        widget = MainPanel(QgsProject.instance(), self.iface)
 
         with tempfile.TemporaryDirectory() as temp_dir:
             path = os.path.join(temp_dir, "test_database.gpkg")
@@ -42,7 +42,7 @@ class QCityProjectMainWidgetTest(QCityTestBase):
         self.delete_qobject(widget)
 
     def test_add_base_layers(self) -> None:
-        widget = QCityDockWidget(QgsProject.instance(), self.iface)
+        widget = MainPanel(QgsProject.instance(), self.iface)
         widget.add_base_layers()
 
         # This needs to be updated if the base layers are changed
@@ -53,7 +53,7 @@ class QCityProjectMainWidgetTest(QCityTestBase):
 
     def test_load_project(self) -> None:
         path = os.path.join(test_data_path, "filled_test_database.gpkg")
-        widget = QCityDockWidget(QgsProject.instance(), self.iface)
+        widget = MainPanel(QgsProject.instance(), self.iface)
         widget.load_project_database(path)
 
         # This needs to be updated if the base layers are changed

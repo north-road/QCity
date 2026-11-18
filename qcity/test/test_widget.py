@@ -4,7 +4,7 @@ from qgis.PyQt.QtCore import QCoreApplication
 from qgis.core import QgsProject
 from qgis.core import QgsSettings
 
-from qcity.gui.qcity_dock import QCityDockWidget
+from qcity.gui.dock import QCityDock
 from qcity.test.utilities import get_qgis_app, IFACE
 from qcity.test.qcity_test_base import QCityTestBase
 
@@ -22,7 +22,7 @@ class WidgetTest(QCityTestBase):
         QgsSettings().clear()
 
     def test_config_ui(self):
-        ui = QCityDockWidget(QgsProject(), IFACE)
+        ui = QCityDock(QgsProject(), IFACE)
         ui.show()
 
 
