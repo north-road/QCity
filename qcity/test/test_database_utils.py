@@ -135,6 +135,79 @@ class TestDatabaseUtils(QCityTestBase):
         finally:
             SETTINGS_MANAGER.set_default_database_crs(original_crs)
 
+    def test_copy_reprojected_geopackage(self) -> None:
+        from qgis.core import QgsFeature, QgsGeometry, QgsPointXY
+
+        original_crs = SETTINGS_MANAGER.default_database_crs()
+        try:
+            SETTINGS_MANAGER.set_default_database_crs(
+                QgsCoordinateReferenceSystem("EPSG:28356")
+            )
+            with tempfile.TemporaryDirectory() as temp_dir:
+                source_gpkg = os.path.join(temp_dir, "source.gpkg")
+                target_gpkg = os.path.join(temp_dir, "reprojected.gpkg")
+
+                DatabaseUtils.create_base_tables(source_gpkg)
+
+                sample_ring = [
+                    QgsPointXY(334000.0, 6250000.0),
+                    QgsPointXY(334100.0, 6250000.0),
+                    QgsPointXY(334100.0, 6250100.0),
+                    QgsPointXY(334000.0, 6250100.0),
+                    QgsPointXY(334000.0, 6250000.0),
+                ]
+                sample_geom = QgsGeometry.fromPolygonXY([sample_ring])
+
+                expected_layers = [
+                    "project_areas",
+                    "development_sites",
+                    "building_levels",
+                ]
+                for layer_name in expected_layers:
+                    edit_vl = QgsVectorLayer(
+                        f"{source_gpkg}|layername={layer_name}", layer_name, "ogr"
+                    )
+                    self.assertTrue(edit_vl.isValid())
+                    self.assertTrue(edit_vl.startEditing())
+
+                    feat = QgsFeature(edit_vl.fields())
+                    feat.setGeometry(sample_geom)
+                    self.assertTrue(edit_vl.addFeature(feat))
+                    self.assertTrue(edit_vl.commitChanges())
+
+                DatabaseUtils.copy_reprojected_geopackage(
+                    source_gpkg, target_gpkg, QgsCoordinateReferenceSystem("EPSG:4326")
+                )
+
+                self.assertTrue(os.path.exists(target_gpkg))
+
+                for layer_name in expected_layers:
+                    src_vl = QgsVectorLayer(
+                        f"{source_gpkg}|layername={layer_name}", layer_name, "ogr"
+                    )
+                    dst_vl = QgsVectorLayer(
+                        f"{target_gpkg}|layername={layer_name}", layer_name, "ogr"
+                    )
+                    self.assertTrue(src_vl.isValid())
+                    self.assertTrue(dst_vl.isValid())
+                    self.assertEqual(src_vl.crs().authid(), "EPSG:28356")
+                    self.assertEqual(dst_vl.crs().authid(), "EPSG:4326")
+                    self.assertEqual(src_vl.featureCount(), 1)
+                    self.assertEqual(dst_vl.featureCount(), 1)
+                    self.assertEqual(dst_vl.fields().names(), src_vl.fields().names())
+
+                    src_feat = next(src_vl.getFeatures())
+                    dst_feat = next(dst_vl.getFeatures())
+                    self.assertTrue(src_feat.hasGeometry())
+                    self.assertTrue(dst_feat.hasGeometry())
+
+                    self.assertEqual(
+                        dst_feat.geometry().asWkt(2),
+                        "MultiPolygon (((151.21 -33.88, 151.21 -33.88, 151.21 -33.88, 151.21 -33.88, 151.21 -33.88)))",
+                    )
+        finally:
+            SETTINGS_MANAGER.set_default_database_crs(original_crs)
+
 
 if __name__ == "__main__":
     suite = unittest.TestLoader().loadTestsFromTestCase(TestDatabaseUtils)

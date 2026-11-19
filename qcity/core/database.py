@@ -1,4 +1,5 @@
 import json
+import os
 from typing import Optional, Dict
 
 from qgis.PyQt.QtCore import QVariant, QDate
@@ -10,10 +11,15 @@ from qgis.core import (
     QgsVectorFileWriter,
     QgsCoordinateTransformContext,
     QgsMemoryProviderUtils,
+    QgsCoordinateReferenceSystem,
+    QgsProviderRegistry,
+    QgsProject,
+    QgsProviderSublayerDetails,
+    QgsCoordinateTransform,
 )
 
-from .settings import SETTINGS_MANAGER
 from .enums import LayerType
+from .settings import SETTINGS_MANAGER
 
 
 class DatabaseUtils:
@@ -183,3 +189,83 @@ class DatabaseUtils:
             if not has_base_height_field:
                 with wrapped_edits(layer) as edits:
                     edits.addAttribute(QgsField("base_height", QVariant.Double))
+
+    @staticmethod
+    def copy_reprojected_geopackage(
+        source_gpkg: str | os.PathLike,
+        target_gpkg: str | os.PathLike,
+        target_crs: QgsCoordinateReferenceSystem,
+    ) -> None:
+        """
+        Copies all vector tables from an existing GeoPackage into a new GeoPackage,
+
+        reprojecting every layer to a new CRS
+        """
+        source_path = os.fspath(source_gpkg)
+        target_path = os.fspath(target_gpkg)
+
+        if not os.path.exists(source_path):
+            raise FileNotFoundError(f"Source GeoPackage not found: {source_path}")
+
+        if os.path.abspath(source_path) == os.path.abspath(target_path):
+            raise ValueError("Target GeoPackage path must differ from source path.")
+
+        sublayer_details = QgsProviderRegistry.instance().querySublayers(source_path)
+        if not sublayer_details:
+            raise RuntimeError(f"No sublayers found in GeoPackage: {source_path}")
+
+        target_dir = os.path.dirname(os.path.abspath(target_path))
+        if target_dir:
+            os.makedirs(target_dir, exist_ok=True)
+
+        if os.path.exists(target_path):
+            os.remove(target_path)
+
+        transform_context = QgsProject.instance().transformContext()
+        layer_options = QgsProviderSublayerDetails.LayerOptions(transform_context)
+        file_exists = False
+
+        for details in sublayer_details:
+            if details.type() != Qgis.LayerType.Vector:
+                continue
+
+            layer_name = details.name()
+            map_layer = details.toLayer(layer_options)
+            if not isinstance(map_layer, QgsVectorLayer) or not map_layer.isValid():
+                raise RuntimeError(
+                    f"Failed to load vector sublayer '{layer_name}' from {source_path}"
+                )
+
+            options = QgsVectorFileWriter.SaveVectorOptions()
+            options.driverName = "GPKG"
+            options.fileEncoding = map_layer.dataProvider().encoding() or "UTF-8"
+            options.ct = QgsCoordinateTransform(
+                map_layer.crs(), target_crs, QgsProject.instance()
+            )
+            options.layerName = layer_name
+
+            if not file_exists:
+                options.actionOnExistingFile = (
+                    QgsVectorFileWriter.ActionOnExistingFile.CreateOrOverwriteFile
+                )
+            else:
+                options.actionOnExistingFile = (
+                    QgsVectorFileWriter.ActionOnExistingFile.CreateOrOverwriteLayer
+                )
+
+            error, error_msg, _, _ = QgsVectorFileWriter.writeAsVectorFormatV3(
+                layer=map_layer,
+                fileName=target_path,
+                transformContext=transform_context,
+                options=options,
+            )
+
+            if error != QgsVectorFileWriter.WriterError.NoError:
+                raise RuntimeError(
+                    f"Failed to write reprojected layer '{layer_name}' to {target_path}: {error_msg}"
+                )
+
+            file_exists = True
+
+        if not file_exists:
+            raise RuntimeError(f"No vector layers found in GeoPackage: {source_path}")
