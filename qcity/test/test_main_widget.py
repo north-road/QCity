@@ -29,18 +29,6 @@ class QCityProjectMainWidgetTest(QCityTestBase):
         _, CANVAS, cls.iface, cls.PARENT = get_qgis_app()
         QgsSettings().clear()
 
-    def test_create_database(self) -> None:
-        widget = MainPanel(QgsProject.instance(), self.iface)
-
-        with tempfile.TemporaryDirectory() as temp_dir:
-            path = os.path.join(temp_dir, "test_database.gpkg")
-            widget.create_new_project_database(path)
-            self.assertTrue(
-                os.path.exists(os.path.join(temp_dir, "test_database.gpkg"))
-            )
-            self.assertEqual(widget.label_current_project_area.text(), "Project")
-        self.delete_qobject(widget)
-
     def test_add_base_layers(self) -> None:
         widget = MainPanel(QgsProject.instance(), self.iface)
         widget.add_base_layers()

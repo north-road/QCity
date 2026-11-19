@@ -36,6 +36,7 @@ from ..core import SETTINGS_MANAGER, block_zoom_to_feature
 from .gui_utils import GuiUtils
 from .settings_panel import SettingsPanel
 from .database_settings import DatabaseSettingsPanel
+from .new_db_wizard import NewDatabaseWizard
 
 WIDGET, _ = uic.loadUiType(GuiUtils.get_ui_file_path("main_panel.ui"))
 
@@ -206,12 +207,7 @@ class MainPanel(WIDGET, QgsPanelWidget):
                 self.tr("Please see QCity documentation")
             )
 
-    def create_new_project_database(
-        self, file_name: Optional[str] = None, selected_filter: str = ".gpkg"
-    ) -> None:
-
-        from .new_db_wizard import NewDatabaseWizard
-
+    def create_new_project_database(self, file_name: Optional[str] = None) -> None:
         wizard = NewDatabaseWizard()
         if not wizard.exec():
             return
