@@ -93,6 +93,7 @@ class DatabaseSettingsPanel(WIDGET, QgsPanelWidget):
                 QgsProject.instance(), current_path, gpkg_path
             )
             SETTINGS_MANAGER.set_database_path(gpkg_path)
+            QgsProject.instance().setDirty()
 
             self._db_crs = dest_crs
             self.label_current_crs.setText(
