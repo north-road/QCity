@@ -2,12 +2,16 @@ from qgis.PyQt import uic
 
 from qgis.PyQt.QtWidgets import QWidget
 
-from qgis.gui import QgsPanelWidget
+from qgis.core import Qgis
+from qgis.gui import QgsPanelWidget, QgsProjectionSelectionTreeWidget
 
 from .gui_utils import GuiUtils
-from qcity.core import SETTINGS_MANAGER
 
 WIDGET, _ = uic.loadUiType(GuiUtils.get_ui_file_path("database_settings.ui"))
+
+from ..core import DatabaseUtils, get_project_controller, LayerType
+
+from .crs_selector import CrsSelectorDialog
 
 
 class DatabaseSettingsPanel(WIDGET, QgsPanelWidget):
@@ -22,5 +26,25 @@ class DatabaseSettingsPanel(WIDGET, QgsPanelWidget):
 
         self.panelAccepted.connect(self._save_settings)
 
+        project_controller = get_project_controller()
+
+        layer = project_controller.get_building_levels_layer()
+
+        self._db_crs = layer.crs()
+        self.label_current_crs.setText(
+            self._db_crs.userFriendlyIdentifier(Qgis.CrsIdentifierType.MediumString)
+        )
+
+        self.button_change_crs.clicked.connect(self._change_crs)
+
     def _save_settings(self):
         pass
+
+    def _change_crs(self):
+        dlg = CrsSelectorDialog()
+        dlg.set_crs(self._db_crs)
+        if dlg.exec():
+            self._db_crs = dlg.crs()
+            self.label_current_crs.setText(
+                self._db_crs.userFriendlyIdentifier(Qgis.CrsIdentifierType.MediumString)
+            )

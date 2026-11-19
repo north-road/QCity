@@ -22,25 +22,20 @@ from qcity.core import SETTINGS_MANAGER
 
 class CrsSelector(QWidget):
     crs_double_clicked = pyqtSignal()
+    crs_changed = pyqtSignal()
 
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
 
         layout = QVBoxLayout()
-
-        group = QGroupBox(self.tr("Select CRS for QCity database"))
-        layout.addWidget(group)
         layout.setContentsMargins(0, 0, 0, 0)
-
-        group_layout = QVBoxLayout()
 
         self._crs_widget = QgsProjectionSelectionTreeWidget()
         self._crs_widget.setCrs(SETTINGS_MANAGER.default_database_crs())
-        group_layout.addWidget(self._crs_widget, 1)
+        layout.addWidget(self._crs_widget, 1)
 
         self._crs_widget.projectionDoubleClicked.connect(self.crs_double_clicked)
-
-        group.setLayout(group_layout)
+        self._crs_widget.crsSelected.connect(self.crs_changed)
 
         self.setLayout(layout)
 
@@ -73,10 +68,15 @@ class CrsSelectorDialog(QDialog):
         self.setObjectName("CrsSelectorDialog")
         QgsGui.enableAutoGeometryRestore(self)
         self.setWindowTitle(self.tr("QCity Database CRS"))
-
         layout = QVBoxLayout()
+
+        group = QGroupBox(self.tr("Select CRS for QCity database"))
+        layout.addWidget(group)
+
+        group_layout = QVBoxLayout()
         self._crs_widget = CrsSelector()
-        layout.addWidget(self._crs_widget, 1)
+        group_layout.addWidget(self._crs_widget, 1)
+        group.setLayout(group_layout)
 
         self._button_box = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel

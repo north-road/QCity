@@ -209,20 +209,18 @@ class MainPanel(WIDGET, QgsPanelWidget):
     def create_new_project_database(
         self, file_name: Optional[str] = None, selected_filter: str = ".gpkg"
     ) -> None:
-        """Opens a QFileDialog and returns the path to the new project Geopackage."""
-        # Have the file_name as an argument to enable testing
-        if not file_name:
-            file_name, selected_filter = QFileDialog.getSaveFileName(
-                self,
-                self.tr("New QCity Package"),
-                SETTINGS_MANAGER.last_used_database_folder(),
-                "GeoPackage (*.gpkg)",
-            )
 
-        if not file_name:
-            return None
+        from .new_db_wizard import NewDatabaseWizard
 
-        gpkg_path = QgsFileUtils.addExtensionFromFilter(file_name, selected_filter)
+        wizard = NewDatabaseWizard()
+        if not wizard.exec():
+            return
+
+        config = wizard.config()
+
+        gpkg_path = QgsFileUtils.ensureFileNameHasExtension(
+            config.destination_path, ["gpkg"]
+        )
         SETTINGS_MANAGER.set_last_used_database_folder(os.path.split(gpkg_path)[0])
 
         SETTINGS_MANAGER.set_database_path(gpkg_path)
