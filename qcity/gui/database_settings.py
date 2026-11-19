@@ -1,15 +1,15 @@
+import os
 from qgis.PyQt import uic
+from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QMessageBox
 
-from qgis.PyQt.QtWidgets import QWidget
-
-from qgis.core import Qgis
-from qgis.gui import QgsPanelWidget, QgsProjectionSelectionTreeWidget
+from qgis.core import Qgis, QgsFileUtils
+from qgis.gui import QgsPanelWidget
 
 from .gui_utils import GuiUtils
 
 WIDGET, _ = uic.loadUiType(GuiUtils.get_ui_file_path("database_settings.ui"))
 
-from ..core import DatabaseUtils, get_project_controller, LayerType
+from ..core import get_project_controller, SETTINGS_MANAGER, DatabaseUtils
 
 from .crs_selector import CrsSelectorDialog
 
@@ -44,7 +44,53 @@ class DatabaseSettingsPanel(WIDGET, QgsPanelWidget):
         dlg = CrsSelectorDialog()
         dlg.set_crs(self._db_crs)
         if dlg.exec():
-            self._db_crs = dlg.crs()
+            QMessageBox.information(
+                self,
+                self.tr("Change Database CRS"),
+                self.tr(
+                    "To change the CRS of an existing QCity database a new copy of this database must be created. Please select the path to store the new database."
+                ),
+                QMessageBox.StandardButton.Ok,
+            )
+
+            current_path = SETTINGS_MANAGER.get_database_path()
+
+            while True:
+                file_name, selected_filter = QFileDialog.getSaveFileName(
+                    self,
+                    self.tr("New QCity Package"),
+                    SETTINGS_MANAGER.last_used_database_folder(),
+                    "GeoPackage (*.gpkg)",
+                )
+                if not file_name:
+                    return
+
+                gpkg_path = QgsFileUtils.addExtensionFromFilter(
+                    file_name, selected_filter
+                )
+
+                if (
+                    os.path.exists(current_path)
+                    and os.path.exists(gpkg_path)
+                    and os.path.samefile(current_path, gpkg_path)
+                ):
+                    QMessageBox.warning(
+                        self,
+                        self.tr("Invalid Database Path"),
+                        self.tr(
+                            "The new database path must be a different file to the existing database."
+                        ),
+                        QMessageBox.StandardButton.Ok,
+                    )
+
+                    continue
+                break
+
+            dest_crs = dlg.crs()
+            DatabaseUtils.copy_reprojected_geopackage(current_path, gpkg_path, dest_crs)
+            print(gpkg_path)
+
+            self._db_crs = dest_crs
             self.label_current_crs.setText(
                 self._db_crs.userFriendlyIdentifier(Qgis.CrsIdentifierType.MediumString)
             )
