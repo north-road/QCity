@@ -1,10 +1,11 @@
 import os
 from qgis.PyQt import uic
+from qgis.PyQt.QtCore import QDir
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QMessageBox
 
-from qgis.core import Qgis, QgsFileUtils
+from qgis.core import Qgis, QgsFileUtils, QgsProjectUtils, QgsProject
 from qgis.gui import QgsPanelWidget
-
+from qgis.utils import iface
 from .gui_utils import GuiUtils
 
 WIDGET, _ = uic.loadUiType(GuiUtils.get_ui_file_path("database_settings.ui"))
@@ -88,9 +89,20 @@ class DatabaseSettingsPanel(WIDGET, QgsPanelWidget):
 
             dest_crs = dlg.crs()
             DatabaseUtils.copy_reprojected_geopackage(current_path, gpkg_path, dest_crs)
-            print(gpkg_path)
+            QgsProjectUtils.updateLayerPath(
+                QgsProject.instance(), current_path, gpkg_path
+            )
+            SETTINGS_MANAGER.set_database_path(gpkg_path)
 
             self._db_crs = dest_crs
             self.label_current_crs.setText(
                 self._db_crs.userFriendlyIdentifier(Qgis.CrsIdentifierType.MediumString)
             )
+
+            if iface is not None:
+                iface.messageBar().pushSuccess(
+                    "",
+                    self.tr(
+                        "QCity database copied to {}, and existing QGIS project updated"
+                    ).format(QDir.toNativeSeparators(gpkg_path)),
+                )
