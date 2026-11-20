@@ -47,6 +47,7 @@ class ReassignBuildingLevelsAlgorithm(QCityAlgorithm):
         self.building_levels_crs = None
         self.building_level_count = None
         self.development_sites_source = None
+        self.selected_level_fids = None
         self.updates = None
 
     def name(self) -> str:
@@ -111,6 +112,11 @@ class ReassignBuildingLevelsAlgorithm(QCityAlgorithm):
             development_sites_layer
         )
 
+        if self.parameterAsBool(parameters, self.ONLY_SELECTED, context):
+            self.selected_level_fids = building_levels_layer.selectedFeatureIds()
+            if len(self.selected_level_fids) == 0:
+                raise QgsProcessingException(self.tr("No building levels are selected"))
+
         return True
 
     def processAlgorithm(
@@ -119,8 +125,6 @@ class ReassignBuildingLevelsAlgorithm(QCityAlgorithm):
         context: QgsProcessingContext,
         feedback: QgsProcessingFeedback,
     ):
-        controller = get_project_controller()
-
         dev_sites = {}
         dev_site_index = QgsSpatialIndex()
 
@@ -135,7 +139,13 @@ class ReassignBuildingLevelsAlgorithm(QCityAlgorithm):
             dev_site_index.addFeature(dev_site)
 
         updates = {}
-        for idx, building_level in enumerate(self.building_levels_source.getFeatures()):
+
+        building_request = QgsFeatureRequest()
+        if self.selected_level_fids is not None:
+            building_request.setFilterFids(self.selected_level_fids)
+        for idx, building_level in enumerate(
+            self.building_levels_source.getFeatures(building_request)
+        ):
             if feedback.isCanceled():
                 break
             feedback.setProgress(100 * idx / self.building_level_count)
