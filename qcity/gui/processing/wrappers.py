@@ -43,7 +43,7 @@ class QCityProjectAreaWidgetWrapper(QgsAbstractProcessingParameterWidgetWrapper)
             }
             names_sorted = sorted(list(name_to_id.keys()), key=str.casefold)
             for name in names_sorted:
-                self._combo.addItem(name, name_to_id[name])
+                self._combo.addItem(name, name)
 
         self._combo.currentIndexChanged.connect(
             lambda: self.widgetValueHasChanged.emit(self)
@@ -58,7 +58,7 @@ class QCityProjectAreaWidgetWrapper(QgsAbstractProcessingParameterWidgetWrapper)
             self._combo.setCurrentIndex(idx)
 
     def widgetValue(self):
-        return self._combo.currentText() if self._combo else None
+        return self._combo.currentData() if self._combo else None
 
 
 class QCityProjectAreaWidgetFactory(QgsProcessingParameterWidgetFactoryInterface):
