@@ -7,6 +7,7 @@ import typing
 
 from qgis.core import (
     QgsProcessingContext,
+    QgsExpression,
     QgsProcessingException,
     QgsProcessingFeedback,
     QgsProcessingOutputVectorLayer,
@@ -35,7 +36,7 @@ class ReassignBuildingLevelsAlgorithm(QCityAlgorithm):
     Reassigns building levels to the development site they overlap most
     """
 
-    INPUT = "INPUT"
+    PROJECT_AREA = "PROJECT_AREA"
     ONLY_SELECTED = "ONLY_SELECTED"
     OUTPUT = "OUTPUT"
 
@@ -48,6 +49,8 @@ class ReassignBuildingLevelsAlgorithm(QCityAlgorithm):
         self.building_level_count = None
         self.development_sites_source = None
         self.selected_level_fids = None
+        self.project_area_pk = None
+        self.project_area_name = None
         self.updates = None
 
     def name(self) -> str:
@@ -66,7 +69,9 @@ class ReassignBuildingLevelsAlgorithm(QCityAlgorithm):
 
     def initAlgorithm(self, config=None) -> None:
         project_area_param = QCityProjectAreaParameterDefinition(
-            self.INPUT, self.tr("Only reassign to development sites in"), optional=True
+            self.PROJECT_AREA,
+            self.tr("Only reassign to development sites in"),
+            optional=True,
         )
         project_area_param.setHelp(
             self.tr(
@@ -104,6 +109,32 @@ class ReassignBuildingLevelsAlgorithm(QCityAlgorithm):
                 self.tr("QCity development sites layer is invalid")
             )
 
+        self.project_area_name = parameters.get(self.PROJECT_AREA)
+        if self.project_area_name:
+            project_area_layer = controller.get_project_area_layer()
+            if project_area_layer is None or not project_area_layer.isValid():
+                raise QgsProcessingException(
+                    self.tr("QCity project area layer is invalid")
+                )
+
+            name_field = DatabaseUtils.name_field_for_layer(LayerType.ProjectAreas)
+            request = QgsFeatureRequest().setFilterExpression(
+                QgsExpression.createFieldEqualityExpression(
+                    name_field, self.project_area_name
+                )
+            )
+            project_area_feature = next(project_area_layer.getFeatures(request), None)
+            if project_area_feature is None or not project_area_feature.isValid():
+                raise QgsProcessingException(
+                    self.tr("Project area '{}' could not be found").format(
+                        self.project_area_name
+                    )
+                )
+
+            self.project_area_pk = project_area_feature[
+                DatabaseUtils.primary_key_for_layer(LayerType.ProjectAreas)
+            ]
+
         self.building_levels_source = QgsVectorLayerFeatureSource(building_levels_layer)
         self.building_levels_crs = building_levels_layer.crs()
         self.building_level_count = building_levels_layer.featureCount()
@@ -130,6 +161,13 @@ class ReassignBuildingLevelsAlgorithm(QCityAlgorithm):
 
         request = QgsFeatureRequest()
         request.setDestinationCrs(self.building_levels_crs, context.transformContext())
+        if self.project_area_pk is not None:
+            request.setFilterExpression(
+                QgsExpression.createFieldEqualityExpression(
+                    DatabaseUtils.foreign_key_for_layer(LayerType.DevelopmentSites),
+                    self.project_area_pk,
+                )
+            )
 
         for dev_site in self.development_sites_source.getFeatures(request):
             if not dev_site.hasGeometry() or dev_site.geometry().isEmpty():
@@ -182,12 +220,22 @@ class ReassignBuildingLevelsAlgorithm(QCityAlgorithm):
                     best_site = site_feature
 
             if best_site is None or best_overlap_area <= 0:
-                feedback.pushWarning(
-                    self.tr(
-                        "Building level {} does not overlap any development "
-                        "sites, skipping".format(building_level.id())
+                if self.project_area_name:
+                    feedback.pushWarning(
+                        self.tr(
+                            "Building level {} does not overlap any development "
+                            "sites in {}, skipping".format(
+                                building_level.id(), self.project_area_name
+                            )
+                        )
                     )
-                )
+                else:
+                    feedback.pushWarning(
+                        self.tr(
+                            "Building level {} does not overlap any development "
+                            "sites, skipping".format(building_level.id())
+                        )
+                    )
                 continue
 
             current_development_site_key = building_level[
