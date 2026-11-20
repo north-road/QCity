@@ -6,8 +6,6 @@ from qgis.PyQt.QtCore import QCoreApplication
 
 from qgis.core import (
     Qgis,
-    QgsApplication,
-    QgsProcessingAlgorithm,
     QgsProcessingParameterDefinition,
     QgsProcessingParameterType,
     QgsProcessingParameterString,
