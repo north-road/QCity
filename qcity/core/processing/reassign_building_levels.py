@@ -29,6 +29,7 @@ from qcity.core.utils import wrapped_edits
 
 from .parameters import QCityProjectAreaParameterDefinition
 from .qcity_algorithm import QCityAlgorithm
+from qcity.gui import GuiUtils
 
 
 class ReassignBuildingLevelsAlgorithm(QCityAlgorithm):
@@ -65,7 +66,35 @@ class ReassignBuildingLevelsAlgorithm(QCityAlgorithm):
         )
 
     def shortHelpString(self) -> str:
-        return self.tr("")
+        return (
+            self.tr(
+                "This QCity algorithm re-assigns building levels to the development sites that are positioned spatially below them."
+            )
+            + "\n\n"
+            + self.tr(
+                "This algorithm can be used together with the copy and move feature in QGIS to copy existing building levels from one QCity development site to another "
+                "and re-assign the copied building levels to the new development site."
+            )
+            + "\n\n"
+            + "<b>"
+            + self.tr(
+                "Initial state, with building levels contained within development site:"
+            )
+            + "</b>\n\n"
+            + GuiUtils.get_svg_as_html("buildings_red.svg", height=140)
+            + "\n\n<b>"
+            + self.tr(
+                "After using the 'Copy and Move' tool to copy the building levels to a new development site:"
+            )
+            + "</b>\n\n"
+            + GuiUtils.get_svg_as_html("buildings_mixed.svg", height=140)
+            + "\n\n<b>"
+            + self.tr(
+                "Running this algorithm changes the assigned development site for the new building levels to the new development site:"
+            )
+            + "</b>\n\n"
+            + GuiUtils.get_svg_as_html("buildings_blue.svg", height=140)
+        )
 
     def initAlgorithm(self, config=None) -> None:
         project_area_param = QCityProjectAreaParameterDefinition(
