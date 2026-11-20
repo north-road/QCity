@@ -24,6 +24,8 @@ from qcity.core import (
 from qcity.core import (
     get_project_controller,
 )
+from qcity.core.utils import wrapped_edits
+
 from .parameters import QCityProjectAreaParameterDefinition
 from .qcity_algorithm import QCityAlgorithm
 
@@ -204,7 +206,10 @@ class ReassignBuildingLevelsAlgorithm(QCityAlgorithm):
                 )
                 continue
 
-            updates[building_level.id()] = best_development_site_key
+            updates[building_level.id()] = (
+                current_development_site_key,
+                best_development_site_key,
+            )
 
         self.updates = updates
         return {}
@@ -212,5 +217,66 @@ class ReassignBuildingLevelsAlgorithm(QCityAlgorithm):
     def postProcessAlgorithm(
         self, context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ):
-        print(self.updates)
-        return {}
+        controller = get_project_controller()
+
+        building_levels_layer = controller.get_building_levels_layer()
+        if building_levels_layer is None or not building_levels_layer.isValid():
+            raise QgsProcessingException(
+                self.tr("QCity building levels layer is invalid")
+            )
+
+        if not self.updates:
+            return {self.OUTPUT: building_levels_layer.id()}
+
+        fk_field_name = DatabaseUtils.foreign_key_for_layer(LayerType.BuildingLevels)
+        fk_field_idx = building_levels_layer.fields().lookupField(fk_field_name)
+        if fk_field_idx < 0:
+            raise QgsProcessingException(
+                self.tr("Foreign key field '{}' not found").format(fk_field_name)
+            )
+
+        affected_site_pks = set()
+
+        site_name_field = DatabaseUtils.name_field_for_layer(LayerType.DevelopmentSites)
+        site_names = {}
+        for pks in set(self.updates.values()):
+            current_development_site_key, new_site_pk = pks
+            site_feature = controller.get_feature_by_pk(
+                LayerType.DevelopmentSites, new_site_pk
+            )
+            if site_feature is not None and site_feature.isValid():
+                site_names[new_site_pk] = site_feature[site_name_field]
+            else:
+                site_names[new_site_pk] = str(new_site_pk)
+
+        with wrapped_edits(building_levels_layer) as edits:
+            for building_level_fid, pks in self.updates.items():
+                current_development_site_key, new_site_pk = pks
+                if not edits.changeAttributeValues(
+                    building_level_fid,
+                    {fk_field_idx: new_site_pk},
+                    {fk_field_idx: current_development_site_key},
+                ):
+                    edits.error_occurred = True
+                    raise QgsProcessingException(
+                        self.tr("Failed to reassign building level {}").format(
+                            building_level_fid
+                        )
+                    )
+                affected_site_pks.add(current_development_site_key)
+                affected_site_pks.add(new_site_pk)
+                feedback.pushInfo(
+                    self.tr("Reassigning building level {} to {}").format(
+                        building_level_fid, site_names[new_site_pk]
+                    )
+                )
+
+        for site_pk in affected_site_pks:
+            site_feature = controller.get_feature_by_pk(
+                LayerType.DevelopmentSites, site_pk
+            )
+            if site_feature is not None and site_feature.isValid():
+                controller.auto_calculate_development_site_floorspace(site_feature.id())
+                controller.update_floor_heights(site_feature.id())
+
+        return {self.OUTPUT: building_levels_layer.id()}
