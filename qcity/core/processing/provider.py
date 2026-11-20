@@ -6,6 +6,7 @@ from qgis.core import QgsApplication, QgsProcessingProvider
 from qcity.gui.gui_utils import GuiUtils
 
 from .reassign_building_levels import ReassignBuildingLevelsAlgorithm
+from .import_development_sites import ImportDevelopmentSitesAlgorithm
 
 
 class QCityProcessingProvider(QgsProcessingProvider):
@@ -15,7 +16,10 @@ class QCityProcessingProvider(QgsProcessingProvider):
 
     def __init__(self):
         super().__init__()
-        self._algorithms = [ReassignBuildingLevelsAlgorithm]
+        self._algorithms = [
+            ImportDevelopmentSitesAlgorithm,
+            ReassignBuildingLevelsAlgorithm,
+        ]
 
     def id(self) -> str:
         return "qcity"
