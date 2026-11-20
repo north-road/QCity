@@ -51,11 +51,16 @@ class ReassignBuildingLevelsAlgorithm(QCityAlgorithm):
         return self.tr("")
 
     def initAlgorithm(self, config=None) -> None:
-        self.addParameter(
-            QCityProjectAreaParameterDefinition(
-                self.INPUT, self.tr("Project area"), optional=True
+        project_area_param = QCityProjectAreaParameterDefinition(
+            self.INPUT, self.tr("Only reassign to development sites in"), optional=True
+        )
+        project_area_param.setHelp(
+            self.tr(
+                "If set, building levels will only be assigned to development sites that are within the selected project area."
             )
         )
+
+        self.addParameter(project_area_param)
 
         self.addParameter(
             QgsProcessingParameterBoolean(
